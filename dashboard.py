@@ -215,7 +215,7 @@ with tabs[0]:
             'Id': 'count',
             'revenue': 'sum',
             'Deal_Age_days': 'median',
-            'SLA': lambda x: x.mean().total_seconds() / 3600 if pd.notna(x).any() else 0
+            'SLA': lambda x: pd.to_timedelta(x).mean().total_seconds() / 3600 if pd.notna(x).any() and any(pd.notna(x)) else 0
         }).round(1)
         
         st.dataframe(
@@ -313,7 +313,7 @@ with tabs[2]:
             'revenue': 'sum',
             'is_paid': 'mean',
             'Deal_Age_days': 'median',
-            'SLA': lambda x: x.mean().total_seconds() / 3600 if pd.notna(x).any() else None
+            'SLA': lambda x: pd.to_timedelta(x).mean().total_seconds() / 3600 if pd.notna(x).any() and any(pd.notna(x)) else None
         }).sort_values('revenue', ascending=False)
         
         manager_stats['Конверсия'] = (manager_stats['is_paid'] * 100).round(1)
@@ -399,7 +399,7 @@ with tabs[3]:
     with col2:
         st.markdown('<div class="section-header">ТИПЫ ОПЛАТЫ</div>', unsafe_allow_html=True)
         
-        # Анализ типов оплата
+        # Анализ типов оплаты
         if 'Payment_Type_Recovered' in filtered_deals.columns:
             payment_stats = filtered_deals.groupby('Payment_Type_Recovered').agg({
                 'Id': 'count',
