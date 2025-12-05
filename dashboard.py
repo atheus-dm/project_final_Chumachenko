@@ -291,6 +291,8 @@ def calculate_business_metrics():
     ]
 
     summary_df = pd.DataFrame(summary_rows, columns=['Metric', 'Value', 'Unit'])
+    date_min = contacts['Created Time'].min() if 'Created Time' in contacts.columns else None
+    date_max = contacts['Created Time'].max() if 'Created Time' in contacts.columns else None
     
     return summary_df, date_min, date_max, TOTAL_UA, TOTAL_B_CORRECT, total_revenue, total_marketing_spend
 
