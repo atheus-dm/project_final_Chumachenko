@@ -32,10 +32,10 @@ st.markdown("""
 @st.cache_data(ttl=3600)
 def load_all_data():
     """Загрузка всех очищенных данных"""
-    deals = pd.read_pickle('deals_clean.pkl')
-    spend = pd.read_pickle('spend_clean.pkl')
-    contacts = pd.read_pickle('contacts_clean.pkl')
-    calls = pd.read_pickle('calls_clean.pkl')
+    deals = pd.read_parquet('deals_clean.parquet')
+    spend = pd.read_parquet('spend_clean.parquet')
+    contacts = pd.read_parquet('contacts_clean.parquet')
+    calls = pd.read_parquet('calls_clean.parquet')
     
     # Дополнительные преобразования
     if 'Created Time' in deals.columns:
