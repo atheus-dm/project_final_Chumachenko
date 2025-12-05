@@ -26,13 +26,35 @@ st.markdown("""
 <style>
     .main-title {font-size: 2rem; color: #1E3A8A; font-weight: 700; margin-bottom: 0.5rem;}
     .section-title {font-size: 1.3rem; color: #374151; font-weight: 600; margin-top: 1.5rem; padding-bottom: 0.3rem; border-bottom: 2px solid #3B82F6;}
-    .metric-box {background: #f8fafc; padding: 1rem; border-radius: 0.5rem; margin: 0.3rem 0; border: 1px solid #e5e7eb;}
+    .metric-box {
+        background: #f8fafc; 
+        padding: 1rem; 
+        border-radius: 0.5rem; 
+        margin: 0.3rem 0; 
+        border: 1px solid #e5e7eb;
+        color: #000000 !important;
+        font-weight: 600;
+    }
     .dataframe-table {font-size: 0.9rem;}
     
-    /* Убираем белую подсветку */
-    div[data-testid="stMetricValue"] {background-color: transparent !important;}
-    div[data-testid="stMetricLabel"] {background-color: transparent !important;}
-    div[data-testid="stMetricDelta"] {background-color: transparent !important;}
+    /* Убираем белую подсветку Streamlit */
+    div[data-testid="stMetric"] {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    div[data-testid="stMetricValue"] {
+        background-color: transparent !important;
+        color: #000000 !important;
+        font-weight: 700 !important;
+    }
+    div[data-testid="stMetricLabel"] {
+        background-color: transparent !important;
+        color: #374151 !important;
+    }
+    div[data-testid="stMetricDelta"] {
+        background-color: transparent !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -199,7 +221,8 @@ def calculate_business_metrics():
         sources_count = filtered_deals['Source'].nunique()
         
         # Средний чек: Revenue / B
-        avg_check = total_revenue / TOTAL_B_CORRECT if TOTAL_B_CORRECT > 0 else 0
+        total_t = active_students_calc['Transactions'].sum() if len(active_students_calc) > 0 else 0
+        avg_check = total_revenue / total_t if total_t > 0 else 0
         
         # Vacuum Win Rate (C1): B / UA
         win_rate_vacuum = (TOTAL_B_CORRECT / TOTAL_UA * 100) if TOTAL_UA > 0 else 0
@@ -264,11 +287,15 @@ def calculate_business_metrics():
             top_product_name = top_product_row['Product'].iloc[0] if len(top_product_row) else "Нет данных"
             
             # Бизнес-LTV (weighted CLTV × B/UA)
+            # Бизнес-LTV
             if product_stats['B'].sum() > 0:
                 cltv_weighted = (product_stats['CLTV'] * product_stats['B']).sum() / product_stats['B'].sum()
             else:
                 cltv_weighted = 0
-            ltv_vacuum_business = cltv_weighted * (TOTAL_B_CORRECT / TOTAL_UA) if TOTAL_UA > 0 else 0
+
+            # LTV = CLTV × C1 (где C1 = B/UA)
+            C1 = TOTAL_B_CORRECT / TOTAL_UA if TOTAL_UA > 0 else 0
+            ltv_vacuum_business = cltv_weighted * C1
     
     # --- Сводный df ---
     summary_rows = [
@@ -287,7 +314,7 @@ def calculate_business_metrics():
         ('Время закрытия сделки (медиана)', median_deal_age, 'дн'),
         ('Время закрытия сделки (среднее)', mean_deal_age, 'дн'),
         ('Топовый продукт по выручке', top_product_name, 'str'),
-        ('Бизнес-LTV (weighted CLTV × B/UA)', ltv_vacuum_business, '€'),
+        ('Бизнес-LTV', ltv_vacuum_business, '€'),
     ]
 
     summary_df = pd.DataFrame(summary_rows, columns=['Metric', 'Value', 'Unit'])
