@@ -1441,7 +1441,7 @@ with tabs[5]:
                 center={"lat": 50.0, "lon": 10.0},
                 title="Карта продаж: размер = сделки, цвет = выручка",
                 color_continuous_scale='RdYlGn',
-                map_style="carto-positron",
+                projection="natural earth",
                 height=600
             )
             fig_map.update_layout(margin={"r":0,"t":40,"l":0,"b":0})
