@@ -222,6 +222,15 @@ def calculate_business_metrics():
         
         # Средний чек: Revenue / B
         total_t = active_students_calc['Transactions'].sum() if len(active_students_calc) > 0 else 0
+        deals_calc = filtered_deals.copy()
+        deals_calc['Transactions'] = np.where(
+            deals_calc.get('Payment_Type_Recovered', None) == 'one payment',
+            1,
+            deals_calc.get('Months of study', pd.Series(index=deals_calc.index, dtype='float')).fillna(1)
+)
+        deals_calc.loc[deals_calc['stage_normalized'] != 'Active Student', 'Transactions'] = 0
+        active_students_calc = deals_calc[deals_calc['stage_normalized'] == 'Active Student']
+        total_t = active_students_calc['Transactions'].sum() if len(active_students_calc) > 0 else 0
         avg_check = total_revenue / total_t if total_t > 0 else 0
         
         # Vacuum Win Rate (C1): B / UA
