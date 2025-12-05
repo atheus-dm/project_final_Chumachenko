@@ -10,6 +10,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
+import io  # Добавлен импорт io для работы с буфером Excel
 
 # ================= НАСТРОЙКА СТРАНИЦЫ =================
 st.set_page_config(
@@ -42,6 +43,10 @@ def load_all_data():
         deals['Created_Date'] = pd.to_datetime(deals['Created Time']).dt.date
         deals['Created_Month'] = pd.to_datetime(deals['Created Time']).dt.to_period('M')
         deals['Created_Week'] = pd.to_datetime(deals['Created Time']).dt.isocalendar().week
+    
+    # Конвертируем timedelta колонки в строки для отображения
+    for col in deals.select_dtypes(include=['timedelta64[ns]']).columns:
+        deals[col] = deals[col].astype(str)
     
     return deals, spend, contacts, calls
 
@@ -394,7 +399,7 @@ with tabs[3]:
     with col2:
         st.markdown('<div class="section-header">ТИПЫ ОПЛАТЫ</div>', unsafe_allow_html=True)
         
-        # Анализ типов оплаты
+        # Анализ типов оплата
         if 'Payment_Type_Recovered' in filtered_deals.columns:
             payment_stats = filtered_deals.groupby('Payment_Type_Recovered').agg({
                 'Id': 'count',
@@ -527,12 +532,16 @@ with tabs[5]:
         )
     
     with col_exp2:
-        excel_buffer = df_to_show.to_excel(index=False)
+        # Исправленный код для экспорта в Excel с использованием буфера
+        excel_buffer = io.BytesIO()
+        df_to_show.to_excel(excel_buffer, index=False, engine='openpyxl')
+        excel_buffer.seek(0)
+        
         st.download_button(
             label="Скачать Excel",
             data=excel_buffer,
             file_name=f"{dataset_choice.lower()}_filtered.xlsx",
-            mime="application/vnd.ms-excel"
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
     
     with col_exp3:
