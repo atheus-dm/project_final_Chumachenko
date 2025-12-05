@@ -1437,7 +1437,7 @@ with tabs[5]:
                 color="Total_Revenue",
                 hover_name="City",
                 hover_data={'Total_Revenue': ':.0f', 'Total_Deals': True, 'Win_Rate': ':.1f', 'Top_Source': True},
-                zoom=4,
+                scope="europe",
                 center={"lat": 50.0, "lon": 10.0},
                 title="Карта продаж: размер = сделки, цвет = выручка",
                 color_continuous_scale='RdYlGn',
