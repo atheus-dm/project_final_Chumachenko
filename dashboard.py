@@ -503,7 +503,7 @@ with tabs[5]:
         city_stats['lat'] = city_stats['City'].map(lambda x: city_coords.get(x, (51.1657, 10.4515))[0])
         city_stats['lon'] = city_stats['City'].map(lambda x: city_coords.get(x, (51.1657, 10.4515))[1])
         
-        fig = px.scatter_map(
+        fig = px.scatter_mapbox(
             city_stats,
             lat="lat",
             lon="lon",
@@ -516,7 +516,10 @@ with tabs[5]:
             title="Карта продаж по городам",
             color_continuous_scale='RdYlGn'
         )
-        fig.update_layout(height=500)
+        fig.update_layout(
+            mapbox_style="carto-positron",
+            height=500
+        )
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
