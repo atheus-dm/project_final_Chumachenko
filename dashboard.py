@@ -691,170 +691,308 @@ with tabs[0]:
             - **ROMI** = CM / AC × 100% (Окупаемость рекламы)
             """)
 
-# ---------- ВКЛАДКА 2: ТОЧКИ РОСТА ----------
+# ---------- ВКЛАДКА 2: ТОЧКИ РОСТА (ПОЛНАЯ ВЕРСИЯ ИЗ ЯЧЕЙКИ 25) ----------
 with tabs[1]:
     st.markdown('<div class="section-title">АНАЛИЗ ТОЧЕК РОСТА (SENSITIVITY ANALYSIS)</div>', unsafe_allow_html=True)
     
-    # Получаем данные
-    total_df, product_econ, growth_summary = calculate_growth_points()
-    
-    if len(total_df) == 0:
-        st.warning("Нет данных для анализа точек роста")
-    else:
-        st.subheader("1. СЦЕНАРИИ РОСТА ДЛЯ ВСЕГО БИЗНЕСА")
-        
-        # Расчет сценариев для TOTAL BUSINESS
-        TOTAL_UA = contacts['Id'].nunique()
-        total_marketing_spend = spend['Spend'].sum()
-        active_students_df = filtered_deals[filtered_deals['stage_normalized'] == 'Active Student']
-        TOTAL_B_CORRECT = active_students_df['Contact Name'].nunique()
-        total_t = active_students_df['Transactions'].sum() if 'Transactions' in active_students_df.columns else 0
-        total_revenue = active_students_df['revenue'].sum()
-        
-        global_row = {
-            'UA': TOTAL_UA,
-            'B': TOTAL_B_CORRECT,
-            'Revenue': total_revenue,
-            'T': total_t,
-            'AC': total_marketing_spend,
-            'C1': TOTAL_B_CORRECT / TOTAL_UA if TOTAL_UA > 0 else 0,
-            'AOV': total_revenue / total_t if total_t > 0 else 0,
-            'APC': total_t / TOTAL_B_CORRECT if TOTAL_B_CORRECT > 0 else 0,
-        }
-        
-        # Функции из ячейки 25
-        GROWTH_PCT = 0.10
-        AC_SCALING_FACTOR = 0.8
-        
-        def calculate_scenario_metrics_simple(ua, c1, aov, apc, ac_base, scenario_name, growth_pct):
-            b = ua * c1 if ua > 0 and c1 > 0 else 0
-            t = b * apc if b > 0 and apc > 0 else 0
-            revenue = t * aov if t > 0 and aov > 0 else 0
-            
-            if "UA" in scenario_name:
-                ac = ac_base * (1 + growth_pct * AC_SCALING_FACTOR)
-            elif "CPA" in scenario_name:
-                ac = ac_base * (1 - growth_pct)
-            else:
-                ac = ac_base
+    # --- НАСТРОЙКИ (из твоей ячейки) ---
+    GROWTH_PCT = 0.10
+    COGS_FIXED_PER_TRANS = 0
+    COGS_PERCENT_FROM_CHECK = 0.0
+    AC_SCALING_FACTOR = 0.8
 
-            cm = revenue - ac
-            romi = (cm / ac * 100) if ac > 0 else 0
-            
-            return {
-                'Scenario': scenario_name,
-                'UA': ua, 'C1': c1, 'B': b, 'AOV': aov, 'APC': apc,
-                'T': t, 'Revenue': revenue, 'AC': ac, 'CM': cm, 'ROMI': romi
-            }
+    # Коэффициенты сложности
+    DIFFICULTY_FACTORS = {
+        'UA': 0.2, 'C1': 0.4, 'AOV': 0.6, 'APC': 0.5, 'CPA': 0.3
+    }
+    REALISM_WEIGHTS = {k: 1 - v for k, v in DIFFICULTY_FACTORS.items()}
+
+    ACTION_INSIGHTS = {
+        'UA': "Масштабирование каналов",
+        'C1': "Оптимизация воронки", 
+        'AOV': "Up-sell и цены",
+        'APC': "Удержание и лояльность",
+        'CPA': "Оптимизация рекламы"
+    }
+    
+    # --- ФУНКЦИИ (из твоей ячейки) ---
+    def calculate_scenario_metrics(ua, c1, aov, apc, ac_base, product_name, scenario_name, growth_pct):
+        b = ua * c1 if ua > 0 and c1 > 0 else 0
+        t = b * apc if b > 0 and apc > 0 else 0
+        revenue = t * aov if t > 0 and aov > 0 else 0
         
-        # Генерация сценариев
-        scenarios_list = []
-        base_ua, base_c1, base_aov, base_apc = global_row['UA'], global_row['C1'], global_row['AOV'], global_row['APC']
-        base_ac = global_row['AC']
+        if "UA" in scenario_name:
+            ac = ac_base * (1 + growth_pct * AC_SCALING_FACTOR)
+        elif "CPA" in scenario_name:
+            ac = ac_base * (1 - growth_pct)
+        else:
+            ac = ac_base
+
+        cogs_total = (revenue * COGS_PERCENT_FROM_CHECK) + (t * COGS_FIXED_PER_TRANS)
+        cogs_per_trans = cogs_total / t if t > 0 else 0
         
-        scenarios_list.append(calculate_scenario_metrics_simple(
-            base_ua, base_c1, base_aov, base_apc, base_ac, "BASELINE", 0))
+        cltv = (aov - cogs_per_trans) * apc if aov > 0 and cogs_per_trans >= 0 and apc > 0 else 0
+        ltv = cltv * c1 if cltv > 0 and c1 > 0 else 0
+        
+        cm = revenue - ac - cogs_total
+        romi = (cm / ac * 100) if ac > 0 else 0
+        cpa = ac / ua if ua > 0 else 0
+        cac = ac / b if b > 0 else 0
+        
+        scenario_type = 'BASELINE'
+        if scenario_name != 'BASELINE':
+            if 'C1' in scenario_name: scenario_type = 'C1'
+            elif 'AOV' in scenario_name: scenario_type = 'AOV'
+            elif 'APC' in scenario_name: scenario_type = 'APC'
+            elif 'CPA' in scenario_name: scenario_type = 'CPA'
+            elif 'UA' in scenario_name: scenario_type = 'UA'
+        
+        return {
+            'Scenario': scenario_name, 'Scenario_Type': scenario_type, 'Growth_Pct': growth_pct,
+            'Product': product_name, 'UA': ua, 'C1': c1, 'B': b, 'AOV': aov, 'APC': apc, 
+            'T': t, 'Revenue': revenue, 'AC': ac, 'CLTV': cltv, 'LTV': ltv, 
+            'CPA': cpa, 'CAC': cac, 'CM': cm, 'ROMI': romi,
+            'Realism_Weight': REALISM_WEIGHTS.get(scenario_type, 0.5)
+        }
+
+    def generate_scenarios_for_row(row, product_name):
+        base_ua, base_c1, base_aov, base_apc = row['UA'], row['C1'], row['AOV'], row['APC']
+        base_ac = row['AC'] if 'AC' in row else 0
+        
+        scenarios = []
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov, base_apc, base_ac, product_name, "BASELINE", 0))
         
         g = GROWTH_PCT
-        scenarios_list.append(calculate_scenario_metrics_simple(
-            base_ua * (1 + g), base_c1, base_aov, base_apc, base_ac, f"UA +{int(g*100)}%", g))
-        scenarios_list.append(calculate_scenario_metrics_simple(
-            base_ua, base_c1 * (1 + g), base_aov, base_apc, base_ac, f"C1 +{int(g*100)}%", g))
-        scenarios_list.append(calculate_scenario_metrics_simple(
-            base_ua, base_c1, base_aov * (1 + g), base_apc, base_ac, f"AOV +{int(g*100)}%", g))
-        scenarios_list.append(calculate_scenario_metrics_simple(
-            base_ua, base_c1, base_aov, base_apc * (1 + g), base_ac, f"APC +{int(g*100)}%", g))
-        scenarios_list.append(calculate_scenario_metrics_simple(
-            base_ua, base_c1, base_aov, base_apc, base_ac, f"CPA -{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua * (1 + g), base_c1, base_aov, base_apc, base_ac, product_name, f"UA +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1 * (1 + g), base_aov, base_apc, base_ac, product_name, f"C1 +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov * (1 + g), base_apc, base_ac, product_name, f"AOV +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov, base_apc * (1 + g), base_ac, product_name, f"APC +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov, base_apc, base_ac, product_name, f"CPA -{int(g*100)}%", g))
         
-        scenarios_df = pd.DataFrame(scenarios_list)
+        return pd.DataFrame(scenarios)
+
+    def run_sensitivity_analysis(row, product_name):
+        base_cm = row['CM'] if 'CM' in row else 0
+        results = []
         
-        # Расчет прироста
-        base_cm = scenarios_df.loc[0, 'CM']
-        scenarios_df['CM_Growth'] = scenarios_df['CM'] - base_cm
-        scenarios_df['CM_Growth_Pct'] = (scenarios_df['CM_Growth'] / abs(base_cm) * 100) if abs(base_cm) > 0 else 0
-        
-        # Отображаем таблицу
-        display_cols = ['Scenario', 'UA', 'C1', 'B', 'AOV', 'APC', 'Revenue', 'AC', 'CM', 'CM_Growth', 'ROMI']
-        display_df = scenarios_df[display_cols].sort_values('CM_Growth', ascending=False)
-        
-        st.dataframe(
-            display_df.style.format({
-                'UA': '{:,.0f}', 'B': '{:,.0f}', 'Revenue': '{:,.0f}', 'AC': '{:,.0f}', 
-                'CM': '{:,.0f}', 'CM_Growth': '{:+,.0f}', 'ROMI': '{:.1f}%',
-                'C1': '{:.2%}', 'AOV': '{:,.1f}', 'APC': '{:.2f}'
-            }).background_gradient(subset=['CM_Growth', 'ROMI'], cmap='RdYlGn'),
-            use_container_width=True
-        )
-        
-        # Анализ чувствительности
-        st.subheader("2. АНАЛИЗ ЧУВСТВИТЕЛЬНОСТИ (±5-10%)")
-        
-        sensitivity_results = []
         metrics = ['UA', 'C1', 'AOV', 'APC']
         steps = [-0.10, -0.05, 0.05, 0.10]
         
         for metric in metrics:
             for step in steps:
-                u = global_row['UA'] * (1 + step) if metric == 'UA' else global_row['UA']
-                c = global_row['C1'] * (1 + step) if metric == 'C1' else global_row['C1']
-                a = global_row['AOV'] * (1 + step) if metric == 'AOV' else global_row['AOV']
-                p = global_row['APC'] * (1 + step) if metric == 'APC' else global_row['APC']
+                u = row['UA'] * (1 + step) if metric == 'UA' else row['UA']
+                c = row['C1'] * (1 + step) if metric == 'C1' else row['C1']
+                a = row['AOV'] * (1 + step) if metric == 'AOV' else row['AOV']
+                p = row['APC'] * (1 + step) if metric == 'APC' else row['APC']
                 
-                cost = global_row['AC'] * (1 + step * AC_SCALING_FACTOR) if metric == 'UA' else global_row['AC']
+                cost = row['AC'] * (1 + step * AC_SCALING_FACTOR) if metric == 'UA' else row['AC']
                 
                 b = u * c if u > 0 and c > 0 else 0
                 t = b * p if b > 0 and p > 0 else 0
                 rev = t * a if t > 0 and a > 0 else 0
-                cm = rev - cost
+                cogs = (rev * COGS_PERCENT_FROM_CHECK) + (t * COGS_FIXED_PER_TRANS)
+                cm = rev - cost - cogs
                 
                 cm_impact = cm - base_cm
                 cm_impact_pct = (cm_impact / abs(base_cm) * 100) if abs(base_cm) > 0 else 0
                 
-                sensitivity_results.append({
-                    'Metric': metric, 
-                    'Change': f"{step:+.0%}",
+                results.append({
+                    'Metric': metric, 'Change': f"{step:+.0%}",
                     'New_Value': (u if metric=='UA' else c if metric=='C1' else a if metric=='AOV' else p),
-                    'CM_Impact': cm_impact, 
-                    'CM_Impact_Pct': cm_impact_pct
+                    'CM_Impact': cm_impact, 'CM_Impact_Pct': cm_impact_pct
                 })
         
-        sensitivity_df = pd.DataFrame(sensitivity_results)
+        return pd.DataFrame(results)
+    
+    # --- РАСЧЕТ TOTAL BUSINESS (как в ячейке 25) ---
+    st.subheader("1. АНАЛИЗ ВСЕГО БИЗНЕСА")
+    
+    # 1. Рассчитываем как в Ячейке 31
+    TOTAL_UA = contacts['Id'].nunique()
+    total_marketing_spend = spend['Spend'].sum()
+
+    # Active Student сделки
+    active_students_df = deals[deals['stage_normalized'] == 'Active Student']
+
+    # Правильный B (уникальные клиенты)
+    TOTAL_B_CORRECT = active_students_df['Contact Name'].nunique()
+
+    # Суммируем транзакции и выручку
+    total_t = active_students_df['Transactions'].sum() if 'Transactions' in active_students_df.columns else 0
+    total_revenue = active_students_df['revenue'].sum()
+
+    # Расчет метрик
+    global_row = {
+        'UA': TOTAL_UA,
+        'B': TOTAL_B_CORRECT,  # 829
+        'Revenue': total_revenue,
+        'T': total_t,
+        'AC': total_marketing_spend,
+        'C1': TOTAL_B_CORRECT / TOTAL_UA if TOTAL_UA > 0 else 0,
+        'AOV': total_revenue / total_t if total_t > 0 else 0,
+        'APC': total_t / TOTAL_B_CORRECT if TOTAL_B_CORRECT > 0 else 0,
+    }
+
+    # Расчет CM как в Ячейке 31
+    cogs_global = (total_revenue * COGS_PERCENT_FROM_CHECK) + (total_t * COGS_FIXED_PER_TRANS)
+    global_row['CM'] = total_revenue - total_marketing_spend - cogs_global
+    
+    st.write(f"**Параметры (рассчитаны из исходных данных):**")
+    st.write(f"- UA: {global_row['UA']:,.0f}")
+    st.write(f"- B: {global_row['B']:,.0f} (уникальные клиенты)")
+    st.write(f"- C1: {global_row['C1']:.2%}")
+    st.write(f"- AOV: {global_row['AOV']:,.1f}")
+    st.write(f"- APC: {global_row['APC']:.2f}")
+    st.write(f"- AC: {global_row['AC']:,.0f}")
+    st.write(f"- CM: {global_row['CM']:,.0f}")
+    
+    # Сценарии роста
+    global_scenarios = generate_scenarios_for_row(global_row, "TOTAL BUSINESS")
+    
+    if not global_scenarios.empty:
+        base_scenario = global_scenarios[global_scenarios['Scenario'] == 'BASELINE']
+        if not base_scenario.empty:
+            base_cm = base_scenario.iloc[0]['CM']
+            global_scenarios['CM_Growth'] = global_scenarios['CM'] - base_cm
+            global_scenarios['Realistic_Growth'] = global_scenarios['CM_Growth'] * global_scenarios['Realism_Weight']
+    
+    st.subheader("СЦЕНАРИИ РОСТА ДЛЯ ВСЕГО БИЗНЕСА")
+    
+    format_dict = {
+        'UA': '{:,.0f}', 'B': '{:,.0f}', 'T': '{:,.0f}', 'Revenue': '{:,.0f}', 
+        'C1': '{:.2%}', 'ROMI': '{:.0f}%', 'AOV': '{:,.1f}', 'APC': '{:.2f}', 
+        'CLTV': '{:,.0f}', 'LTV': '{:,.1f}', 'AC': '{:,.0f}', 'CPA': '{:,.2f}', 
+        'CAC': '{:,.1f}', 'CM': '{:,.0f}', 'Realistic_Growth': '{:+,.0f}'
+    }
+    
+    cols = ['Scenario', 'UA', 'C1', 'B', 'T', 'AOV', 'APC', 'Revenue', 'AC', 
+            'CPA', 'CAC', 'CLTV', 'LTV', 'CM', 'Realistic_Growth', 'ROMI']
+    
+    sorted_df = global_scenarios[cols].sort_values('Realistic_Growth', ascending=False) if 'Realistic_Growth' in global_scenarios.columns else global_scenarios[cols]
+    
+    st.dataframe(
+        sorted_df.style.format(format_dict).background_gradient(
+            subset=['Realistic_Growth'], cmap='Greens', vmin=0),
+        use_container_width=True
+    )
+    
+    growth_scenarios = global_scenarios[global_scenarios['Scenario'] != 'BASELINE']
+    if not growth_scenarios.empty:
+        best = growth_scenarios.sort_values('Realistic_Growth', ascending=False).iloc[0]
+        st.write(f"**Наилучший сценарий:** {best['Scenario']}")
+        st.write(f"**Прирост CM:** {best['Realistic_Growth']:+,.0f}")
+        st.write(f"**ROMI:** {best['ROMI']:.1f}%")
+        st.write(f"**Действие:** {ACTION_INSIGHTS.get(best['Scenario_Type'], '')}")
+    
+    # Анализ чувствительности
+    st.subheader("2. АНАЛИЗ ЧУВСТВИТЕЛЬНОСТИ (МИКРО-ИЗМЕНЕНИЯ ±5-10%)")
+    
+    sens_df = run_sensitivity_analysis(global_row, "TOTAL")
+    if not sens_df.empty:
+        sens_df = sens_df.sort_values('CM_Impact', ascending=False)
         
-        if len(sensitivity_df) > 0:
-            sensitivity_df = sensitivity_df.sort_values('CM_Impact', ascending=False)
-            st.dataframe(
-                sensitivity_df.style.format({
-                    'New_Value': '{:.2f}', 
-                    'CM_Impact': '{:+,.0f}', 
-                    'CM_Impact_Pct': '{:+.1f}%'
-                }).background_gradient(subset=['CM_Impact'], cmap='RdYlGn'),
-                use_container_width=True
-            )
-            
-            # Ключевые инсайты
-            st.subheader("3. КЛЮЧЕВЫЕ ИНСАЙТЫ")
-            
-            insights = []
-            for metric in ['UA', 'C1', 'AOV', 'APC']:
-                metric_data = sensitivity_df[sensitivity_df['Metric'] == metric]
-                if not metric_data.empty:
-                    max_impact = metric_data.loc[metric_data['CM_Impact'].idxmax()]
-                    insights.append(f"**{metric}**: {max_impact['Change']} → Влияние на CM: {max_impact['CM_Impact']:+,.0f}€")
-            
-            for insight in insights:
-                st.write(f"• {insight}")
+        st.dataframe(
+            sens_df.style.format({
+                'New_Value': '{:.2f}', 'CM_Impact': '{:+,.0f}', 'CM_Impact_Pct': '{:+.1f}%'
+            }).background_gradient(subset=['CM_Impact'], cmap='RdYlGn'),
+            use_container_width=True
+        )
         
-        # Сводная карта приоритетов по продуктам
-        if len(growth_summary) > 0:
+        st.write("**Ключевые инсайты по чувствительности:**")
+        for metric in ['UA', 'C1', 'AOV', 'APC']:
+            metric_data = sens_df[sens_df['Metric'] == metric]
+            if not metric_data.empty:
+                max_impact = metric_data.loc[metric_data['CM_Impact'].idxmax()]
+                st.write(f"- **{metric}**: {max_impact['Change']} → Влияние на CM: {max_impact['CM_Impact']:+,.0f}")
+    
+    # --- АНАЛИЗ ПО ПРОДУКТАМ ---
+    st.subheader("3. АНАЛИЗ ПО ПРОДУКТАМ (ТОП-ПРОДУКТЫ)")
+    
+    # Создаем product_stats как в Ячейке 31
+    product_stats = active_students_df.groupby('Product').agg({
+        'Contact Name': 'nunique', 'revenue': 'sum', 'Transactions': 'sum'
+    }).reset_index().rename(columns={'Contact Name': 'B', 'Transactions': 'T', 'revenue': 'Revenue'})
+
+    product_stats['UA'] = TOTAL_UA
+    product_stats['AC'] = total_marketing_spend
+    product_stats['C1'] = product_stats['B'] / product_stats['UA']
+    product_stats['AOV'] = product_stats['Revenue'] / product_stats['T']
+    product_stats['APC'] = product_stats['T'] / product_stats['B']
+
+    total_cogs_amt = (product_stats['Revenue'] * COGS_PERCENT_FROM_CHECK) + (product_stats['T'] * COGS_FIXED_PER_TRANS)
+    product_stats['COGS'] = total_cogs_amt / product_stats['T']
+    product_stats['CLTV'] = (product_stats['AOV'] - product_stats['COGS']) * product_stats['APC']
+    product_stats['LTV'] = product_stats['CLTV'] * product_stats['C1']
+    product_stats['CPA'] = product_stats['AC'] / product_stats['UA']
+    product_stats['CAC'] = product_stats['AC'] / product_stats['B']
+    product_stats['CM'] = product_stats['Revenue'] - product_stats['AC'] - total_cogs_amt
+    product_stats['ROMI'] = (product_stats['CM'] / product_stats['AC']) * 100
+
+    # Отбираем топ-продукты
+    revenue_threshold = product_stats['Revenue'].max() * 0.1
+    top_products = product_stats[product_stats['Revenue'] > revenue_threshold].copy()
+    
+    if len(top_products) > 0:
+        all_scenarios = []
+        
+        for _, row in top_products.iterrows():
+            product_name = row['Product']
+            
+            with st.expander(f"**{product_name.upper()}**"):
+                scenarios = generate_scenarios_for_row(row, product_name)
+                if not scenarios.empty:
+                    # Расчет прироста
+                    base_scenario = scenarios[scenarios['Scenario'] == 'BASELINE']
+                    if not base_scenario.empty:
+                        base_cm = base_scenario.iloc[0]['CM']
+                        scenarios['CM_Growth'] = scenarios['CM'] - base_cm
+                        scenarios['Realistic_Growth'] = scenarios['CM_Growth'] * scenarios['Realism_Weight']
+                    
+                    # Таблица
+                    display_cols = ['Scenario', 'UA', 'C1', 'B', 'AOV', 'APC', 'Revenue', 'CM', 'Realistic_Growth', 'ROMI']
+                    display_df = scenarios[display_cols].sort_values('Realistic_Growth', ascending=False)
+                    
+                    st.dataframe(
+                        display_df.style.format({
+                            'UA': '{:,.0f}', 'B': '{:,.0f}', 'Revenue': '{:,.0f}', 
+                            'CM': '{:,.0f}', 'Realistic_Growth': '{:+,.0f}', 'ROMI': '{:.1f}%',
+                            'C1': '{:.2%}', 'AOV': '{:,.1f}', 'APC': '{:.2f}'
+                        }).background_gradient(subset=['Realistic_Growth', 'ROMI'], cmap='RdYlGn'),
+                        use_container_width=True
+                    )
+                    
+                    # Лучший сценарий
+                    growth_scenarios = scenarios[scenarios['Scenario'] != 'BASELINE']
+                    if not growth_scenarios.empty:
+                        best = growth_scenarios.sort_values('Realistic_Growth', ascending=False).iloc[0]
+                        st.write(f"**Лучший сценарий:** {best['Scenario']}")
+                        st.write(f"**Прирост CM:** {best['Realistic_Growth']:+,.0f}")
+                        st.write(f"**Действие:** {ACTION_INSIGHTS.get(best['Scenario_Type'], '')}")
+                        
+                        all_scenarios.append({
+                            'Product': product_name, 'Best_Scenario': best['Scenario'],
+                            'Scenario_Type': best['Scenario_Type'], 'Growth_CM': best['Realistic_Growth'],
+                            'Base_CM': scenarios[scenarios['Scenario'] == 'BASELINE'].iloc[0]['CM'],
+                            'Action': ACTION_INSIGHTS.get(best['Scenario_Type'], '')
+                        })
+        
+        # Сводная карта приоритетов
+        if all_scenarios:
             st.subheader("4. СВОДНАЯ КАРТА ПРИОРИТЕТОВ ПО ПРОДУКТАМ")
             
-            growth_summary['Growth_Pct'] = (growth_summary['Growth_CM'] / growth_summary['Base_CM'].abs() * 100)
-            growth_summary['Growth_Pct'] = growth_summary['Growth_Pct'].apply(lambda x: x if abs(x) < 1000 else (1000 if x > 0 else -1000))
-            growth_summary = growth_summary.sort_values('Growth_CM', ascending=False)
+            summary = pd.DataFrame(all_scenarios)
+            summary['Growth_Pct'] = (summary['Growth_CM'] / summary['Base_CM'].abs() * 100)
+            summary['Growth_Pct'] = summary['Growth_Pct'].apply(lambda x: x if abs(x) < 1000 else (1000 if x > 0 else -1000))
+            summary = summary.sort_values('Growth_CM', ascending=False)
             
             st.dataframe(
-                growth_summary.style.format({
+                summary.style.format({
                     'Growth_CM': '{:+,.0f}', 
                     'Base_CM': '{:,.0f}', 
                     'Growth_Pct': '{:+.1f}%'
@@ -862,6 +1000,16 @@ with tabs[1]:
                 .background_gradient(subset=['Growth_Pct'], cmap='RdYlGn', vmin=-100, vmax=100),
                 use_container_width=True
             )
+            
+            st.write("**Рекомендации:**")
+            for scenario_type in ['UA', 'C1', 'AOV', 'APC', 'CPA']:
+                type_scenarios = summary[summary['Scenario_Type'] == scenario_type]
+                if not type_scenarios.empty:
+                    count = len(type_scenarios)
+                    avg_growth = type_scenarios['Growth_CM'].mean()
+                    st.write(f"- **{ACTION_INSIGHTS.get(scenario_type, '')}**: {count} продукт(ов), средний прирост: {avg_growth:+,.0f}")
+    
+    st.success("Анализ завершен")
 
 # ---------- ВКЛАДКА 3: МАРКЕТИНГ ----------
 with tabs[2]:
