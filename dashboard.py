@@ -1,5 +1,5 @@
 """
-Аналитический дашборд школы немецкого языка
+Аналитика онлайн-школы IT специалистов
 Полное соответствие ТЗ + продвинутая аналитика
 """
 
@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 
 # ================= НАСТРОЙКА СТРАНИЦЫ =================
 st.set_page_config(
-    page_title="Аналитика школы немецкого языка",
+    page_title="Аналитика онлайн-школы IT специалистов",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -125,7 +125,7 @@ def apply_all_filters():
 filtered_deals = apply_all_filters() if 'apply_filters' in locals() else deals
 
 # ================= ЗАГОЛОВОК =================
-st.markdown('<div class="main-header">Аналитический дашборд школы немецкого языка</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">Аналитика онлайн-школы IT специалистов</div>', unsafe_allow_html=True)
 st.markdown("Полный анализ эффективности маркетинга, продаж и продуктов")
 
 # ================= КЛЮЧЕВЫЕ МЕТРИКИ =================
