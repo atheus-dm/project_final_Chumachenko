@@ -1773,68 +1773,66 @@ with tabs[7]:
     # 1. ДЕРЕВО МЕТРИК (ячейка 26)
     st.subheader("1. ДЕРЕВО МЕТРИК БИЗНЕСА")
     
-    tree_data = """
-**УРОВЕНЬ 1: Ключевой показатель бизнеса**
-└── Маржинальная прибыль (CM) — Revenue - AC - COGS
+    st.markdown("""
+**УРОВЕНЬ 1: Ключевой показатель бизнеса**  
+└── **Маржинальная прибыль (CM)** — Revenue - AC - COGS
 
-**УРОВЕНЬ 2: Юнит-экономика**
-├── UA (User Acquisition) — Уникальные контакты → COUNTUNIQUE(CONTACTS['Id'])
-├── C1 (Conversion Rate) — Конверсия в покупателя → B / UA
-├── CPA (Cost Per Acquisition) — Стоимость посетителя → AC / UA
-├── AOV (Average Order Value) — Средний чек → Revenue / T
-├── COGS (Cost of Goods Sold) — Себестоимость (моделируемая)
-├── APC (Average Payment Count) — Платежи на клиента → T / B
-├── CPC (Cost Per Click) — Стоимость клика → AC / Clicks
-└── CTR (Click-Through Rate) — Конверсия в клик → Clicks / Impressions
+**УРОВЕНЬ 2: Юнит-экономика**  
+├── **UA (User Acquisition)** — Уникальные контакты → COUNTUNIQUE(CONTACTS['Id'])  
+├── **C1 (Conversion Rate)** — Конверсия в покупателя → B / UA  
+├── **CPA (Cost Per Acquisition)** — Стоимость посетителя → AC / UA  
+├── **AOV (Average Order Value)** — Средний чек → Revenue / T  
+├── **COGS (Cost of Goods Sold)** — Себестоимость (моделируемая)  
+├── **APC (Average Payment Count)** — Платежи на клиента → T / B  
+├── **CPC (Cost Per Click)** — Стоимость клика → AC / Clicks  
+└── **CTR (Click-Through Rate)** — Конверсия в клик → Clicks / Impressions
 
-**УРОВЕНЬ 2.1: Финансовые показатели**
-├── Оборот (Revenue) — Сумма поступлений → SUM(DEALS['revenue'])
-└── ROMI (Return on Marketing) — Окупаемость рекламы → CM / AC
+**УРОВЕНЬ 2.1: Финансовые показатели**  
+├── **Оборот (Revenue)** — Сумма поступлений → SUM(DEALS['revenue'])  
+└── **ROMI (Return on Marketing)** — Окупаемость рекламы → CM / AC
 
-**УРОВЕНЬ 3: Продуктовые метрики**
-├── B (Buyers) — Платящие клиенты → COUNT(DEALS['is_paid'])
-├── AC (Advertising Cost) — Расходы на рекламу → SUM(SPEND['Spend'])
-├── CAC (Customer Acquisition Cost) — Стоимость клиента → AC / B
-├── CLTV (Customer Lifetime Value) — Прибыль с клиента → (AOV - COGS) × APC
-├── LTV (Lifetime Value) — Ценность посетителя → CLTV × C1
-└── T (Transactions) — Всего транзакций → SUM(DEALS['Transactions'])
+**УРОВЕНЬ 3: Продуктовые метрики**  
+├── **B (Buyers)** — Платящие клиенты → COUNT(DEALS['is_paid'])  
+├── **AC (Advertising Cost)** — Расходы на рекламу → SUM(SPEND['Spend'])  
+├── **CAC (Customer Acquisition Cost)** — Стоимость клиента → AC / B  
+├── **CLTV (Customer Lifetime Value)** — Прибыль с клиента → (AOV - COGS) × APC  
+├── **LTV (Lifetime Value)** — Ценность посетителя → CLTV × C1  
+└── **T (Transactions)** — Всего транзакций → SUM(DEALS['Transactions'])
 
-**УРОВЕНЬ 4: Атомные метрики (ключевые данные)**
-├── DEALS['Created Time'] — Дата создания лида
-├── DEALS['Closing Date'] — Дата закрытия сделки
-├── DEALS['Source'] / SPEND['Source'] — Источник трафика
-├── DEALS['Campaign'] — Кампания
-├── DEALS['Product'] — Тип курса
-├── DEALS['Stage'] — Стадия воронки
-├── DEALS['Quality'] — Качество лида
-├── DEALS['City'] — География
-├── SPEND['Clicks'] — Клики по рекламе
+**УРОВЕНЬ 4: Атомные метрики (ключевые данные)**  
+├── DEALS['Created Time'] — Дата создания лида  
+├── DEALS['Closing Date'] — Дата закрытия сделки  
+├── DEALS['Source'] / SPEND['Source'] — Источник трафика  
+├── DEALS['Campaign'] — Кампания  
+├── DEALS['Product'] — Тип курса  
+├── DEALS['Stage'] — Стадия воронки  
+├── DEALS['Quality'] — Качество лида  
+├── DEALS['City'] — География  
+├── SPEND['Clicks'] — Клики по рекламе  
 └── SPEND['Impressions'] — Показы рекламы
 
-**УРОВЕНЬ 5: Ванильные метрики (мониторинг)**
-├── DEALS['SLA'] — Время ответа
-├── DEALS['Level of Deutsch'] — Уровень языка
-├── DEALS['Course duration'] — Длительность курса
-├── CALLS['Call Duration (in seconds)'] — Длительность звонков
-├── CALLS['Call Type'] — Тип звонка
-├── CALLS['Call Status'] — Статус звонка
-├── SPEND['AdGroup'] — Группа объявлений
+**УРОВЕНЬ 5: Ванильные метрики (мониторинг)**  
+├── DEALS['SLA'] — Время ответа  
+├── DEALS['Level of Deutsch'] — Уровень языка  
+├── DEALS['Course duration'] — Длительность курса  
+├── CALLS['Call Duration (in seconds)'] — Длительность звонков  
+├── CALLS['Call Type'] — Тип звонка  
+├── CALLS['Call Status'] — Статус звонка  
+├── SPEND['AdGroup'] — Группа объявлений  
 └── SPEND['Ad'] — Конкретное объявление
 
-**КЛЮЧЕВЫЕ ЗАВИСИМОСТИ**
-- B = UA × C1 (Клиенты = Посетители × Конверсия)
-- Revenue = AOV × T (Оборот = Чек × Транзакции)
-- T = B × APC (Транзакции = Клиенты × Частота)
-- CAC = AC / B (Стоимость клиента = Реклама / Клиенты)
-- CLTV = (AOV - COGS) × APC (Ценность клиента = (Чек - Себестоимость) × Частота)
-- LTV = CLTV × C1 (Ценность посетителя = Ценность клиента × Конверсия)
-- CM = Revenue - AC - COGS (Маржа = Оборот - Реклама - Себестоимость)
-- ROMI = CM / AC (Окупаемость = Маржа / Реклама)
+**КЛЮЧЕВЫЕ ЗАВИСИМОСТИ**  
+- **B = UA × C1** (Клиенты = Посетители × Конверсия)  
+- **Revenue = AOV × T** (Оборот = Чек × Транзакции)  
+- **T = B × APC** (Транзакции = Клиенты × Частота)  
+- **CAC = AC / B** (Стоимость клиента = Реклама / Клиенты)  
+- **CLTV = (AOV - COGS) × APC** (Ценность клиента = (Чек - Себестоимость) × Частота)  
+- **LTV = CLTV × C1** (Ценность посетителя = Ценность клиента × Конверсия)  
+- **CM = Revenue - AC - COGS** (Маржа = Оборот - Реклама - Себестоимость)  
+- **ROMI = CM / AC** (Окупаемость = Маржа / Реклама)  
 
 *Прибыль (Profit) не включена — нет данных о постоянных затратах*
-    """
-    
-    st.markdown(tree_data)
+""")
     
     # 2. HADI-ЦИКЛЫ И A/B ТЕСТЫ (ячейка 27)
     st.subheader("2. HADI-ЦИКЛЫ И A/B ТЕСТИРОВАНИЕ")
