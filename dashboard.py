@@ -162,131 +162,150 @@ def apply_filters():
 
 filtered_deals = apply_filters()
 
-# ========== РАСЧЕТ КЛЮЧЕВЫХ МЕТРИК (как в ячейке 8) ==========
+# ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ КЛЮЧЕВЫХ МЕТРИК ==========
 def calculate_business_metrics():
-    """Расчет ключевых метрик бизнеса как в Executive Summary (ячейка 8)"""
+    """Расчет ключевых метрик бизнеса с ПРАВИЛЬНЫМ AOV (Revenue/T)"""
     
-    # --- Базовые входы ---
+    # Базовые константы
     TOTAL_UA = contacts['Id'].nunique()
+    total_marketing_spend = spend['Spend'].sum()
+    
+    # Активные студенты
     active_students_df = filtered_deals[filtered_deals['stage_normalized'] == 'Active Student']
-    TOTAL_B = active_students_df['Contact Name'].nunique()
-
-    total_revenue = filtered_deals['revenue'].sum()
-    products_count = filtered_deals['Product'].nunique()
-    managers_count = filtered_deals['Deal Owner Name'].nunique()
-    cities_count = filtered_deals['City'].nunique() if 'City' in filtered_deals.columns else 0
-
-    # Средний чек: сумма выручки / количество уникальных клиентов
-    avg_check = total_revenue / TOTAL_B if TOTAL_B > 0 else 0
-
-    # Расходы и источники
-    marketing_spend = spend['Spend'].sum()
-    sources_count = filtered_deals['Source'].nunique()
-
-    # Vacuum Win Rate (C1): B / UA
-    win_rate_vacuum = (TOTAL_B / TOTAL_UA * 100) if TOTAL_UA > 0 else 0
-
-    # Contribution Margin и ROMI
-    cm_total = total_revenue - marketing_spend
-    romi_total = (cm_total / marketing_spend * 100) if marketing_spend > 0 else 0
-
-    # Период покрытия
-    date_min = contacts['Created Time'].min() if 'Created Time' in contacts.columns else None
-    date_max = contacts['Created Time'].max() if 'Created Time' in contacts.columns else None
-
-    # --- Deal Age ---
-    active_student_ids = active_students_df['Id'].unique()
-    closed_deals_clean = filtered_deals[
-        (filtered_deals['Id'].isin(active_student_ids)) &
-        (filtered_deals['Closing Date'].notna()) &
-        (filtered_deals['Deal_Age_days'].notna()) &
-        (filtered_deals['Deal_Age_days'] >= 0)
-    ].copy()
-
-    median_deal_age = closed_deals_clean['Deal_Age_days'].median() if len(closed_deals_clean) > 0 else np.nan
-    mean_deal_age = closed_deals_clean['Deal_Age_days'].mean() if len(closed_deals_clean) > 0 else np.nan
-
-    # --- Продуктовая аналитика (Vacuum) ---
-    filtered_deals['Transactions'] = np.where(
-        filtered_deals.get('Payment_Type_Recovered', None) == 'one payment',
-        1,
-        filtered_deals.get('Months of study', pd.Series(index=filtered_deals.index, dtype='float')).fillna(1)
-    )
-    filtered_deals.loc[filtered_deals['stage_normalized'] != 'Active Student', 'Transactions'] = 0
-
-    active_students_df = filtered_deals[filtered_deals['stage_normalized'] == 'Active Student']
-
+    TOTAL_B_CORRECT = active_students_df['Contact Name'].nunique() if len(active_students_df) > 0 else 0
+    
+    # Инициализация значений по умолчанию
+    total_revenue = 0
+    products_count = 0
+    managers_count = 0
+    cities_count = 0
+    sources_count = 0
+    avg_check = 0
+    win_rate_vacuum = 0
+    cm_total = -total_marketing_spend  # если нет выручки, CM = -расходы
+    romi_total = -100
+    median_deal_age = 0
+    mean_deal_age = 0
+    top_product_name = "Нет данных"
+    ltv_vacuum_business = 0
+    
+    # Если есть успешные сделки
     if len(active_students_df) > 0:
-        product_stats = active_students_df.groupby('Product').agg({
-            'Contact Name': 'nunique',
-            'revenue': 'sum',
-            'Transactions': 'sum',
-        }).reset_index().rename(columns={
-            'Contact Name': 'B',
-            'revenue': 'Revenue',
-            'Transactions': 'T'
-        })
+        # Базовые метрики
+        total_revenue = filtered_deals['revenue'].sum()
+        products_count = filtered_deals['Product'].nunique()
+        managers_count = filtered_deals['Deal Owner Name'].nunique()
+        cities_count = filtered_deals['City'].nunique() if 'City' in filtered_deals.columns else 0
+        sources_count = filtered_deals['Source'].nunique()
         
-        product_stats['AOV'] = product_stats['Revenue'] / product_stats['T']
-        product_stats['APC'] = product_stats['T'] / product_stats['B']
+        # Средний чек: Revenue / B
+        avg_check = total_revenue / TOTAL_B_CORRECT if TOTAL_B_CORRECT > 0 else 0
         
-        COGS_FIXED_PER_TRANS = 0
-        COGS_PERCENT_FROM_CHECK = 0.0
-        total_cogs_amt_by_product = (product_stats['Revenue'] * COGS_PERCENT_FROM_CHECK) + (product_stats['T'] * COGS_FIXED_PER_TRANS)
-        product_stats['COGS'] = total_cogs_amt_by_product / product_stats['T'].replace(0, np.nan)
-
-        product_stats['CLTV'] = (product_stats['AOV'] - product_stats['COGS']) * product_stats['APC']
-        product_stats['C1_vacuum'] = product_stats['B'] / TOTAL_UA if TOTAL_UA > 0 else 0
-        product_stats['LTV'] = product_stats['CLTV'] * product_stats['C1_vacuum']
-
-        top_product_row = product_stats.sort_values('Revenue', ascending=False).head(1)
-        top_product_name = top_product_row['Product'].iloc[0] if len(top_product_row) else None
-
-        if product_stats['B'].sum() > 0:
-            cltv_weighted = (product_stats['CLTV'] * product_stats['B']).sum() / product_stats['B'].sum()
-        else:
-            cltv_weighted = 0
-        ltv_vacuum_business = cltv_weighted * (TOTAL_B / TOTAL_UA) if TOTAL_UA > 0 else 0
-    else:
-        top_product_name = None
-        ltv_vacuum_business = 0
-
+        # Vacuum Win Rate (C1): B / UA
+        win_rate_vacuum = (TOTAL_B_CORRECT / TOTAL_UA * 100) if TOTAL_UA > 0 else 0
+        
+        # Contribution Margin и ROMI
+        cm_total = total_revenue - total_marketing_spend
+        romi_total = (cm_total / total_marketing_spend * 100) if total_marketing_spend > 0 else 0
+        
+        # Deal Age
+        active_student_ids = active_students_df['Id'].unique()
+        closed_deals_clean = filtered_deals[
+            (filtered_deals['Id'].isin(active_student_ids)) &
+            (filtered_deals['Closing Date'].notna()) &
+            (filtered_deals['Deal_Age_days'].notna()) &
+            (filtered_deals['Deal_Age_days'] >= 0)
+        ].copy()
+        
+        if len(closed_deals_clean) > 0:
+            median_deal_age = closed_deals_clean['Deal_Age_days'].median()
+            mean_deal_age = closed_deals_clean['Deal_Age_days'].mean()
+        
+        # --- ПРАВИЛЬНЫЙ РАСЧЕТ ПРОДУКТОВОЙ СТАТИСТИКИ (как в юнит-экономике) ---
+        # Подготовка транзакций
+        deals_calc = filtered_deals.copy()
+        deals_calc['Transactions'] = np.where(
+            deals_calc.get('Payment_Type_Recovered', None) == 'one payment',
+            1,
+            deals_calc.get('Months of study', pd.Series(index=deals_calc.index, dtype='float')).fillna(1)
+        )
+        deals_calc.loc[deals_calc['stage_normalized'] != 'Active Student', 'Transactions'] = 0
+        
+        # Агрегация по продуктам
+        active_students_calc = deals_calc[deals_calc['stage_normalized'] == 'Active Student']
+        
+        if len(active_students_calc) > 0:
+            product_stats = active_students_calc.groupby('Product').agg({
+                'Contact Name': 'nunique',
+                'revenue': 'sum',
+                'Transactions': 'sum',
+            }).reset_index().rename(columns={
+                'Contact Name': 'B',
+                'revenue': 'Revenue',
+                'Transactions': 'T'
+            })
+            
+            # ПРАВИЛЬНЫЙ AOV = Revenue / T
+            product_stats['AOV'] = product_stats['Revenue'] / product_stats['T']
+            product_stats['APC'] = product_stats['T'] / product_stats['B']
+            
+            COGS_FIXED_PER_TRANS = 0
+            COGS_PERCENT_FROM_CHECK = 0.0
+            total_cogs_amt_by_product = (product_stats['Revenue'] * COGS_PERCENT_FROM_CHECK) + (product_stats['T'] * COGS_FIXED_PER_TRANS)
+            product_stats['COGS'] = total_cogs_amt_by_product / product_stats['T'].replace(0, np.nan)
+            
+            # ПРАВИЛЬНЫЙ CLTV = (AOV - COGS) × APC
+            product_stats['CLTV'] = (product_stats['AOV'] - product_stats['COGS']) * product_stats['APC']
+            product_stats['C1_vacuum'] = product_stats['B'] / TOTAL_UA if TOTAL_UA > 0 else 0
+            product_stats['LTV'] = product_stats['CLTV'] * product_stats['C1_vacuum']
+            
+            # Топ продукт
+            top_product_row = product_stats.sort_values('Revenue', ascending=False).head(1)
+            top_product_name = top_product_row['Product'].iloc[0] if len(top_product_row) else "Нет данных"
+            
+            # Бизнес-LTV (weighted CLTV × B/UA)
+            if product_stats['B'].sum() > 0:
+                cltv_weighted = (product_stats['CLTV'] * product_stats['B']).sum() / product_stats['B'].sum()
+            else:
+                cltv_weighted = 0
+            ltv_vacuum_business = cltv_weighted * (TOTAL_B_CORRECT / TOTAL_UA) if TOTAL_UA > 0 else 0
+    
     # --- Сводный df ---
     summary_rows = [
         ('Выручка (Total Revenue)', total_revenue, '€'),
         ('Средний чек (Average Check)', avg_check, '€'),
-        ('Клиенты (Buyers Count)', TOTAL_B, ''),
+        ('Клиенты (Buyers Count)', TOTAL_B_CORRECT, ''),
         ('Уникальные контакты (UA Count)', TOTAL_UA, ''),
         ('Продукты (Products Count)', products_count, ''),
         ('Менеджеры (Managers Count)', managers_count, ''),
         ('Города (Cities Count)', cities_count, ''),
-        ('Маркетинговые расходы (Marketing Spend)', marketing_spend, '€'),
+        ('Маркетинговые расходы (Marketing Spend)', total_marketing_spend, '€'),
         ('Источники (Sources Count)', sources_count, ''),
         ('Конверсия (Vacuum, B/UA)', win_rate_vacuum, '%'),
         ('ROMI ((Revenue - Spend)/Spend)', romi_total, '%'),
         ('Маржинальный вклад (Contribution Margin)', cm_total, '€'),
         ('Время закрытия сделки (медиана)', median_deal_age, 'дн'),
         ('Время закрытия сделки (среднее)', mean_deal_age, 'дн'),
-        ('Топовый продукт по выручке', top_product_name if top_product_name is not None else "Нет данных", 'str'),
+        ('Топовый продукт по выручке', top_product_name, 'str'),
         ('Бизнес-LTV (weighted CLTV × B/UA)', ltv_vacuum_business, '€'),
     ]
 
     summary_df = pd.DataFrame(summary_rows, columns=['Metric', 'Value', 'Unit'])
     
-    return summary_df, date_min, date_max, TOTAL_UA, TOTAL_B, total_revenue, marketing_spend
+    return summary_df, date_min, date_max, TOTAL_UA, TOTAL_B_CORRECT, total_revenue, total_marketing_spend
 
-# Вызов функции расчета метрик
+# Вызов функции
 summary_df, date_min, date_max, TOTAL_UA, TOTAL_B, total_revenue, marketing_spend = calculate_business_metrics()
 
 # ========== ЗАГОЛОВОК ==========
 st.markdown('<div class="main-title">ПОЛНЫЙ АНАЛИТИЧЕСКИЙ ОТЧЕТ IT ШКОЛЫ</div>', unsafe_allow_html=True)
-st.markdown(f"*Период данных: {min_date} - {max_date} | Всего сделок: {len(filtered_deals):,}*")
+st.markdown(f"*Период данных: {min_date} - {max_date}*")  # УБРАЛ СЧЕТ СДЕЛОК
 st.markdown("---")
 
 # ========== КЛЮЧЕВЫЕ МЕТРИКИ ==========
 st.markdown('<div class="section-title">СВОДНЫЕ ПОКАЗАТЕЛИ БИЗНЕСА</div>', unsafe_allow_html=True)
 
-# Форматирование значений для метрик
+# Форматирование для отображения
 def format_value(val, unit):
     if pd.isna(val):
         return '—'
@@ -1408,7 +1427,7 @@ with tabs[5]:
         geocoded = prepare_geodata(city_stats)
         
         if len(geocoded) > 0:
-            fig_map = px.scatter_map(
+            fig_map = px.scatter_geo(
                 geocoded,
                 lat="lat",
                 lon="lon",
