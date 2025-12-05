@@ -296,22 +296,22 @@ def calculate_business_metrics():
     
     # --- Сводный df ---
     summary_rows = [
-        ('Выручка (Total Revenue)', total_revenue, '€'),
-        ('Средний чек (Average Check)', avg_check, '€'),
-        ('Клиенты (Buyers Count)', TOTAL_B_CORRECT, ''),
-        ('Уникальные контакты (UA Count)', TOTAL_UA, ''),
-        ('Продукты (Products Count)', products_count, ''),
-        ('Менеджеры (Managers Count)', managers_count, ''),
-        ('Города (Cities Count)', cities_count, ''),
-        ('Маркетинговые расходы (Marketing Spend)', total_marketing_spend, '€'),
-        ('Источники (Sources Count)', sources_count, ''),
-        ('Конверсия (Vacuum, B/UA)', win_rate_vacuum, '%'),
+        ('Выручка(Revenue)', total_revenue, '€'),
+        ('Средний чек(AOV)', avg_check, '€'),
+        ('Клиенты (Buyers)', TOTAL_B_CORRECT, ''),
+        ('Уникальные контакты (UA)', TOTAL_UA, ''),
+        ('Продукты (Products)', products_count, ''),
+        ('Менеджеры (Managers)', managers_count, ''),
+        ('Города (Cities)', cities_count, ''),
+        ('Маркетинговые расходы (Spend)', total_marketing_spend, '€'),
+        ('Источники (Sources)', sources_count, ''),
+        ('Конверсия (С1, B/UA)', win_rate_vacuum, '%'),
         ('ROMI ((Revenue - Spend)/Spend)', romi_total, '%'),
-        ('Маржинальный вклад (Contribution Margin)', cm_total, '€'),
+        ('Маржа (Contribution Margin)', cm_total, '€'),
         ('Время закрытия сделки (медиана)', median_deal_age, 'дн'),
         ('Время закрытия сделки (среднее)', mean_deal_age, 'дн'),
-        ('Топовый продукт по выручке', top_product_name, 'str'),
-        ('Бизнес-LTV', ltv_vacuum_business, '€'),
+        ('Топ продукт по выручке', top_product_name, 'str'),
+        ('LTV', ltv_vacuum_business, '€'),
     ]
 
     summary_df = pd.DataFrame(summary_rows, columns=['Metric', 'Value', 'Unit'])
