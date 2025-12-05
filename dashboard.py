@@ -196,6 +196,16 @@ def calculate_business_metrics():
     active_students_df = filtered_deals[filtered_deals['stage_normalized'] == 'Active Student']
     TOTAL_B_CORRECT = active_students_df['Contact Name'].nunique() if len(active_students_df) > 0 else 0
     
+    # СОЗДАЕМ ТРАНЗАКЦИИ ВСЕГДА (чтобы active_students_calc был доступен)
+    deals_calc = filtered_deals.copy()
+    deals_calc['Transactions'] = np.where(
+        deals_calc.get('Payment_Type_Recovered', None) == 'one payment',
+        1,
+        deals_calc.get('Months of study', pd.Series(index=deals_calc.index, dtype='float')).fillna(1)
+    )
+    deals_calc.loc[deals_calc['stage_normalized'] != 'Active Student', 'Transactions'] = 0
+    active_students_calc = deals_calc[deals_calc['stage_normalized'] == 'Active Student']
+    
     # Инициализация значений по умолчанию
     total_revenue = 0
     products_count = 0
@@ -220,16 +230,7 @@ def calculate_business_metrics():
         cities_count = filtered_deals['City'].nunique() if 'City' in filtered_deals.columns else 0
         sources_count = filtered_deals['Source'].nunique()
         
-        # Средний чек: Revenue / B
-        total_t = active_students_calc['Transactions'].sum() if len(active_students_calc) > 0 else 0
-        deals_calc = filtered_deals.copy()
-        deals_calc['Transactions'] = np.where(
-            deals_calc.get('Payment_Type_Recovered', None) == 'one payment',
-            1,
-            deals_calc.get('Months of study', pd.Series(index=deals_calc.index, dtype='float')).fillna(1)
-)
-        deals_calc.loc[deals_calc['stage_normalized'] != 'Active Student', 'Transactions'] = 0
-        active_students_calc = deals_calc[deals_calc['stage_normalized'] == 'Active Student']
+        # ПРАВИЛЬНЫЙ AOV = Revenue / T
         total_t = active_students_calc['Transactions'].sum() if len(active_students_calc) > 0 else 0
         avg_check = total_revenue / total_t if total_t > 0 else 0
         
@@ -254,18 +255,6 @@ def calculate_business_metrics():
             mean_deal_age = closed_deals_clean['Deal_Age_days'].mean()
         
         # --- ПРАВИЛЬНЫЙ РАСЧЕТ ПРОДУКТОВОЙ СТАТИСТИКИ (как в юнит-экономике) ---
-        # Подготовка транзакций
-        deals_calc = filtered_deals.copy()
-        deals_calc['Transactions'] = np.where(
-            deals_calc.get('Payment_Type_Recovered', None) == 'one payment',
-            1,
-            deals_calc.get('Months of study', pd.Series(index=deals_calc.index, dtype='float')).fillna(1)
-        )
-        deals_calc.loc[deals_calc['stage_normalized'] != 'Active Student', 'Transactions'] = 0
-        
-        # Агрегация по продуктам
-        active_students_calc = deals_calc[deals_calc['stage_normalized'] == 'Active Student']
-        
         if len(active_students_calc) > 0:
             product_stats = active_students_calc.groupby('Product').agg({
                 'Contact Name': 'nunique',
@@ -295,8 +284,7 @@ def calculate_business_metrics():
             top_product_row = product_stats.sort_values('Revenue', ascending=False).head(1)
             top_product_name = top_product_row['Product'].iloc[0] if len(top_product_row) else "Нет данных"
             
-            # Бизнес-LTV (weighted CLTV × B/UA)
-            # Бизнес-LTV
+            # Бизнес-LTV = weighted CLTV × C1
             if product_stats['B'].sum() > 0:
                 cltv_weighted = (product_stats['CLTV'] * product_stats['B']).sum() / product_stats['B'].sum()
             else:
