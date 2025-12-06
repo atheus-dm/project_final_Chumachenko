@@ -1607,7 +1607,7 @@ with tabs[5]:
         geocoded = prepare_geodata(city_stats)
         
         if len(geocoded) > 0:
-            fig_map = px.scatter_map(
+            fig_map = px.scatter_geo(
                 geocoded,
                 lat="lat",
                 lon="lon",
@@ -1615,13 +1615,14 @@ with tabs[5]:
                 color="Total_Revenue",
                 hover_name="City",
                 hover_data={'Total_Revenue': ':.0f', 'Total_Deals': True, 'Win_Rate': ':.1f', 'Top_Source': True},
+                scope="europe",
                 center={"lat": 50.0, "lon": 10.0},
                 title="Карта продаж: размер = сделки, цвет = выручка",
                 color_continuous_scale='RdYlGn',
-                map_style="carto-positron",
+                projection="natural earth",
                 height=600
             )
-            fig_map.update_layout(margin={"r":0,"t":40,"l":0,"b":0})
+            fig_map.update_layout(template="plotly_white")
             st.plotly_chart(fig_map, use_container_width=True)
         else:
             st.info("Не удалось геокодировать города для отображения карты")
@@ -1644,6 +1645,31 @@ with tabs[5]:
         )
         fig_bar.update_layout(xaxis={'categoryorder': 'total descending'})
         st.plotly_chart(fig_bar, use_container_width=True)
+        
+        # 3. АНАЛИЗ ЭФФЕКТИВНОСТИ ПО ГОРОДАМ (ячейка 22)
+        st.subheader("3. АНАЛИЗ ЭФФЕКТИВНОСТИ ПО ГОРОДАМ")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # ТОП-10 ПО ВЫРУЧКЕ
+            top_revenue = city_stats.head(10).sort_values('Total_Revenue', ascending=True)
+            
+            fig_rev = px.bar(
+                top_revenue,
+                x='Total_Revenue',
+                y='City',
+                orientation='h',
+                text='Total_Revenue',
+                title='Топ-10 городов по выручке',
+                labels={'Total_Revenue': 'Выручка (€)', 'City': ''},
+                color='Win_Rate',
+                color_continuous_scale='RdYlGn',
+                height=500
+            )
+            fig_rev.update_traces(texttemplate='%{text:,.0f}€', textposition='outside')
+            fig_rev.update_layout(showlegend=False, yaxis={'categoryorder': 'total ascending'})
+            st.plotly_chart(fig_rev, use_container_width=True)
         
         with col2:
             # ТОП-10 ПО КОНВЕРСИИ (минимум 5 сделок)
