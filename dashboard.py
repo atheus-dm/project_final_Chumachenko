@@ -1915,12 +1915,10 @@ with tabs[6]:
 
     # Используем уже рассчитанный summary_df
     if 'summary_df' in locals():
-    # Просто передаём DataFrame без Styler
-        st.dataframe(
-        summary_df[['Metric', 'Formatted']],
-        use_container_width=True,
-        hide_index=True
-    )
+    # Явно приводим всё к строкам
+        display_df = summary_df[['Metric', 'Formatted']].copy()
+        display_df['Formatted'] = display_df['Formatted'].astype(str)
+        st.dataframe(display_df, use_container_width=True, hide_index=True)
 
 # ---------- ВКЛАДКА 8: МЕТОДОЛОГИЯ ----------
 with tabs[7]:
