@@ -1068,32 +1068,37 @@ with tabs[2]:
         top_funnel['CPM'] = (top_funnel['Spend'] / top_funnel['Impressions'] * 1000).replace([np.inf], 0).round(2)
         top_funnel['CPC'] = (top_funnel['Spend'] / top_funnel['Clicks']).replace([np.inf], 0).round(2)
         top_funnel['CPL (Lead)'] = (top_funnel['Spend'] / top_funnel['Leads']).replace([np.inf], 0).round(2)
-        top_funnel['CPQ (Quality)'] = (top_funnel['Spend'] / top_funnel['Quality_Leads']).replace([np.inf], 0).round(2)
-        
+        top_funnel['CPQ (Quality)'] = np.where(
+            top_funnel['Quality_Leads'] > 0,
+            (top_funnel['Spend'] / top_funnel['Quality_Leads']).round(2),
+            0
+        )
+
         fig1.add_trace(
             go.Table(
                 header=dict(
                     values=['Source', 'Spend', 'CPM (1000 shows)', 'CPC (Click)', 'CPL (Lead)', 'CPQ (Quality Lead)'],
-                    fill_color="#0235C4",  # Тёмно-синий
-                    font_color='white',    # Белый текст,
+                    fill_color="#0235C4",
+                    font_color='white',
                     align='left'
-                ),
-                cells=dict(
-                    values=[
-                        top_funnel['Source'],
-                        top_funnel['Spend'].apply(lambda x: f"{x:,.0f}€"),
-                        top_funnel['CPM'],
-                        top_funnel['CPC'],
-                        top_funnel['CPL (Lead)'],
-                        top_funnel['CPQ (Quality)']
-                    ],
-                    fill_color="#456AD3",
-                    align='left'
-                )
             ),
-            row=2, col=1
+            cells=dict(
+                values=[
+                    top_funnel['Source'],
+                    top_funnel['Spend'].apply(lambda x: f"{x:,.0f}€"),
+                    top_funnel['CPM'].apply(lambda x: f"{x:.2f}"),
+                    top_funnel['CPC'].apply(lambda x: f"{x:.2f}"),
+                    top_funnel['CPL (Lead)'].apply(lambda x: f"{x:.2f}"),
+                    top_funnel['CPQ (Quality)'].apply(lambda x: f"{x:.2f}")
+                ],
+                fill_color="#456AD3",
+                font_color='white',
+                align='left'
+            )
+        ),
+        row=2, col=1
         )
-        
+
         fig1.update_layout(height=800, title_text="Маркетинговая аналитика: Объемы и Деньги", barmode='group')
         st.plotly_chart(fig1, use_container_width=True)
     
