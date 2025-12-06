@@ -1622,7 +1622,7 @@ with tabs[5]:
                 projection="natural earth",
                 height=600
             )
-            fig_map.update_layout(margin={"r":0,"t":40,"l":0,"b":0})
+            fig_map.update_layout(template="plotly_white")
             st.plotly_chart(fig_map, use_container_width=True)
         else:
             st.info("Не удалось геокодировать города для отображения карты")
