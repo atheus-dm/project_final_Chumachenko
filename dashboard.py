@@ -226,7 +226,7 @@ def calculate_business_metrics():
         # Базовые метрики
         total_revenue = filtered_deals['revenue'].sum()
         products_count = filtered_deals['Product'].nunique()
-        managers_count = filtered_deals['Deal Owner Name'].nunique()
+        managers_count = deals['Deal Owner Name'].nunique()
         cities_count = filtered_deals['City'].nunique() if 'City' in filtered_deals.columns else 0
         sources_count = filtered_deals['Source'].nunique()
         
