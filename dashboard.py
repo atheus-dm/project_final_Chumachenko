@@ -1074,7 +1074,8 @@ with tabs[2]:
             go.Table(
                 header=dict(
                     values=['Source', 'Spend', 'CPM (1000 shows)', 'CPC (Click)', 'CPL (Lead)', 'CPQ (Quality Lead)'],
-                    fill_color='paleturquoise',
+                    fill_color="#0235C4",  # Тёмно-синий
+                    font_color='white',    # Белый текст,
                     align='left'
                 ),
                 cells=dict(
@@ -1086,7 +1087,7 @@ with tabs[2]:
                         top_funnel['CPL (Lead)'],
                         top_funnel['CPQ (Quality)']
                     ],
-                    fill_color='lavender',
+                    fill_color="#456AD3",
                     align='left'
                 )
             ),
