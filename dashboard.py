@@ -1622,7 +1622,63 @@ with tabs[5]:
                 projection="natural earth",
                 height=600
             )
-            fig_map.update_layout(template="plotly_white")
+            
+            # КРАСИВЫЙ ФОН С НАЗВАНИЯМИ
+            fig_map.update_geos(
+                visible=True,
+                resolution=50,
+                showcoastlines=True,
+                coastlinecolor="RebeccaPurple",
+                showland=True,
+                landcolor="rgb(230, 230, 230)",
+                showocean=True,
+                oceancolor="rgb(212, 230, 255)",
+                showlakes=True,
+                lakecolor="rgb(180, 220, 255)",
+                showrivers=True,
+                rivercolor="rgb(180, 220, 255)",
+                showcountries=True,
+                countrycolor="rgb(150, 150, 150)",
+                showsubunits=True,
+                subunitcolor="rgb(200, 200, 200)",
+                showsubunitlabels=True,  # Показывать названия регионов
+                showcountrylabels=True,  # Показывать названия стран
+                subunitfont=dict(size=10, color="gray"),
+                countryfont=dict(size=12, color="black"),
+                bgcolor='rgb(240, 240, 240)'
+            )
+            
+            fig_map.update_layout(
+                margin={"r":0,"t":40,"l":0,"b":0},
+                paper_bgcolor="white",
+                plot_bgcolor="white",
+                geo=dict(
+                    bgcolor='white',
+                    lakecolor='LightBlue',
+                    showland=True,
+                    landcolor='rgb(240,240,240)',
+                    showcountries=True,
+                    countrycolor='rgb(150,150,150)',
+                    countrywidth=0.5,
+                    showsubunits=True,
+                    subunitcolor='rgb(200,200,200)'
+                )
+            )
+            
+            # Добавляем названия городов на точки
+            fig_map.add_trace(
+                go.Scattergeo(
+                    lon=geocoded['lon'],
+                    lat=geocoded['lat'],
+                    text=geocoded['City'],
+                    mode='text',
+                    textposition='top center',
+                    textfont=dict(size=10, color='black'),
+                    showlegend=False,
+                    hoverinfo='none'
+                )
+            )
+            
             st.plotly_chart(fig_map, use_container_width=True)
         else:
             st.info("Не удалось геокодировать города для отображения карты")
@@ -1915,7 +1971,10 @@ with tabs[6]:
 
     # Используем уже рассчитанный summary_df
     if 'summary_df' in locals():
-        st.table(summary_df[['Metric', 'Formatted']].set_index('Metric'))
+    # Явно приводим всё к строкам
+        display_df = summary_df[['Metric', 'Formatted']].copy()
+        display_df['Formatted'] = display_df['Formatted'].astype(str)
+        st.dataframe(display_df, use_container_width=True, hide_index=True)
 
 # ---------- ВКЛАДКА 8: МЕТОДОЛОГИЯ ----------
 with tabs[7]:
