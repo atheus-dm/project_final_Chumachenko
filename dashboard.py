@@ -1915,10 +1915,7 @@ with tabs[6]:
 
     # Используем уже рассчитанный summary_df
     if 'summary_df' in locals():
-    # Явно приводим всё к строкам
-        display_df = summary_df[['Metric', 'Formatted']].copy()
-        display_df['Formatted'] = display_df['Formatted'].astype(str)
-        st.dataframe(display_df, use_container_width=True, hide_index=True)
+        st.table(summary_df[['Metric', 'Formatted']].set_index('Metric'))
 
 # ---------- ВКЛАДКА 8: МЕТОДОЛОГИЯ ----------
 with tabs[7]:
