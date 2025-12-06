@@ -602,7 +602,7 @@ tabs = st.tabs([
 
 # ---------- ВКЛАДКА 1: ЮНИТ-ЭКОНОМИКА ----------
 with tabs[0]:
-    st.markdown('<div class="section-title">ЮНИТ-ЭКОНОМИКА БИЗНЕСА (VACUUM MODEL)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">ЮНИТ-ЭКОНОМИКА БИЗНЕСА </div>', unsafe_allow_html=True)
     
     # Получаем данные
     total_df, product_econ = calculate_unit_economics()
@@ -637,7 +637,7 @@ with tabs[0]:
             height=150
         )
         
-        st.subheader("2. ЭКОНОМИКА ПО ПРОДУКТАМ (ВАКУУМНАЯ МОДЕЛЬ)")
+        st.subheader("2. ЭКОНОМИКА ПО ПРОДУКТАМ ")
         st.dataframe(
             format_unit_econ(product_econ).background_gradient(subset=['ROMI', 'LTV'], cmap='RdYlGn'),
             use_container_width=True
