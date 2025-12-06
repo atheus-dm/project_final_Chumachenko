@@ -1791,7 +1791,7 @@ with tabs[5]:
             
             if len(group_stats) > 0:
                 group_stats['Доля выручки'] = (group_stats['Выручка'] / group_stats['Выручка'].sum() * 100).round(1)
-                group_stats['Выручка на город'] = (group_stats['Выручка'] / group_stats['Города']).astype(int)
+                group_stats['Выручка на город'] = (group_stats['Выручка'] / group_stats['Города'].replace(0, np.nan)).fillna(0).astype(int)
                 
                 fig_groups = px.bar(
                     group_stats.reset_index(),
@@ -1912,13 +1912,15 @@ with tabs[6]:
     
     # 4. КЛЮЧЕВЫЕ МЕТРИКИ КАК В EXECUTIVE SUMMARY (ячейка 8)
     st.subheader("4. КЛЮЧЕВЫЕ МЕТРИКИ БИЗНЕСА")
-    
+
     # Используем уже рассчитанный summary_df
     if 'summary_df' in locals():
+    # Просто передаём DataFrame без Styler
         st.dataframe(
-            summary_df[['Metric', 'Formatted']].style.hide(axis='index'),
-            use_container_width=True
-        )
+        summary_df[['Metric', 'Formatted']],
+        use_container_width=True,
+        hide_index=True
+    )
 
 # ---------- ВКЛАДКА 8: МЕТОДОЛОГИЯ ----------
 with tabs[7]:
