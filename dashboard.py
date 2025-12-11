@@ -1082,146 +1082,146 @@ with tabs[1]:
     else:
         st.info(t('not_enough_data'))
 
-st.subheader(t('top_managers_revenue_conversion'))
+    st.subheader(t('top_managers_revenue_conversion'))
 
-if 'Deal Owner Name' in deals.columns:
-    df_clean = deals.copy()
-    
-    manager_stats = df_clean.groupby('Deal Owner Name').agg(
-        Leads=('Id', 'count'),
-        Revenue=('revenue', 'sum'),
-        Sales=('stage_normalized', lambda x: (x == 'Active Student').sum())
-    ).reset_index().rename(columns={'Deal Owner Name': t('manager')})
-    
-    speed_stats = df_clean[df_clean['stage_normalized'] == 'Active Student'].groupby('Deal Owner Name')['Deal_Age_days'].median().reset_index()
-    speed_stats.columns = [t('manager'), t('median_deal_age_days')]
-    
-    if 'calls' in locals() and len(calls) > 0:
-        calls_agg = calls.groupby('CONTACTID')['Id'].count().reset_index().rename(columns={'Id': 'Calls_Count', 'CONTACTID': 'Contact Name'})
-        successful_deals = df_clean[df_clean['stage_normalized'] == 'Active Student']
-        deals_with_calls = successful_deals[['Id', 'Deal Owner Name', 'Contact Name']].merge(calls_agg, on='Contact Name', how='left').fillna(0)
-        calls_stats = deals_with_calls.groupby('Deal Owner Name')['Calls_Count'].mean().reset_index()
-        calls_stats.columns = [t('manager'), t('avg_calls_per_deal')]
-    else:
-        calls_stats = pd.DataFrame({t('manager'): manager_stats[t('manager')], t('avg_calls_per_deal'): 0})
-    
-    final_stats = manager_stats.merge(speed_stats, on=t('manager'), how='left').fillna(0)
-    final_stats = final_stats.merge(calls_stats, on=t('manager'), how='left').fillna(0)
-    
-    final_stats[t('win_rate')] = (final_stats['Sales'] / final_stats['Leads'] * 100).round(2)
-    final_stats[t('avg_check_2')] = (final_stats['Revenue'] / final_stats['Sales']).replace([np.inf], 0).fillna(0).round(0)
-    
-    top_managers = final_stats[final_stats['Leads'] >= 10].sort_values(by='Revenue', ascending=False)
-    
-    if len(top_managers) > 0:
-        fig1 = px.bar(
-            top_managers.head(15),
-            x=t('manager'), y='Revenue', 
-            color=t('win_rate'),
-            text_auto='.2s',
-            title=t('top_15_managers_revenue'),
-            labels={'Revenue': f"{t('revenue')} ({t('currency')})", t('win_rate'): f"{t('win_rate')} ({t('percent')})"},
-            color_continuous_scale='RdYlGn',
-            height=500
-        )
-        fig1.update_layout(xaxis={'categoryorder':'total descending'})
-        st.plotly_chart(fig1, use_container_width=True)
+    if 'Deal Owner Name' in deals.columns:
+        df_clean = deals.copy()
         
-        efficiency_view = top_managers.sort_values(by=t('win_rate'), ascending=True).tail(15)
-        fig2 = px.bar(
-            efficiency_view,
-            x=t('win_rate'), 
-            y=t('manager'), 
-            orientation='h', 
-            color=t('median_deal_age_days'),
-            text_auto='.1f',
-            title=t('top_conversion'),
-            labels={t('win_rate'): f"{t('win_rate')} ({t('percent')})", t('manager'): t('manager')},
-            color_continuous_scale='Bluered',
-            height=600
-        )
-        st.plotly_chart(fig2, use_container_width=True)
+        manager_stats = df_clean.groupby('Deal Owner Name').agg(
+            Leads=('Id', 'count'),
+            Revenue=('revenue', 'sum'),
+            Sales=('stage_normalized', lambda x: (x == 'Active Student').sum())
+        ).reset_index().rename(columns={'Deal Owner Name': t('manager')})
         
-        display_cols = [t('manager'), 'Leads', 'Sales', 'Revenue', t('win_rate'), 
-                        t('avg_check_2'), t('median_deal_age_days'), t('avg_calls_per_deal')]
-        display_df = final_stats[display_cols].sort_values('Revenue', ascending=False).head(20)
+        speed_stats = df_clean[df_clean['stage_normalized'] == 'Active Student'].groupby('Deal Owner Name')['Deal_Age_days'].median().reset_index()
+        speed_stats.columns = [t('manager'), t('median_deal_age_days')]
         
-        st.dataframe(
-            display_df.style\
-                .background_gradient(subset=['Revenue', t('win_rate')], cmap='Greens')\
-                .format({
-                    'Revenue': '{:,.0f}', 
-                    t('avg_check_2'): '{:,.0f}', 
-                    t('median_deal_age_days'): '{:.0f}',
-                    t('win_rate'): '{:.1f}%',
-                    t('avg_calls_per_deal'): '{:.1f}'
-                }),
-            use_container_width=True
-        )
-
-st.subheader(t('sla_analysis'))
-
-if 'SLA_seconds' in deals.columns:
-    deals_sla = deals[deals['SLA_seconds'].notna()].copy()
-    deals_sla['SLA_Hours'] = deals_sla['SLA_seconds'] / 3600
-    
-    manager_sla_stats = deals_sla.groupby('Deal Owner Name').agg({
-        'Id': 'count',
-        'SLA_Hours': 'median',
-        'is_paid': 'mean'
-    }).reset_index()
-    manager_sla_stats.columns = [t('manager'), t('deals_count'), t('deal_age_hours'), t('win_rate_pct')]
-    manager_sla_stats[t('win_rate_pct')] = (manager_sla_stats[t('win_rate_pct')] * 100).round(2)
-    manager_sla_stats = manager_sla_stats[manager_sla_stats[t('deals_count')] > 10]
-    
-    if len(manager_sla_stats) > 0:
-        fig5 = px.scatter(
-            manager_sla_stats,
-            x=t('deal_age_hours'),
-            y=t('win_rate_pct'),
-            size=t('deals_count'),
-            color=t('win_rate_pct'),
-            hover_name=t('manager'),
-            title=t('response_speed_vs_conversion'),
-            labels={t('deal_age_hours'): t('median_response_time_hours'), t('win_rate_pct'): f"{t('win_rate')} ({t('percent')})"},
-            color_continuous_scale='RdYlGn',
-            height=600
-        )
+        if 'calls' in locals() and len(calls) > 0:
+            calls_agg = calls.groupby('CONTACTID')['Id'].count().reset_index().rename(columns={'Id': 'Calls_Count', 'CONTACTID': 'Contact Name'})
+            successful_deals = df_clean[df_clean['stage_normalized'] == 'Active Student']
+            deals_with_calls = successful_deals[['Id', 'Deal Owner Name', 'Contact Name']].merge(calls_agg, on='Contact Name', how='left').fillna(0)
+            calls_stats = deals_with_calls.groupby('Deal Owner Name')['Calls_Count'].mean().reset_index()
+            calls_stats.columns = [t('manager'), t('avg_calls_per_deal')]
+        else:
+            calls_stats = pd.DataFrame({t('manager'): manager_stats[t('manager')], t('avg_calls_per_deal'): 0})
         
-        avg_sla = manager_sla_stats[t('deal_age_hours')].median()
-        avg_win = manager_sla_stats[t('win_rate_pct')].median()
-        fig5.add_vline(x=avg_sla, line_dash="dash", line_color="gray", annotation_text=t('avg_sla'))
-        fig5.add_hline(y=avg_win, line_dash="dash", line_color="gray", annotation_text=t('avg_conversion'))
-        st.plotly_chart(fig5, use_container_width=True)
+        final_stats = manager_stats.merge(speed_stats, on=t('manager'), how='left').fillna(0)
+        final_stats = final_stats.merge(calls_stats, on=t('manager'), how='left').fillna(0)
         
-        manager_table = deals_sla.groupby('Deal Owner Name').agg({
-            'Id': 'count',
-            'SLA_Hours': ['median', 'mean'],
-            'stage_normalized': lambda x: (x == 'Active Student').sum()
-        }).reset_index()
+        final_stats[t('win_rate')] = (final_stats['Sales'] / final_stats['Leads'] * 100).round(2)
+        final_stats[t('avg_check_2')] = (final_stats['Revenue'] / final_stats['Sales']).replace([np.inf], 0).fillna(0).round(0)
         
-        manager_table.columns = [t('manager'), t('deals_count'), t('deal_age_hours'), t('avg_response_time'), t('active_students')]
-        manager_table[t('win_rate_pct')] = (manager_table[t('active_students')] / manager_table[t('deals_count')] * 100).round(2)
-        manager_table = manager_table[manager_table[t('deals_count')] > 10]
+        top_managers = final_stats[final_stats['Leads'] >= 10].sort_values(by='Revenue', ascending=False)
         
-        if len(manager_table) > 0:
-            manager_table = manager_table.sort_values(t('deal_age_hours'), ascending=True)
-            display_df = manager_table[[t('manager'), t('deals_count'), t('deal_age_hours'), t('avg_response_time'), t('win_rate_pct')]]
-            display_df.columns = [t('manager'), t('deal_count'), t('median'), t('average'), t('win_rate_pct')]
+        if len(top_managers) > 0:
+            fig1 = px.bar(
+                top_managers.head(15),
+                x=t('manager'), y='Revenue', 
+                color=t('win_rate'),
+                text_auto='.2s',
+                title=t('top_15_managers_revenue'),
+                labels={'Revenue': f"{t('revenue')} ({t('currency')})", t('win_rate'): f"{t('win_rate')} ({t('percent')})"},
+                color_continuous_scale='RdYlGn',
+                height=500
+            )
+            fig1.update_layout(xaxis={'categoryorder':'total descending'})
+            st.plotly_chart(fig1, use_container_width=True)
+            
+            efficiency_view = top_managers.sort_values(by=t('win_rate'), ascending=True).tail(15)
+            fig2 = px.bar(
+                efficiency_view,
+                x=t('win_rate'), 
+                y=t('manager'), 
+                orientation='h', 
+                color=t('median_deal_age_days'),
+                text_auto='.1f',
+                title=t('top_conversion'),
+                labels={t('win_rate'): f"{t('win_rate')} ({t('percent')})", t('manager'): t('manager')},
+                color_continuous_scale='Bluered',
+                height=600
+            )
+            st.plotly_chart(fig2, use_container_width=True)
+            
+            display_cols = [t('manager'), 'Leads', 'Sales', 'Revenue', t('win_rate'), 
+                            t('avg_check_2'), t('median_deal_age_days'), t('avg_calls_per_deal')]
+            display_df = final_stats[display_cols].sort_values('Revenue', ascending=False).head(20)
             
             st.dataframe(
                 display_df.style\
-                    .background_gradient(subset=[t('median')], cmap='RdYlGn_r')\
-                    .background_gradient(subset=[t('average')], cmap='RdYlGn_r')\
-                    .background_gradient(subset=[t('win_rate_pct')], cmap='RdYlGn')\
+                    .background_gradient(subset=['Revenue', t('win_rate')], cmap='Greens')\
                     .format({
-                        t('median'): '{:.1f} ' + t('days'),
-                        t('average'): '{:.1f} ' + t('days'),
-                        t('win_rate_pct'): '{:.1f}%'
+                        'Revenue': '{:,.0f}', 
+                        t('avg_check_2'): '{:,.0f}', 
+                        t('median_deal_age_days'): '{:.0f}',
+                        t('win_rate'): '{:.1f}%',
+                        t('avg_calls_per_deal'): '{:.1f}'
                     }),
-                use_container_width=True,
-                height=300
+                use_container_width=True
             )
+
+    st.subheader(t('sla_analysis'))
+
+    if 'SLA_seconds' in deals.columns:
+        deals_sla = deals[deals['SLA_seconds'].notna()].copy()
+        deals_sla['SLA_Hours'] = deals_sla['SLA_seconds'] / 3600
+        
+        manager_sla_stats = deals_sla.groupby('Deal Owner Name').agg({
+            'Id': 'count',
+            'SLA_Hours': 'median',
+            'is_paid': 'mean'
+        }).reset_index()
+        manager_sla_stats.columns = [t('manager'), t('deals_count'), t('deal_age_hours'), t('win_rate_pct')]
+        manager_sla_stats[t('win_rate_pct')] = (manager_sla_stats[t('win_rate_pct')] * 100).round(2)
+        manager_sla_stats = manager_sla_stats[manager_sla_stats[t('deals_count')] > 10]
+        
+        if len(manager_sla_stats) > 0:
+            fig5 = px.scatter(
+                manager_sla_stats,
+                x=t('deal_age_hours'),
+                y=t('win_rate_pct'),
+                size=t('deals_count'),
+                color=t('win_rate_pct'),
+                hover_name=t('manager'),
+                title=t('response_speed_vs_conversion'),
+                labels={t('deal_age_hours'): t('median_response_time_hours'), t('win_rate_pct'): f"{t('win_rate')} ({t('percent')})"},
+                color_continuous_scale='RdYlGn',
+                height=600
+            )
+            
+            avg_sla = manager_sla_stats[t('deal_age_hours')].median()
+            avg_win = manager_sla_stats[t('win_rate_pct')].median()
+            fig5.add_vline(x=avg_sla, line_dash="dash", line_color="gray", annotation_text=t('avg_sla'))
+            fig5.add_hline(y=avg_win, line_dash="dash", line_color="gray", annotation_text=t('avg_conversion'))
+            st.plotly_chart(fig5, use_container_width=True)
+            
+            manager_table = deals_sla.groupby('Deal Owner Name').agg({
+                'Id': 'count',
+                'SLA_Hours': ['median', 'mean'],
+                'stage_normalized': lambda x: (x == 'Active Student').sum()
+            }).reset_index()
+            
+            manager_table.columns = [t('manager'), t('deals_count'), t('deal_age_hours'), t('avg_response_time'), t('active_students')]
+            manager_table[t('win_rate_pct')] = (manager_table[t('active_students')] / manager_table[t('deals_count')] * 100).round(2)
+            manager_table = manager_table[manager_table[t('deals_count')] > 10]
+            
+            if len(manager_table) > 0:
+                manager_table = manager_table.sort_values(t('deal_age_hours'), ascending=True)
+                display_df = manager_table[[t('manager'), t('deals_count'), t('deal_age_hours'), t('avg_response_time'), t('win_rate_pct')]]
+                display_df.columns = [t('manager'), t('deal_count'), t('median'), t('average'), t('win_rate_pct')]
+                
+                st.dataframe(
+                    display_df.style\
+                        .background_gradient(subset=[t('median')], cmap='RdYlGn_r')\
+                        .background_gradient(subset=[t('average')], cmap='RdYlGn_r')\
+                        .background_gradient(subset=[t('win_rate_pct')], cmap='RdYlGn')\
+                        .format({
+                            t('median'): '{:.1f} ' + t('days'),
+                            t('average'): '{:.1f} ' + t('days'),
+                            t('win_rate_pct'): '{:.1f}%'
+                        }),
+                    use_container_width=True,
+                    height=300
+                )
 
 with tabs[2]:
     st.markdown(f'<div class="section-title">{t("products")}</div>', unsafe_allow_html=True)
