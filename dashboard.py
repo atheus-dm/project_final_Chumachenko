@@ -490,7 +490,7 @@ def prepare_geodata(city_stats):
     top_cities = city_stats.head(50).copy()
     
     coordinates = []
-    for city in top_cities['City']:
+    for city in top_cities[t('city')]:
         coords = geocode_city(city)
         coordinates.append(coords)
     
