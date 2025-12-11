@@ -1755,11 +1755,24 @@ def calculate_growth_points():
             elif 'UA' in scenario_name: scenario_type = 'UA'
         
         return {
-            'Scenario': scenario_name, 'Scenario_Type': scenario_type, 'Growth_Pct': growth_pct,
-            'Product': product_name, 'UA': ua, 'C1': c1, 'B': b, 'AOV': aov, 'APC': apc, 
-            'T': t, 'Revenue': revenue, 'AC': ac, 'CLTV': cltv, 'LTV': ltv, 
-            'CPA': cpa, 'CAC': cac, 'CM': cm, 'ROMI': romi,
-            'Realism_Weight': REALISM_WEIGHTS.get(scenario_type, 0.5)
+            'Scenario': scenario_name,  # ← Английский ключ
+            'Scenario_Type': scenario_type,  # ← Английский ключ
+            'Growth_Pct': growth_pct,
+            'Product': product_name,
+            'UA': ua,
+            'C1': c1,
+            'B': b,
+            'AOV': aov,
+            'APC': apc,
+            'T': t,
+            'Revenue': revenue,
+            'AC': ac,
+            'CLTV': cltv,
+            'LTV': ltv,
+            'CPA': cpa,
+            'CAC': cac,
+            'CM': cm,
+            'ROMI': romi
         }
     
     def generate_scenarios_for_row(row, product_name):
@@ -3771,10 +3784,10 @@ with tabs[5]:
     global_scenarios = generate_scenarios_for_row(global_row, "TOTAL BUSINESS")
     
     if not global_scenarios.empty:
-        base_scenario = global_scenarios[global_scenarios[t('scenario')] == 'BASELINE']
+        base_scenario = global_scenarios[global_scenarios['Scenario'] == 'BASELINE']  # 'Scenario' вместо t('scenario')
         if not base_scenario.empty:
             base_cm = base_scenario.iloc[0]['CM']
-            global_scenarios[t('cm_growth')] = global_scenarios['CM'] - base_cm
+            global_scenarios['CM_Growth_€'] = global_scenarios['CM'] - base_cm  # 'CM_Growth_€' вместо t('cm_growth')
     
     st.subheader(t("global_business_scenarios"))
     
@@ -3782,25 +3795,25 @@ with tabs[5]:
         'UA': '{:,.0f}', 'B': '{:,.0f}', 'T': '{:,.0f}', 'Revenue': '{:,.0f}', 
         'C1': '{:.2%}', 'ROMI': '{:.0f}%', 'AOV': '{:,.1f}', 'APC': '{:.2f}', 
         'CLTV': '{:,.0f}', 'LTV': '{:,.1f}', 'AC': '{:,.0f}', 'CPA': '{:,.2f}', 
-        'CAC': '{:,.1f}', 'CM': '{:,.0f}', t('cm_growth'): '{:+,.0f}'
+        'CAC': '{:,.1f}', 'CM': '{:,.0f}', 'CM_Growth_€': '{:+,.0f}'  # ← 'CM_Growth_€' вместо t('cm_growth')
     }
     
     cols = [t('scenario'), 'UA', 'C1', 'B', 'T', 'AOV', 'APC', t('revenue'), 'AC', 
             'CPA', 'CAC', 'CLTV', 'LTV', 'CM', t('cm_growth'), 'ROMI']
     
-    if t('cm_growth') in global_scenarios.columns:
-        sorted_df = global_scenarios[cols].sort_values(t('cm_growth'), ascending=False)
+    if 'CM_Growth_€' in global_scenarios.columns:
+        sorted_df = global_scenarios[cols].sort_values('CM_Growth_€', ascending=False)  # Английское название
     else:
         sorted_df = global_scenarios[cols]
     
     st.dataframe(
         sorted_df.style.format(format_dict).background_gradient(
-            subset=[t('cm_growth') if t('cm_growth') in global_scenarios.columns else 'CM'], 
+            subset=['CM_Growth_€' if 'CM_Growth_€' in global_scenarios.columns else 'CM'],  # Английские названия
             cmap='Greens', vmin=0),
         use_container_width=True
     )
     
-    growth_scenarios = global_scenarios[global_scenarios[t('scenario')] != 'BASELINE']
+    growth_scenarios = global_scenarios[global_scenarios['Scenario'] != 'BASELINE']
     if not growth_scenarios.empty and t('cm_growth') in growth_scenarios.columns:
         # Округляем для корректного сравнения
         growth_scenarios['CM_Growth_Rounded'] = growth_scenarios[t('cm_growth')].round(0)
@@ -3809,9 +3822,9 @@ with tabs[5]:
         
         st.write(f"**{t('best_scenarios')} ({len(best_scenarios)} с одинаковым эффектом):**")
         for _, scenario in best_scenarios.iterrows():
-            st.write(f"- **{scenario[t('scenario')]}**: {t('cm_growth')} {scenario[t('cm_growth')]:+,.0f} €")
+            st.write(f"- **{scenario['Scenario']}**: {t('profit_growth')} {scenario['CM_Growth_€']:+,.0f} €")
             st.write(f"  ROMI: {scenario['ROMI']:.1f}%")
-            st.write(f"  {t('action')}: {ACTION_INSIGHTS.get(scenario[t('scenario_type')], '')}")
+            st.write(f"  {t('action')}: {ACTION_INSIGHTS.get(scenario['Scenario_Type'], '')}")
     
     # Анализ чувствительности
     st.subheader(t("sensitivity_analysis"))
@@ -3868,75 +3881,64 @@ with tabs[5]:
             with st.expander(f"**{product_name.upper()}**"):
                 scenarios = generate_scenarios_for_row(row, product_name)
                 if not scenarios.empty:
-                    base_scenario = scenarios[scenarios[t('scenario')] == 'BASELINE']
+                    # 1. Исправляем обращения к столбцам
+                    base_scenario = scenarios[scenarios['Scenario'] == 'BASELINE']  # 'Scenario' вместо t('scenario')
                     if not base_scenario.empty:
                         base_cm = base_scenario.iloc[0]['CM']
-                        scenarios[t('cm_growth')] = scenarios['CM'] - base_cm
+                        scenarios['CM_Growth_€'] = scenarios['CM'] - base_cm  # 'CM_Growth_€' вместо t('cm_growth')
                     
-                    display_cols = [t('scenario'), 'UA', 'C1', 'B', 'AOV', 'APC', t('revenue'), 'CM', t('cm_growth'), 'ROMI']
+                    # 2. Английские названия столбцов
+                    display_cols = ['Scenario', 'UA', 'C1', 'B', 'AOV', 'APC', 'Revenue', 'CM', 'CM_Growth_€', 'ROMI']  # Английские!
                     
-                    if t('cm_growth') in scenarios.columns:
-                        display_df = scenarios[display_cols].sort_values(t('cm_growth'), ascending=False)
+                    # 3. Проверка и сортировка по английским названиям
+                    if 'CM_Growth_€' in scenarios.columns:
+                        display_df = scenarios[display_cols].sort_values('CM_Growth_€', ascending=False)  # Английское
                     else:
                         display_df = scenarios[display_cols]
                     
+                    # 4. Форматирование с английскими ключами
                     st.dataframe(
                         display_df.style.format({
-                            'UA': '{:,.0f}', 'B': '{:,.0f}', t('revenue'): '{:,.0f}', 
-                            'CM': '{:,.0f}', t('cm_growth'): '{:+,.0f}' if t('cm_growth') in scenarios.columns else '{}', 
+                            'UA': '{:,.0f}', 'B': '{:,.0f}', 'Revenue': '{:,.0f}',  # 'Revenue' вместо t('revenue')
+                            'CM': '{:,.0f}', 'CM_Growth_€': '{:+,.0f}' if 'CM_Growth_€' in scenarios.columns else '{}',  # Английское
                             'ROMI': '{:.1f}%',
                             'C1': '{:.2%}', 'AOV': '{:,.1f}', 'APC': '{:.2f}'
                         }).background_gradient(
-                            subset=[t('cm_growth') if t('cm_growth') in scenarios.columns else 'CM', 'ROMI'], 
+                            subset=['CM_Growth_€' if 'CM_Growth_€' in scenarios.columns else 'CM', 'ROMI'],  # Английские
                             cmap='RdYlGn'),
                         use_container_width=True
                     )
                     
-                    growth_scenarios = scenarios[scenarios[t('scenario')] != 'BASELINE']
-                    if not growth_scenarios.empty and t('cm_growth') in growth_scenarios.columns:
-                        # Округляем для корректного сравнения
-                        growth_scenarios['CM_Growth_Rounded'] = growth_scenarios[t('cm_growth')].round(0)
+                    # 5. Английские названия столбцов
+                    growth_scenarios = scenarios[scenarios['Scenario'] != 'BASELINE']  # 'Scenario' вместо t('scenario')
+                    if not growth_scenarios.empty and 'CM_Growth_€' in growth_scenarios.columns:  # 'CM_Growth_€' вместо t('cm_growth')
+                        growth_scenarios['CM_Growth_Rounded'] = growth_scenarios['CM_Growth_€'].round(0)  # Английское
                         max_growth = growth_scenarios['CM_Growth_Rounded'].max()
                         best_scenarios = growth_scenarios[growth_scenarios['CM_Growth_Rounded'] == max_growth]
                         
                         st.write(f"**{t('product_scenarios')} ({len(best_scenarios)} с одинаковым эффектом):**")
                         for _, scenario in best_scenarios.iterrows():
-                            st.write(f"- **{scenario[t('scenario')]}**: {t('cm_growth')} {scenario[t('cm_growth')]:+,.0f} €")
-                            st.write(f"  {t('action')}: {ACTION_INSIGHTS.get(scenario[t('scenario_type')], '')}")
-                        
-                        # Собираем ВСЕХ лидеров для сводной карты
-                        for _, best_scenario in best_scenarios.iterrows():
-                            all_scenarios.append({
-                                t('product'): product_name, 
-                                t('best_scenario'): best_scenario[t('scenario')],
-                                t('scenario_type'): best_scenario[t('scenario_type')], 
-                                t('cm_growth'): best_scenario[t('cm_growth')],
-                                'Base_CM': scenarios[scenarios[t('scenario')] == 'BASELINE'].iloc[0]['CM'],
-                                t('action'): ACTION_INSIGHTS.get(best_scenario[t('scenario_type')], '')
-                            })
-        
-        # Сводная карта приоритетов
-        if all_scenarios:
-            st.subheader(t("priority_map"))
-            
-            summary = pd.DataFrame(all_scenarios)
-            summary[t('growth_pct_column')] = (summary[t('cm_growth')] / summary['Base_CM'].abs() * 100)
-            summary[t('growth_pct_column')] = summary[t('growth_pct_column')].apply(lambda x: x if abs(x) < 1000 else (1000 if x > 0 else -1000))
-            summary = summary.sort_values([t('cm_growth'), t('product')], ascending=[False, True])
-            
-            st.dataframe(
-                summary.style.format({
-                    t('cm_growth'): '{:+,.0f}', 
-                    'Base_CM': '{:,.0f}', 
-                    t('growth_pct_column'): '{:+.1f}%'
-                }).background_gradient(subset=[t('cm_growth')], cmap='Greens', vmin=0)
-                .background_gradient(subset=[t('growth_pct_column')], cmap='RdYlGn', vmin=-100, vmax=100),
-                use_container_width=True
-            )
-            
-            # Пояснение методологии
-            st.info(t('key_insight_text'))
-
+                            st.write(f"- **{scenario['Scenario']}**: {t('profit_growth')} {scenario['CM_Growth_€']:+,.0f} €")
+                            st.write(f"  {t('action')}: {ACTION_INSIGHTS.get(scenario['Scenario_Type'], '')}")
+                    
+            # Сводная карта приоритетов
+            if all_scenarios:
+                st.subheader(t("priority_map"))
+                
+                summary = pd.DataFrame(all_scenarios)
+                summary['Growth_Pct'] = (summary['CM_Growth_€'] / summary['Base_CM'].abs() * 100)  # Английские ключи
+                summary['Growth_Pct'] = summary['Growth_Pct'].apply(lambda x: x if abs(x) < 1000 else (1000 if x > 0 else -1000))
+                summary = summary.sort_values(['CM_Growth_€', 'Product'], ascending=[False, True])  # Английские
+                
+                st.dataframe(
+                    summary.style.format({
+                        'CM_Growth_€': '{:+,.0f}',  # Английское
+                        'Base_CM': '{:,.0f}', 
+                        'Growth_Pct': '{:+.1f}%'  # Английское
+                    }).background_gradient(subset=['CM_Growth_€'], cmap='Greens', vmin=0)
+                    .background_gradient(subset=['Growth_Pct'], cmap='RdYlGn', vmin=-100, vmax=100),
+                    use_container_width=True
+                )
 # ---------- ВКЛАДКА 7: Дерево метрик и A/B тесты ----------
 with tabs[6]:
     st.markdown(f'<div class="section-title">{t("methodology_ab_testing")}</div>', unsafe_allow_html=True)
