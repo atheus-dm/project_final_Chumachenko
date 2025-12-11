@@ -3798,8 +3798,8 @@ with tabs[5]:
         'CAC': '{:,.1f}', 'CM': '{:,.0f}', 'CM_Growth_€': '{:+,.0f}'  # ← 'CM_Growth_€' вместо t('cm_growth')
     }
     
-    cols = [t('scenario'), 'UA', 'C1', 'B', 'T', 'AOV', 'APC', t('revenue'), 'AC', 
-            'CPA', 'CAC', 'CLTV', 'LTV', 'CM', t('cm_growth'), 'ROMI']
+    cols = ['Scenario', 'UA', 'C1', 'B', 'T', 'AOV', 'APC', 'Revenue', 'AC', 
+        'CPA', 'CAC', 'CLTV', 'LTV', 'CM', 'CM_Growth_€', 'ROMI']
     
     if 'CM_Growth_€' in global_scenarios.columns:
         sorted_df = global_scenarios[cols].sort_values('CM_Growth_€', ascending=False)  # Английское название
