@@ -1657,7 +1657,7 @@ with tabs[5]:
     global_scenarios_df = pd.DataFrame(global_scenarios)
     
     if not global_scenarios_df.empty:
-        base_scenario = global_scenarios_df[global_scenarios_df[t('scenario')] == 'BASELINE']
+        base_scenario = global_scenarios_df[global_scenarios_df['Scenario'] == 'BASELINE']
         if not base_scenario.empty:
             base_cm = base_scenario.iloc[0]['CM']
             global_scenarios_df['CM_Growth_€'] = global_scenarios_df['CM'] - base_cm
@@ -1665,14 +1665,14 @@ with tabs[5]:
     st.subheader(t('growth_scenarios_total_business'))
     
     format_dict = {
-        'UA': '{:,.0f}', 'B': '{:,.0f}', 'T': '{:,.0f}', t('revenue'): '{:,.0f}', 
-        'C1': '{:.2%}', 'ROMI': '{:.0f}%', 'AOV': '{:,.1f}', 'APC': '{:.2f}', 
-        'CLTV': '{:,.0f}', 'LTV': '{:,.1f}', 'AC': '{:,.0f}', 'CPA': '{:,.2f}', 
-        'CAC': '{:,.1f}', 'CM': '{:,.0f}', 'CM_Growth_€': '{:+,.0f}'
+    'UA': '{:,.0f}', 'B': '{:,.0f}', 'T': '{:,.0f}', 'Revenue': '{:,.0f}', 
+    'C1': '{:.2%}', 'ROMI': '{:.0f}%', 'AOV': '{:,.1f}', 'APC': '{:.2f}', 
+    'CLTV': '{:,.0f}', 'LTV': '{:,.1f}', 'AC': '{:,.0f}', 'CPA': '{:,.2f}', 
+    'CAC': '{:,.1f}', 'CM': '{:,.0f}', 'CM_Growth_€': '{:+,.0f}'
     }
     
-    cols = [t('scenario'), 'UA', 'C1', 'B', 'T', 'AOV', 'APC', t('revenue'), 'AC', 
-            'CPA', 'CAC', 'CLTV', 'LTV', 'CM', 'CM_Growth_€', 'ROMI']
+    cols = ['Scenario', 'UA', 'C1', 'B', 'T', 'AOV', 'APC', 'Revenue', 'AC', 
+        'CPA', 'CAC', 'CLTV', 'LTV', 'CM', 'CM_Growth_€', 'ROMI']
     
     if 'CM_Growth_€' in global_scenarios_df.columns:
         sorted_df = global_scenarios_df[cols].sort_values('CM_Growth_€', ascending=False)
@@ -1686,7 +1686,7 @@ with tabs[5]:
         use_container_width=True
     )
     
-    growth_scenarios = global_scenarios_df[global_scenarios_df[t('scenario')] != 'BASELINE']
+    growth_scenarios = global_scenarios_df[global_scenarios_df['Scenario'] != 'BASELINE']
     if not growth_scenarios.empty and 'CM_Growth_€' in growth_scenarios.columns:
         growth_scenarios['CM_Growth_Rounded'] = growth_scenarios['CM_Growth_€'].round(0)
         max_growth = growth_scenarios['CM_Growth_Rounded'].max()
@@ -1694,7 +1694,7 @@ with tabs[5]:
         
         st.write(f"**{t('best_scenarios')}:**")
         for _, scenario in best_scenarios.iterrows():
-            st.write(f"- **{scenario[t('scenario')]}**: {t('profit_growth')} {scenario['CM_Growth_€']:+,.0f} {t('currency')}")
+            st.write(f"- **{scenario['Scenario']}**: {t('profit_growth')} {scenario['CM_Growth_€']:+,.0f} {t('currency')}")
             st.write(f"  ROMI: {scenario['ROMI']:.1f}%")
             st.write(f"  {t('action')}: {ACTION_INSIGHTS.get(scenario['Scenario_Type'], '')}")
 
