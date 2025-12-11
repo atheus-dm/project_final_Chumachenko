@@ -3696,9 +3696,9 @@ with tabs[5]:
             elif 'UA' in scenario_name: scenario_type = 'UA'
         
         return {
-            t('scenario'): scenario_name, t('scenario_type'): scenario_type, t('growth_pct'): growth_pct,
-            t('product'): product_name, 'UA': ua, 'C1': c1, 'B': b, 'AOV': aov, 'APC': apc, 
-            t('transactions'): t, t('revenue'): revenue, 'AC': ac, 'CLTV': cltv, 'LTV': ltv, 
+            'Scenario': scenario_name, 'Scenario_Type': scenario_type, 'Growth_Pct': growth_pct,
+            'Product': product_name, 'UA': ua, 'C1': c1, 'B': b, 'AOV': aov, 'APC': apc, 
+            'T': t, 'Revenue': revenue, 'AC': ac, 'CLTV': cltv, 'LTV': ltv, 
             'CPA': cpa, 'CAC': cac, 'CM': cm, 'ROMI': romi
         }
 
@@ -3750,9 +3750,9 @@ with tabs[5]:
                 cm_impact_pct = (cm_impact / abs(base_cm) * 100) if abs(base_cm) > 0 else 0
                 
                 results.append({
-                    t('metric'): metric, t('change'): f"{step:+.0%}",
-                    t('new_value'): (u if metric=='UA' else c if metric=='C1' else a if metric=='AOV' else p),
-                    t('cm_impact'): cm_impact, t('cm_impact_pct'): cm_impact_pct
+                    'Metric': metric, 'Change': f"{step:+.0%}",  # Английские ключи
+                    'New_Value': (u if metric=='UA' else c if metric=='C1' else a if metric=='AOV' else p),
+                    'CM_Impact': cm_impact, 'CM_Impact_Pct': cm_impact_pct
                 })
         
         return pd.DataFrame(results)
