@@ -2431,7 +2431,7 @@ with tabs[1]:
             manager_stats.columns = ['Manager', 'Deals_Count', 'Min_Days', 'Median_Days', 'Mean_Days', 'Max_Days']
             
             # Фильтруем менеджеров с >=3 сделками
-            manager_stats = manager_stats[manager_stats['Deals_Count'] >= 3]
+            manager_stats = manager_stats[manager_stats['Deals_Count'] >= 3]  # ← ИСПРАВЛЕНО!
 
             if len(manager_stats) > 0:
                 st.subheader(t('manager_speed'))
@@ -2452,8 +2452,8 @@ with tabs[1]:
                     use_container_width=True,
                     height=400
                 )
-    else:
-        st.info(t('insufficient_data'))
+        else:
+            st.info(t('insufficient_data'))
 
     # 4. МЕСЯЧНАЯ ДИНАМИКА ВЫРУЧКИ, ЛИДОВ И СТУДЕНТОВ
     st.subheader(t("monthly_dynamics"))
