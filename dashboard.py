@@ -2428,27 +2428,26 @@ with tabs[1]:
             }).reset_index()
             
             # Выравниваем колонки
-            manager_stats.columns = [t('manager'), t('deals_count_full'), t('minimum'), t('median_full'), t('mean'), t('maximum')]
+            manager_stats.columns = ['Manager', 'Deals_Count', 'Min_Days', 'Median_Days', 'Mean_Days', 'Max_Days']
             
             # Фильтруем менеджеров с >=3 сделками
-            # УБЕРИ ВСЕ t() из квадратных скобок:
-            manager_stats = manager_stats[manager_stats[('Id', 'count')] >= 3]
+            manager_stats = manager_stats[manager_stats['Deals_Count'] >= 3]
 
             if len(manager_stats) > 0:
                 st.subheader(t('manager_speed'))
                 
                 # Сортируем по медиане (быстрее → медленнее)
-                manager_stats = manager_stats.sort_values(('Deal_Age_days', 'median'), ascending=True)
+                manager_stats = manager_stats.sort_values('Median_Days', ascending=True)
                 
                 st.dataframe(
                     manager_stats.style\
-                        .background_gradient(subset=[('Deal_Age_days', 'median')], cmap='RdYlGn_r')\
-                        .background_gradient(subset=[('Deal_Age_days', 'mean')], cmap='RdYlGn_r')\
+                        .background_gradient(subset=['Median_Days'], cmap='RdYlGn_r')\
+                        .background_gradient(subset=['Mean_Days'], cmap='RdYlGn_r')\
                         .format({
-                            ('Deal_Age_days', 'min'): '{:.0f}',
-                            ('Deal_Age_days', 'median'): '{:.1f}',
-                            ('Deal_Age_days', 'mean'): '{:.1f}',
-                            ('Deal_Age_days', 'max'): '{:.0f}'
+                            'Min_Days': '{:.0f}',
+                            'Median_Days': '{:.1f}',
+                            'Mean_Days': '{:.1f}',
+                            'Max_Days': '{:.0f}'
                         }),
                     use_container_width=True,
                     height=400
