@@ -1,0 +1,3460 @@
+"""
+ПОЛНЫЙ АНАЛИТИЧЕСКИЙ ДАШБОРД IT ШКОЛЫ
+Версия 3.0 - Мультиязычная версия (Русский/Немецкий)
+"""
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from datetime import datetime
+import io
+import warnings
+from statsmodels.stats.power import NormalIndPower
+warnings.filterwarnings('ignore')
+
+# ========== СИСТЕМА ПЕРЕВОДОВ ==========
+TRANSLATIONS = {
+    'RU': {
+        # Основные заголовки
+        'full_analytical_report': 'ПОЛНЫЙ АНАЛИТИЧЕСКИЙ ОТЧЕТ IT ШКОЛЫ',
+        'data_period': 'Период данных',
+        'business_summary_metrics': 'СВОДНЫЕ ПОКАЗАТЕЛИ БИЗНЕСА',
+        'no_data': 'Нет данных',
+        
+        # Метрики бизнеса
+        'revenue': 'Выручка',
+        'margin': 'Маржа',
+        'romi': 'ROMI',
+        'ltv': 'LTV',
+        'conversion_c1': 'Конверсия C1',
+        'marketing_spend': 'Маркетинг расходы',
+        'ua': 'UA',
+        'successful_deals': 'Успешные сделки',
+        'unique_clients': 'Уникальные клиенты',
+        'aov_per_transaction': 'AOV на транзакцию',
+        'aov_per_client': 'AOV на клиента',
+        'traffic_sources': 'Источники трафика',
+        'cities': 'Города',
+        'managers': 'Менеджеры',
+        'products': 'Продукты',
+        'top_product': 'Топ продукт',
+        'currency': '€',
+        'days': 'дн',
+        'percent': '%',
+        
+        # Названия вкладок
+        'tab_marketing': 'МАРКЕТИНГ',
+        'tab_sales': 'ПРОДАЖИ',
+        'tab_products': 'ПРОДУКТЫ',
+        'tab_geography': 'ГЕОГРАФИЯ/ЯЗЫКИ',
+        'tab_unit_economics': 'ЮНИТ-ЭКОНОМИКА',
+        'tab_growth_points': 'ТОЧКИ РОСТА',
+        'tab_metrics_tree': 'ДЕРЕВО МЕТРИК И A/B ТЕСТЫ',
+        
+        # Юнит-экономика
+        'unit_economics_business': 'ЮНИТ-ЭКОНОМИКА БИЗНЕСА',
+        'economics_whole_business': 'ЭКОНОМИКА ВСЕГО БИЗНЕСА',
+        'economics_by_products': 'ЭКОНОМИКА ПО ПРОДУКТАМ',
+        'revenue_by_products': 'Выручка по продуктам',
+        'matrix_conversion_vs_ltv': 'Матрица: Конверсия vs LTV',
+        'metric_guide': 'СПРАВОЧНИК МЕТРИК И ФОРМУЛ',
+        'initial_data': 'ИСХОДНЫЕ ДАННЫЕ:',
+        'base_metrics': 'БАЗОВЫЕ МЕТРИКИ:',
+        'transaction_metrics': 'ТРАНЗАКЦИОННЫЕ МЕТРИКИ:',
+        'costs': 'ЗАТРАТЫ:',
+        'economics_profit': 'ЭКОНОМИКА (ПРИБЫЛЬ):',
+        
+        # Точки роста
+        'growth_points_analysis': 'АНАЛИЗ ТОЧКИ РОСТА (SENSITIVITY ANALYSIS)',
+        'total_business_analysis': 'АНАЛИЗ ВСЕГО БИЗНЕСА',
+        'growth_scenarios_total_business': 'СЦЕНАРИИ РОСТА ДЛЯ ВСЕГО БИЗНЕСА',
+        'best_scenarios': 'Наилучшие сценарии',
+        'sensitivity_analysis': 'АНАЛИЗ ЧУВСТВИТЕЛЬНОСТИ (МИКРО-ИЗМЕНЕНИЯ ±5-10%)',
+        'sensitivity_insights': 'Ключевые инсайты по чувствительности:',
+        'product_analysis': 'АНАЛИЗ ПО ПРОДУКТАМ (ТОП-ПРОДУКТЫ)',
+        'priority_map': 'СВОДНАЯ КАРТА ПРИОРИТЕТОВ ПО ПРОДУКТАМ',
+        'growth_insights': 'Ключевой вывод анализа:',
+        'methodology_explanation': 'Почему выбран фокус на C1 (конверсия):',
+        
+        # Маркетинг
+        'marketing_analytics': 'МАРКЕТИНГОВАЯ АНАЛИТИКА',
+        'marketing_funnel': 'МАРКЕТИНГОВАЯ ВОРОНКА И ЭФФЕКТИВНОСТЬ РАСХОДОВ',
+        'conversion_funnel_channels': 'Воронка конверсии по каналам (Log Scale)',
+        'result_cost': 'Стоимость результата',
+        'paid_sources_analysis': 'АНАЛИЗ ПЛАТНЫХ ИСТОЧНИКОВ: CPC vs КАЧЕСТВО',
+        'cpc_vs_conversion': 'CPC vs Конверсия лидов в студентов',
+        'source_efficiency_matrix': 'МАТРИЦА ЭФФЕКТИВНОСТИ ИСТОЧНИКОВ: СКОРОСТЬ VS ЧЕК',
+        'source_matrix_speed_vs_check': 'Матрица Источников: Скорость (X) vs Средний чек (Y)',
+        'roas_by_sources': 'ROAS ПО ИСТОЧНИКАМ ТРАФИКА',
+        'roas_return_on_sources': 'ROAS: Окупаемость источников',
+        'campaign_analysis': 'АНАЛИЗ КАМПАНИЙ ПО ЭФФЕКТИВНОСТИ',
+        'top_campaigns_efficiency': 'ТОП-15 кампаний по эффективности (студенты / лиды)',
+        'detailed_source_stats': 'Детальная статистика по источникам:',
+        'detailed_lead_stats': 'Детализация по лидам и финансам:',
+        'roas_table': 'ROAS ПО ИСТОЧНИКАМ ТРАФИКА:',
+        'campaign_detailed_stats': 'Детальная статистика по кампаниям:',
+        
+        # Продажи
+        'sales_efficiency': 'ЭФФЕКТИВНОСТЬ ОТДЕЛА ПРОДАЖ (KPI 360°)',
+        'dynamics_analysis': 'АНАЛИЗ ДИНАМИКИ И ВЛИЯНИЯ ЗВОНКОВ',
+        'leads_calls_sales_dynamics': 'ДИНАМИКА ЛИДОВ, ЗВОНКОВ И ПРОДАЖ',
+        'calls_impact_on_sales': 'Влияние звонков на продажи (по неделям)',
+        'correlation_analysis': 'Корреляционный анализ:',
+        'calls_distribution': 'РАСПРЕДЕЛЕНИЕ ЗВОНКОВ ДО ПРОДАЖИ',
+        'deal_closing_speed': 'СКОРОСТЬ ЗАКРЫТИЯ СДЕЛОК',
+        'deal_closing_distribution': 'Распределение времени закрытия успешных сделок (Шаг = 5 дней)',
+        'manager_closing_speed': 'Скорость закрытия по менеджерам (только ≥3 сделок)',
+        'monthly_dynamics': 'МЕСЯЧНАЯ ДИНАМИКА: ВЫРУЧКА, СТУДЕНТЫ И ЛИДЫ',
+        'revenue_active_students': 'ВЫРУЧКА И АКТИВНЫЕ СТУДЕНТЫ',
+        'leads_conversion': 'ЛИДЫ И КОНВЕРСИЯ',
+        'monthly_detailed_stats': 'Детальная месячная статистика:',
+        'top_managers': 'ТОП МЕНЕДЖЕРОВ ПО ВЫРУЧКЕ И КОНВЕРСИИ',
+        'top_managers_revenue': 'ТОП-15 Менеджеров по Выручке (Цвет = Конверсия Win Rate)',
+        'top_conversion': 'ТОП по конверсии (Цвет = Скорость закрытия, дни)',
+        'manager_detailed_stats': 'ДЕТАЛЬНАЯ СТАТИСТИКА МЕНЕДЖЕРОВ',
+        'speed_quality_analysis': 'АНАЛИЗ СКОРОСТИ ОТВЕТА (SLA) И КАЧЕСТВА ЛИДОВ',
+        'conversion_by_sla': 'Конверсия по сегментам скорости ответа',
+        'conversion_by_quality': 'Конверсия по качеству лидов (только категории с >10 лидами)',
+        'sla_vs_conversion': 'Скорость ответа vs Конверсия по менеджерам',
+        'manager_sla_analysis': 'Скорость ответа по менеджерам:',
+        'lost_reasons_analysis': 'АНАЛИЗ ПРИЧИНЫ ОТКАЗОВ ПО МЕНЕДЖЕРАМ',
+        'lost_reasons_distribution': 'Распределение причин отказов по менеджерам:',
+        'lost_reasons_total_distribution': 'Общее распределение причин отказов:',
+        
+        # Продукты
+        'products_payments_analysis': 'АНАЛИЗ ПРОДУКТОВ И ПЛАТЕЖЕЙ',
+        'full_product_metrics': 'ПОЛНЫЕ МЕТРИКИ ПО ПРОДУКТАМ',
+        'products_visualizations': 'ВИЗУАЛИЗАЦИИ ЭФФЕКТИВНОСТИ ПРОДУКТОВ',
+        'revenue_by_products_ltv': 'Выручка по продуктам (Цвет = LTV)',
+        'products_matrix_clients_vs_check': 'Матрица продуктов: Клиенты vs Средний чек',
+        'payment_type_analysis': 'АНАЛИЗ ТИПОВ ОПЛАТЫ',
+        'payment_distribution': 'Распределение типов оплата по продуктам',
+        'education_type_analysis': 'АНАЛИЗ ТИПОВ ОБУЧЕНИЯ',
+        'revenue_by_education_type': 'Выручка по типам обучения (Цвет = Средний чек)',
+        
+        # География
+        'geographical_analysis': 'ГЕОГРАФИЧЕСКИЙ АНАЛИЗ',
+        'sales_map': 'КАРТА ПРОДАЖ',
+        'top_cities_revenue': 'ТОП ГОРОДОВ ПО ВЫРУЧКЕ',
+        'cities_efficiency_analysis': 'АНАЛИЗ ЭФФЕКТИВНОСТИ ПО ГОРОДАМ',
+        'top_cities_conversion': 'Топ-10 городов по конверсии',
+        'additional_metrics': 'ДОПОЛНИТЕЛЬНЫЕ МЕТРИКИ',
+        'top_cities_volume': 'Топ-10 городов по объему сделок',
+        'sources_by_cities': 'Топ источников по охвату городов',
+        'german_levels_by_cities': 'УРОВНИ НЕМЕЦКОГО ЯЗЫКА ПО ГОРОДАМ',
+        'german_levels_analysis': 'АНАЛИЗ УРОВНЕЙ НЕМЕЦКОГО ЯЗЫКА',
+        'conversion_by_german_levels': 'Конверсия по уровням немецкого языка',
+        'financial_metrics_by_levels': 'Финансовые показатели по уровням языка',
+        'german_levels_stats': 'Статистика по уровням языка:',
+        'geography_summary': 'СВОДНАЯ СТАТИСТИКА ПО ГЕОГРАФИИ',
+        'cities_distribution': 'Распределение городов по объему сделок',
+        'key_geography_metrics': 'Ключевые метрики географии:',
+        
+        # Дерево метрик и A/B тесты
+        'methodology_ab_testing': 'МЕТОДОЛОГИЯ И A/B ТЕСТИРОВАНИЕ',
+        'metrics_tree': 'ДЕРЕВО МЕТРИК БИЗНЕСА',
+        'hadi_cycles_ab_tests': 'HADI-ЦИКЛЫ И A/B ТЕСТИРОВАНИЕ',
+        'ab_test_parameters_calculation': 'РАСЧЕТ ПАРАМЕТРОВ A/B ТЕСТОВ',
+        'basic_metrics_ab_tests': 'Базовые метрики для A/B тестов:',
+        'ready_hadi_cycles': 'Готовые HADI-циклы для тестирования:',
+        'ab_tests_sample_calculation': 'Расчет минимального объема выборки и времени для статистически значимых результатов при различных целевых эффектах (MDE).',
+        'color_legend': 'Легенда:',
+        'test_implementable': 'тест реализуем в стандартном 2-недельном цикле',
+        'extended_test_needed': 'требуется продленный тест или увеличение трафика',
+        'hypothesis_testing_difficult': 'проверка гипотезы затруднена при текущем трафике',
+        
+        # Общие тексты
+        'insufficient_data': 'Недостаточно данных для анализа',
+        'not_enough_data': 'Нет данных для отображения',
+        'no_city_data': 'Нет данных по городам для анализа',
+        'no_successful_deals': 'Нет успешных сделок для анализа продуктов',
+        'week': 'Неделя',
+        'month': 'Месяц',
+        'leads': 'Лиды',
+        'sales': 'Продажи',
+        'calls': 'Звонки',
+        'students': 'Студенты',
+        'conversion': 'Конверсия',
+        'revenue': 'Выручка',
+        'avg_check': 'Средний чек',
+        'median_speed': 'Медианная скорость',
+        'avg_speed': 'Средняя скорость',
+        'source': 'Источник',
+        'spend': 'Расходы',
+        'clicks': 'Клики',
+        'impressions': 'Показы',
+        'cpc': 'CPC',
+        'cpl': 'CPL',
+        'cps': 'CPS',
+        'cpq': 'CPQ',
+        'ctr': 'CTR',
+        'product': 'Продукт',
+        'manager': 'Менеджер',
+        'city': 'Город',
+        'total_deals': 'Всего сделок',
+        'active_students': 'Активные студенты',
+        'win_rate': 'Конверсия',
+        'avg_calls_per_deal': 'Средние звонки на сделку',
+        'total_revenue': 'Общая выручка',
+        'top_source': 'Топ источник',
+        'level': 'Уровень',
+        'total_deals_count': 'Всего сделок',
+        'avg_revenue_per_student': 'Средняя выручка на студента',
+        'hypothesis': 'Гипотеза',
+        'action': 'Действие',
+        'scenario': 'Сценарий',
+        'scenario_type': 'Тип сценария',
+        'growth_pct': 'Рост %',
+        'cm_growth': 'Прирост CM',
+        'base_cm': 'Базовый CM',
+        'realism_weight': 'Вес реализма',
+        'total_business': 'ВСЕГО БИЗНЕСА',
+        
+        # Сообщения
+        'conclusion': 'Вывод:',
+        'weak_correlation': 'Корреляция слабая',
+        'no_direct_relationship': 'Нет прямой линейной связи между звонками/лидами и продажами в рамках одной недели.',
+        'possible_reasons': 'Возможные причины:',
+        'time_lag': 'Временной лаг (лиды приходят в январе, продажи в марте)',
+        'lead_quality': 'Качество лидов важнее количества',
+        'other_factors': 'Другие факторы (сезонность, акции, качество менеджеров)',
+        
+        # Кнопки и интерфейс
+        'language_russian': 'Русский',
+        'language_german': 'Deutsch',
+        'select_language': 'Выберите язык:',
+        'download_csv': 'Скачать CSV',
+        'download_excel': 'Скачать Excel',
+        'show_raw_data': 'Показать исходные данные',
+        'hide_raw_data': 'Скрыть исходные данные',
+        
+        # Метрики формул
+        'ua_desc': 'Уникальные контакты',
+        'b_desc': 'Уникальные платящие клиенты',
+        'ac_desc': 'Весь маркетинговый бюджет школы',
+        'c1_desc': 'Конверсия из посетителя в покупателя',
+        't_desc': 'Количество платежей',
+        'aov_desc': 'Средний чек ОДНОЙ транзакции',
+        'apc_desc': 'Сколько раз в среднем платит студент',
+        'cogs_desc': 'Себестоимость ОДНОЙ транзакции (комиссии, налоги)',
+        'cpa_desc': 'Цена одного лида',
+        'cac_desc': 'Цена одного покупателя',
+        'cltv_desc': 'Прибыль с одного ПЛАТЯЩЕГО клиента',
+        'ltv_desc': 'Прибыль с одного ПОСЕТИТЕЛЯ - самая важная метрика',
+        'cm_desc': 'Маржинальный вклад',
+        'romi_desc': 'Окупаемость рекламы',
+        
+        # Гипотезы
+        'hadi_1': 'HADI-1. Уведомление менеджера',
+        'hadi_1_desc': 'Внедрение автоматического уведомления менеджера при поступлении заявки и обязательный первый звонок в течение 1 часа',
+        'hadi_2': 'HADI-2. Автоматическая отправка материалов',
+        'hadi_2_desc': 'Автоматическая отправка email с программой курса и видео-отзывом выпускника в течение 5 минут после заявки',
+        'hadi_3': 'HADI-3. SMS-напоминание',
+        'hadi_3_desc': 'Отправка SMS-напоминания о записи на курс через 1 час после пропущенного звонка менеджера',
+        
+        # Действия
+        'channel_scaling': 'Масштабирование каналов',
+        'funnel_optimization': 'Оптимизация воронки',
+        'upsell_pricing': 'Up-sell и цены',
+        'retention_loyalty': 'Удержание и лояльность',
+        'ad_optimization': 'Оптимизация рекламы',
+    },
+    'DE': {
+        # Основные заголовки
+        'full_analytical_report': 'VOLLSTÄNDIGER ANALYTISCHER BERICHT IT-SCHULE',
+        'data_period': 'Datenzeitraum',
+        'business_summary_metrics': 'ZUSAMMENFASSENDE GESCHÄFTSKENNZAHLEN',
+        'no_data': 'Keine Daten',
+        
+        # Метрики бизнеса
+        'revenue': 'Umsatz',
+        'margin': 'Marge',
+        'romi': 'ROMI',
+        'ltv': 'LTV',
+        'conversion_c1': 'Konversion C1',
+        'marketing_spend': 'Marketingausgaben',
+        'ua': 'UA',
+        'successful_deals': 'Erfolgreiche Deals',
+        'unique_clients': 'Eindeutige Kunden',
+        'aov_per_transaction': 'AOV pro Transaktion',
+        'aov_per_client': 'AOV pro Kunde',
+        'traffic_sources': 'Verkehrsquellen',
+        'cities': 'Städte',
+        'managers': 'Manager',
+        'products': 'Produkte',
+        'top_product': 'Top-Produkt',
+        'currency': '€',
+        'days': 'Tage',
+        'percent': '%',
+        
+        # Названия вкладок
+        'tab_marketing': 'MARKETING',
+        'tab_sales': 'VERTRIEB',
+        'tab_products': 'PRODUKTE',
+        'tab_geography': 'GEOGRAFIE/SPRACHEN',
+        'tab_unit_economics': 'UNIT-ECONOMICS',
+        'tab_growth_points': 'WACHSTUMSHEBEL',
+        'tab_metrics_tree': 'KENNZAHLENBAUM & A/B TESTS',
+        
+        # Юнит-экономика
+        'unit_economics_business': 'UNIT-ECONOMICS DES GESCHÄFTS',
+        'economics_whole_business': 'ECONOMICS DES GESAMTEN GESCHÄFTS',
+        'economics_by_products': 'ECONOMICS NACH PRODUKTEN',
+        'revenue_by_products': 'Umsatz nach Produkten',
+        'matrix_conversion_vs_ltv': 'Matrix: Konversion vs LTV',
+        'metric_guide': 'KENNZAHLENLEITFADEN UND FORMELN',
+        'initial_data': 'AUSGANGSDATEN:',
+        'base_metrics': 'BASISKENNZAHLEN:',
+        'transaction_metrics': 'TRANSAKTIONSKENNZAHLEN:',
+        'costs': 'KOSTEN:',
+        'economics_profit': 'ECONOMICS (GEWINN):',
+        
+        # Точки роста
+        'growth_points_analysis': 'WACHSTUMSHEBEL-ANALYSE (SENSITIVITY ANALYSIS)',
+        'total_business_analysis': 'ANALYSE DES GESAMTEN GESCHÄFTS',
+        'growth_scenarios_total_business': 'WACHSTUMSSZENARIEN FÜR DAS GESAMTE GESCHÄFT',
+        'best_scenarios': 'Beste Szenarien',
+        'sensitivity_analysis': 'SENSITIVITÄTSANALYSE (MIKRO-ÄNDERUNGEN ±5-10%)',
+        'sensitivity_insights': 'Wichtige Erkenntnisse zur Sensitivität:',
+        'product_analysis': 'PRODUKTANALYSE (TOP-PRODUKTE)',
+        'priority_map': 'ZUSAMMENFASSENDE PRIORITÄTENKARTE NACH PRODUKTEN',
+        'growth_insights': 'Wichtige Erkenntnis der Analyse:',
+        'methodology_explanation': 'Warum der Fokus auf C1 (Konversion):',
+        
+        # Маркетинг
+        'marketing_analytics': 'MARKETING-ANALYTIK',
+        'marketing_funnel': 'MARKETING-TRICHTER UND KOSTENEFFIZIENZ',
+        'conversion_funnel_channels': 'Konversionstrichter nach Kanälen (Log-Skala)',
+        'result_cost': 'Ergebnis-Kosten',
+        'paid_sources_analysis': 'ANALYSE BEZAHLTER QUELLEN: CPC vs QUALITÄT',
+        'cpc_vs_conversion': 'CPC vs Konversion von Leads zu Studenten',
+        'source_efficiency_matrix': 'EFFIZIENZMATRIX DER QUELLEN: GESCHWINDIGKEIT VS CHECK',
+        'source_matrix_speed_vs_check': 'Quellen-Matrix: Geschwindigkeit (X) vs Durchschnittlicher Check (Y)',
+        'roas_by_sources': 'ROAS NACH VERKEHRSQUELLEN',
+        'roas_return_on_sources': 'ROAS: Rentabilität der Quellen',
+        'campaign_analysis': 'ANALYSE VON KAMPAGNEN NACH EFFIZIENZ',
+        'top_campaigns_efficiency': 'TOP-15 Kampagnen nach Effizienz (Studenten / Leads)',
+        'detailed_source_stats': 'Detaillierte Statistiken nach Quellen:',
+        'detailed_lead_stats': 'Details zu Leads und Finanzen:',
+        'roas_table': 'ROAS NACH VERKEHRSQUELLEN:',
+        'campaign_detailed_stats': 'Detaillierte Kampagnenstatistiken:',
+        
+        # Продажи
+        'sales_efficiency': 'EFFIZIENZ DES VERTRIEBS (KPI 360°)',
+        'dynamics_analysis': 'ANALYSE DER DYNAMIK UND AUSWIRKUNGEN VON ANRUFEN',
+        'leads_calls_sales_dynamics': 'DYNAMIK VON LEADS, ANRUFEN UND VERKÄUFEN',
+        'calls_impact_on_sales': 'Auswirkungen von Anrufen auf Verkäufe (nach Wochen)',
+        'correlation_analysis': 'Korrelationsanalyse:',
+        'calls_distribution': 'VERTEILUNG DER ANRUFE BIS ZUM VERKAUF',
+        'deal_closing_speed': 'GESCHWINDIGKEIT DES DEAL-ABSCHLUSSES',
+        'deal_closing_distribution': 'Verteilung der Abschlusszeiten erfolgreicher Deals (Schritt = 5 Tage)',
+        'manager_closing_speed': 'Abschlussgeschwindigkeit nach Managern (nur ≥3 Deals)',
+        'monthly_dynamics': 'MONATLICHE DYNAMIK: UMSATZ, STUDENTEN UND LEADS',
+        'revenue_active_students': 'UMSATZ UND AKTIVE STUDENTEN',
+        'leads_conversion': 'LEADS UND KONVERSION',
+        'monthly_detailed_stats': 'Detaillierte monatliche Statistiken:',
+        'top_managers': 'TOP MANAGER NACH UMSATZ UND KONVERSION',
+        'top_managers_revenue': 'TOP-15 Manager nach Umsatz (Farbe = Konversion Win Rate)',
+        'top_conversion': 'TOP nach Konversion (Farbe = Abschlussgeschwindigkeit, Tage)',
+        'manager_detailed_stats': 'DETAILLIERTE MANAGER-STATISTIKEN',
+        'speed_quality_analysis': 'ANALYSE DER ANTWORTZEIT (SLA) UND LEAD-QUALITÄT',
+        'conversion_by_sla': 'Konversion nach Antwortzeit-Segmenten',
+        'conversion_by_quality': 'Konversion nach Lead-Qualität (nur Kategorien mit >10 Leads)',
+        'sla_vs_conversion': 'Antwortzeit vs Konversion nach Managern',
+        'manager_sla_analysis': 'Antwortzeit nach Managern:',
+        'lost_reasons_analysis': 'ANALYSE DER ABSAGE-GRÜNDE NACH MANAGERN',
+        'lost_reasons_distribution': 'Verteilung der Absage-Gründe nach Managern:',
+        'lost_reasons_total_distribution': 'Gesamtverteilung der Absage-Gründe:',
+        
+        # Продукты
+        'products_payments_analysis': 'ANALYSE VON PRODUKTEN UND ZAHLUNGEN',
+        'full_product_metrics': 'VOLLSTÄNDIGE PRODUKTKENNZAHLEN',
+        'products_visualizations': 'VISUALISIERUNGEN DER PRODUKTEFFIZIENZ',
+        'revenue_by_products_ltv': 'Umsatz nach Produkten (Farbe = LTV)',
+        'products_matrix_clients_vs_check': 'Produkt-Matrix: Kunden vs Durchschnittlicher Check',
+        'payment_type_analysis': 'ANALYSE DER ZAHLUNGSARTEN',
+        'payment_distribution': 'Verteilung der Zahlungsarten nach Produkten',
+        'education_type_analysis': 'ANALYSE DER AUSBILDUNGSARTEN',
+        'revenue_by_education_type': 'Umsatz nach Ausbildungstypen (Farbe = Durchschnittlicher Check)',
+        
+        # География
+        'geographical_analysis': 'GEOGRAFISCHE ANALYSE',
+        'sales_map': 'VERKAUFSKARTE',
+        'top_cities_revenue': 'TOP STÄDTE NACH UMSATZ',
+        'cities_efficiency_analysis': 'ANALYSE DER EFFIZIENZ NACH STÄDTEN',
+        'top_cities_conversion': 'Top-10 Städte nach Konversion',
+        'additional_metrics': 'ZUSÄTZLICHE KENNZAHLEN',
+        'top_cities_volume': 'Top-10 Städte nach Deal-Volumen',
+        'sources_by_cities': 'Top Quellen nach Stadtabdeckung',
+        'german_levels_by_cities': 'DEUTSCH-SPRACHNIVEAUS NACH STÄDTEN',
+        'german_levels_analysis': 'ANALYSE DER DEUTSCH-SPRACHNIVEAUS',
+        'conversion_by_german_levels': 'Konversion nach Deutsch-Sprachniveaus',
+        'financial_metrics_by_levels': 'Finanzkennzahlen nach Sprachniveaus',
+        'german_levels_stats': 'Statistiken nach Sprachniveaus:',
+        'geography_summary': 'ZUSAMMENFASSENDE GEOGRAFIE-STATISTIKEN',
+        'cities_distribution': 'Verteilung der Städte nach Deal-Volumen',
+        'key_geography_metrics': 'Wichtige Geografie-Kennzahlen:',
+        
+        # Дерево метрик и A/B тесты
+        'methodology_ab_testing': 'METHODIK UND A/B TESTING',
+        'metrics_tree': 'KENNZAHLENBAUM DES GESCHÄFTS',
+        'hadi_cycles_ab_tests': 'HADI-ZYKLEN UND A/B TESTING',
+        'ab_test_parameters_calculation': 'BERECHNUNG DER A/B TEST-PARAMETER',
+        'basic_metrics_ab_tests': 'Basis-Kennzahlen für A/B Tests:',
+        'ready_hadi_cycles': 'Fertige HADI-Zyklen zum Testen:',
+        'ab_tests_sample_calculation': 'Berechnung des minimalen Stichprobenumfangs und der Zeit für statistisch signifikante Ergebnisse bei verschiedenen Ziel-Effekten (MDE).',
+        'color_legend': 'Legende:',
+        'test_implementable': 'Test realisierbar im standard 2-wöchigen Zyklus',
+        'extended_test_needed': 'verlängerter Test oder mehr Traffic erforderlich',
+        'hypothesis_testing_difficult': 'Hypothesenprüfung schwierig bei aktuellem Traffic',
+        
+        # Общие тексты
+        'insufficient_data': 'Unzureichende Daten für Analyse',
+        'not_enough_data': 'Keine Daten zum Anzeigen',
+        'no_city_data': 'Keine Stadt-Daten für Analyse',
+        'no_successful_deals': 'Keine erfolgreichen Deals für Produktanalyse',
+        'week': 'Woche',
+        'month': 'Monat',
+        'leads': 'Leads',
+        'sales': 'Verkäufe',
+        'calls': 'Anrufe',
+        'students': 'Studenten',
+        'conversion': 'Konversion',
+        'revenue': 'Umsatz',
+        'avg_check': 'Durchschnittlicher Check',
+        'median_speed': 'Median-Geschwindigkeit',
+        'avg_speed': 'Durchschnittsgeschwindigkeit',
+        'source': 'Quelle',
+        'spend': 'Ausgaben',
+        'clicks': 'Klicks',
+        'impressions': 'Impressions',
+        'cpc': 'CPC',
+        'cpl': 'CPL',
+        'cps': 'CPS',
+        'cpq': 'CPQ',
+        'ctr': 'CTR',
+        'product': 'Produkt',
+        'manager': 'Manager',
+        'city': 'Stadt',
+        'total_deals': 'Gesamte Deals',
+        'active_students': 'Aktive Studenten',
+        'win_rate': 'Konversion',
+        'avg_calls_per_deal': 'Durchschnittliche Anrufe pro Deal',
+        'total_revenue': 'Gesamtumsatz',
+        'top_source': 'Top-Quelle',
+        'level': 'Niveau',
+        'total_deals_count': 'Gesamtzahl Deals',
+        'avg_revenue_per_student': 'Durchschnittlicher Umsatz pro Student',
+        'hypothesis': 'Hypothese',
+        'action': 'Aktion',
+        'scenario': 'Szenario',
+        'scenario_type': 'Szenario-Typ',
+        'growth_pct': 'Wachstum %',
+        'cm_growth': 'CM-Zuwachs',
+        'base_cm': 'Basis-CM',
+        'realism_weight': 'Realismus-Gewicht',
+        'total_business': 'GESAMTES GESCHÄFT',
+        
+        # Сообщения
+        'conclusion': 'Fazit:',
+        'weak_correlation': 'Korrelation schwach',
+        'no_direct_relationship': 'Kein direkter linearer Zusammenhang zwischen Anrufen/Leads und Verkäufen innerhalb einer Woche.',
+        'possible_reasons': 'Mögliche Gründe:',
+        'time_lag': 'Zeitversatz (Leads kommen im Januar, Verkäufe im März)',
+        'lead_quality': 'Lead-Qualität wichtiger als Quantität',
+        'other_factors': 'Andere Faktoren (Saisonalität, Aktionen, Manager-Qualität)',
+        
+        # Кнопки и интерфейс
+        'language_russian': 'Russisch',
+        'language_german': 'Deutsch',
+        'select_language': 'Sprache wählen:',
+        'download_csv': 'CSV herunterladen',
+        'download_excel': 'Excel herunterladen',
+        'show_raw_data': 'Rohdaten anzeigen',
+        'hide_raw_data': 'Rohdaten ausblenden',
+        
+        # Метрики формул
+        'ua_desc': 'Eindeutige Kontakte',
+        'b_desc': 'Eindeutige zahlende Kunden',
+        'ac_desc': 'Gesamtes Marketingbudget der Schule',
+        'c1_desc': 'Konversion vom Besucher zum Käufer',
+        't_desc': 'Anzahl der Zahlungen',
+        'aov_desc': 'Durchschnittlicher Check EINER Transaktion',
+        'apc_desc': 'Wie oft zahlt ein Student im Durchschnitt',
+        'cogs_desc': 'Selbstkosten EINER Transaktion (Gebühren, Steuern)',
+        'cpa_desc': 'Kosten pro Lead',
+        'cac_desc': 'Kosten pro Kunde',
+        'cltv_desc': 'Gewinn pro ZAHLENDEN Kunden',
+        'ltv_desc': 'Gewinn pro BESUCHER - wichtigste Kennzahl',
+        'cm_desc': 'Deckungsbeitrag',
+        'romi_desc': 'Rentabilität der Werbung',
+        
+        # Гипотезы
+        'hadi_1': 'HADI-1. Manager-Benachrichtigung',
+        'hadi_1_desc': 'Einführung automatischer Manager-Benachrichtigung bei eingehender Anfrage und verpflichtender erster Anruf innerhalb 1 Stunde',
+        'hadi_2': 'HADI-2. Automatischer Materialversand',
+        'hadi_2_desc': 'Automatischer E-Mail-Versand mit Kursprogramm und Video-Erfahrungsbericht innerhalb 5 Minuten nach Anfrage',
+        'hadi_3': 'HADI-3. SMS-Erinnerung',
+        'hadi_3_desc': 'SMS-Erinnerung zur Kurseinschreibung 1 Stunde nach verpasstem Manager-Anruf',
+        
+        # Действия
+        'channel_scaling': 'Kanal-Skalierung',
+        'funnel_optimization': 'Trichter-Optimierung',
+        'upsell_pricing': 'Up-Sell und Preise',
+        'retention_loyalty': 'Bindung und Loyalität',
+        'ad_optimization': 'Werbungsoptimierung',
+    }
+}
+
+# Функция перевода
+def t(key):
+    """Получить перевод по ключу для текущего языка"""
+    return TRANSLATIONS.get(st.session_state.language, {}).get(key, key)
+
+# ========== НАСТРОЙКА СТРАНИЦЫ И САЙДБАР ==========
+st.set_page_config(
+    page_title=t('full_analytical_report'),
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Инициализация языка в session_state
+if 'language' not in st.session_state:
+    st.session_state.language = 'RU'
+
+# Сайдбар с переключателем языка
+with st.sidebar:
+    st.markdown(f"### {t('select_language')}")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button(t('language_russian'), use_container_width=True):
+            st.session_state.language = 'RU'
+            st.rerun()
+    with col2:
+        if st.button(t('language_german'), use_container_width=True):
+            st.session_state.language = 'DE'
+            st.rerun()
+
+st.markdown("""
+<style>
+    .main-title {font-size: 2rem; color: #1E3A8A; font-weight: 700; margin-bottom: 0.5rem;}
+    .section-title {font-size: 1.3rem; color: #374151; font-weight: 600; margin-top: 1.5rem; padding-bottom: 0.3rem; border-bottom: 2px solid #3B82F6;}
+    .metric-box {
+        background: #f8fafc; 
+        padding: 1rem; 
+        border-radius: 0.5rem; 
+        margin: 0.3rem 0; 
+        border: 1px solid #e5e7eb;
+        color: #000000 !important;
+        font-weight: 600;
+    }
+    .dataframe-table {font-size: 0.9rem;}
+    
+    /* Убираем белую подсветку Streamlit */
+    div[data-testid="stMetric"] {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    div[data-testid="stMetricValue"] {
+        background-color: transparent !important;
+        color: #000000 !important;
+        font-weight: 700 !important;
+    }
+    div[data-testid="stMetricLabel"] {
+        background-color: transparent !important;
+        color: #374151 !important;
+    }
+    div[data-testid="stMetricDelta"] {
+        background-color: transparent !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ========== ЗАГРУЗКА ДАННЫХ ==========
+@st.cache_data(ttl=3600, show_spinner=False)
+def load_data():
+    deals = pd.read_parquet('deals_clean.parquet')
+    spend = pd.read_parquet('spend_clean.parquet')
+    contacts = pd.read_parquet('contacts_clean.parquet')
+    calls = pd.read_parquet('calls_clean.parquet')
+    
+    # Конвертация дат
+    for col in ['Created Time', 'Closing Date']:
+        if col in deals.columns:
+            deals[col] = pd.to_datetime(deals[col], errors='coerce')
+    
+    # СОЗДАЕМ ЧИСЛОВЫЕ ВЕРСИИ timedelta КОЛОНОК (вместо конвертации в строку)
+    td_cols = deals.select_dtypes(include=['timedelta64[ns]']).columns
+    for col in td_cols:
+        # Создаем числовую версию в секундах для анализа
+        deals[f'{col}_seconds'] = deals[col].dt.total_seconds()
+        # Оригинальную колонку оставляем как есть (timedelta)
+        # Её Streamlit может сконвертировать в строку, но у нас есть backup в секундах
+    
+    return deals, spend, contacts, calls
+
+deals, spend, contacts, calls = load_data()
+
+# ========== КООРДИНАТНАЯ БАЗА ДЛЯ КАРТЫ ==========
+COORD_DB = {
+    'Berlin': (52.5200, 13.4050), 'München': (48.1351, 11.5820), 'Hamburg': (53.5511, 9.9937),
+    'Köln': (50.9375, 6.9603), 'Frankfurt': (50.1109, 8.6821), 'Leipzig': (51.3397, 12.3731),
+    'Düsseldorf': (51.2277, 6.7735), 'Dortmund': (51.5136, 7.4653), 'Essen': (51.4556, 7.0116),
+    'Bremen': (53.0793, 8.8017), 'Dresden': (51.0504, 13.7373), 'Hannover': (52.3759, 9.7320),
+    'Nürnberg': (49.4521, 11.0767), 'Duisburg': (51.4344, 6.7623), 'Bochum': (51.4818, 7.2162),
+    'Wuppertal': (51.2562, 7.1508), 'Bielefeld': (52.0302, 8.5325), 'Bonn': (50.7374, 7.0982),
+    'Münster': (51.9607, 7.6261), 'Karlsruhe': (49.0069, 8.4037), 'Mannheim': (49.4875, 8.4660),
+    'Augsburg': (48.3705, 10.8978), 'Wiesbaden': (50.0826, 8.2493), 'Gelsenkirchen': (51.5177, 7.0857),
+    'Mönchengladbach': (51.1805, 6.4428), 'Braunschweig': (52.2689, 10.5268), 'Chemnitz': (50.8321, 12.9208),
+    'Kiel': (54.3233, 10.1228), 'Aachen': (50.7753, 6.0839), 'Halle': (51.4826, 11.9697),
+    'Magdeburg': (52.1205, 11.6276), 'Freiburg': (47.9961, 7.8494), 'Krefeld': (51.3388, 6.5853),
+    'Lübeck': (53.8696, 10.6872), 'Oberhausen': (51.4780, 6.8625), 'Erfurt': (50.9848, 11.0299),
+    'Mainz': (50.0012, 8.2763), 'Rostock': (54.0924, 12.0991), 'Kassel': (51.3127, 9.4797),
+    'Hagen': (51.3671, 7.4633), 'Saarbrücken': (49.2402, 6.9969), 'Hamm': (51.6803, 7.8209),
+    'Ludwigshafen': (49.4774, 8.4452), 'Mülheim': (51.4271, 6.8806), 'Oldenburg': (53.1435, 8.2146),
+    'Osnabrück': (52.2799, 8.0472), 'Leverkusen': (51.0459, 7.0192), 'Heidelberg': (49.3988, 8.6724),
+    'Solingen': (51.1694, 7.0815), 'Herne': (51.5372, 7.2223), 'Neuss': (51.2042, 6.6879),
+    'Darmstadt': (49.8728, 8.6512), 'Paderborn': (51.7189, 8.7575), 'Regensburg': (49.0134, 12.1016),
+    'Ingolstadt': (48.7632, 11.4251), 'Würzburg': (49.7913, 9.9534), 'Fürth': (49.4771, 10.9887),
+    'Wolfsburg': (52.4227, 10.7865), 'Offenbach': (50.0956, 8.7761), 'Ulm': (48.4011, 9.9876),
+    'Heilbronn': (49.1427, 9.2109), 'Pforzheim': (48.8922, 8.6946), 'Göttingen': (51.5413, 9.9158),
+    'Bottrop': (51.5259, 6.9248), 'Trier': (49.7499, 6.6373), 'Recklinghausen': (51.6149, 7.1977),
+    'Reutlingen': (48.4914, 9.2112), 'Bremerhaven': (53.5396, 8.5809), 'Koblenz': (50.3569, 7.5890),
+    'Bergisch Gladbach': (50.9916, 7.1368), 'Jena': (50.9271, 11.5892), 'Remscheid': (51.1790, 7.1925),
+    'Erlangen': (49.5897, 11.0039), 'Moers': (51.4516, 6.6403), 'Siegen': (50.8745, 8.0243),
+    'Hildesheim': (52.1548, 9.9578), 'Salzgitter': (52.1508, 10.3593),
+    'Wien': (48.2082, 16.3738), 'Graz': (47.0707, 15.4395), 'Linz': (48.3069, 14.2858),
+    'Salzburg': (47.8095, 13.0550), 'Innsbruck': (47.2692, 11.4041), 'Klagenfurt': (46.6362, 14.3126),
+    'Zürich': (47.3769, 8.5417), 'Basel': (47.5596, 7.5886), 'Bern': (46.9480, 7.4474),
+    'Lausanne': (46.5197, 6.6323), 'Genf': (46.2044, 6.1432), 'Luzern': (47.0502, 8.3093),
+    'St. Gallen': (47.4245, 9.3767), 'Lugano': (46.0037, 8.9511),
+}
+
+# ========== ФУНКЦИИ ГЕОКОДИРОВАНИЯ ==========
+def geocode_city(city_name):
+    """Геокодирование города через локальную базу COORD_DB"""
+    if pd.isna(city_name):
+        return None
+    
+    city_clean = str(city_name).strip()
+    
+    # Ищем в локальной базе
+    for db_city, coords in COORD_DB.items():
+        if db_city.lower() in city_clean.lower() or city_clean.lower() in db_city.lower():
+            return coords
+    
+    return None
+
+def prepare_geodata(city_stats):
+    """Подготовка геоданных для карты"""
+    top_cities = city_stats.head(50).copy()
+    
+    coordinates = []
+    for city in top_cities['City']:
+        coords = geocode_city(city)
+        coordinates.append(coords)
+    
+    top_cities[['lat', 'lon']] = pd.DataFrame(coordinates, index=top_cities.index, columns=['lat', 'lon'])
+    geocoded = top_cities.dropna(subset=['lat', 'lon'])
+    
+    return geocoded
+
+# ========== ДАТЫ МИНИМУМ/МАКСИМУМ ==========
+min_date = deals['Created Time'].min().date()
+max_date = deals['Created Time'].max().date()
+
+# ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ КЛЮЧЕВЫХ МЕТРИК ==========
+def calculate_business_metrics():
+    """Расчет ключевых метрик бизнеса"""
+    
+    # Базовые константы
+    TOTAL_UA = contacts['Id'].nunique()
+    total_marketing_spend = spend['Spend'].sum()
+    
+    # Активные студенты
+    active_students_df = deals[deals['stage_normalized'] == 'Active Student']
+    TOTAL_B_CORRECT = active_students_df['Contact Name'].nunique() if len(active_students_df) > 0 else 0
+    successful_deals_count = len(active_students_df)
+    
+    # Транзакции
+    deals_calc = deals.copy()
+    if 'Payment_Type_Recovered' in deals_calc.columns:
+        deals_calc['Transactions'] = np.where(
+            deals_calc['Payment_Type_Recovered'] == 'one payment',
+            1,
+            deals_calc.get('Months of study', pd.Series(index=deals_calc.index, dtype='float')).fillna(1)
+        )
+    else:
+        deals_calc['Transactions'] = deals_calc.get('Months of study', pd.Series(index=deals_calc.index, data=1))
+    
+    deals_calc.loc[deals_calc['stage_normalized'] != 'Active Student', 'Transactions'] = 0
+    active_students_calc = deals_calc[deals_calc['stage_normalized'] == 'Active Student']
+    
+    # Инициализация
+    total_revenue = 0
+    avg_check = 0
+    avg_check_per_client = 0
+    win_rate_vacuum = 0
+    margin = -total_marketing_spend
+    romi = -100
+    median_deal_age = 0
+    top_product_name = t('no_data')
+    ltv_vacuum_business = 0
+    
+    if len(active_students_df) > 0:
+        total_revenue = active_students_df['revenue'].sum()
+        
+        # AOV на транзакцию
+        total_t = active_students_calc['Transactions'].sum() if len(active_students_calc) > 0 else 0
+        avg_check = total_revenue / total_t if total_t > 0 else 0
+        
+        # AOV на клиента
+        avg_check_per_client = total_revenue / TOTAL_B_CORRECT if TOTAL_B_CORRECT > 0 else 0
+        
+        # Конверсия
+        win_rate_vacuum = (TOTAL_B_CORRECT / TOTAL_UA * 100) if TOTAL_UA > 0 else 0
+        
+        # Маржа и ROMI
+        margin = total_revenue - total_marketing_spend
+        romi = (margin / total_marketing_spend * 100) if total_marketing_spend > 0 else 0
+        
+        # Цикл сделки
+        closed_deals_clean = deals[
+            (deals['Id'].isin(active_students_df['Id'].unique())) &
+            (deals['Closing Date'].notna()) &
+            (deals['Deal_Age_days'].notna()) &
+            (deals['Deal_Age_days'] >= 0)
+        ].copy()
+        if len(closed_deals_clean) > 0:
+            median_deal_age = closed_deals_clean['Deal_Age_days'].median()
+        
+        # LTV и топ продукт
+        if len(active_students_calc) > 0:
+            product_stats = active_students_calc.groupby('Product').agg({
+                'Contact Name': 'nunique',
+                'revenue': 'sum',
+                'Transactions': 'sum',
+            }).reset_index()
+            
+            # LTV расчет
+            product_stats['AOV'] = product_stats['revenue'] / product_stats['Transactions']
+            product_stats['APC'] = product_stats['Transactions'] / product_stats['Contact Name']
+            COGS_FIXED_PER_TRANS = 0
+            COGS_PERCENT_FROM_CHECK = 0.0
+            total_cogs = (product_stats['revenue'] * COGS_PERCENT_FROM_CHECK) + (product_stats['Transactions'] * COGS_FIXED_PER_TRANS)
+            product_stats['COGS'] = total_cogs / product_stats['Transactions'].replace(0, np.nan)
+            product_stats['CLTV'] = (product_stats['AOV'] - product_stats['COGS']) * product_stats['APC']
+            product_stats['C1_vacuum'] = product_stats['Contact Name'] / TOTAL_UA if TOTAL_UA > 0 else 0
+            product_stats['LTV'] = product_stats['CLTV'] * product_stats['C1_vacuum']
+            
+            # Топ продукт
+            top_product_row = product_stats.sort_values('revenue', ascending=False).head(1)
+            top_product_name = top_product_row['Product'].iloc[0] if len(top_product_row) else t('no_data')
+            
+            # Бизнес-LTV
+            if product_stats['Contact Name'].sum() > 0:
+                cltv_weighted = (product_stats['CLTV'] * product_stats['Contact Name']).sum() / product_stats['Contact Name'].sum()
+                ltv_vacuum_business = cltv_weighted * (TOTAL_B_CORRECT / TOTAL_UA) if TOTAL_UA > 0 else 0
+    
+    # Сводные метрики
+    summary_rows = [
+        (t('revenue'), total_revenue, t('currency')),
+        (t('margin'), margin, t('currency')),
+        (t('romi'), romi, t('percent')),
+        (t('ltv'), ltv_vacuum_business, t('currency')),
+        (t('conversion_c1'), win_rate_vacuum, t('percent')),
+        (t('marketing_spend'), total_marketing_spend, t('currency')),
+        (t('ua'), TOTAL_UA, ''),
+        (t('successful_deals'), successful_deals_count, ''),
+        (t('unique_clients'), TOTAL_B_CORRECT, ''),
+        (t('aov_per_transaction'), avg_check, t('currency')),
+        (t('aov_per_client'), avg_check_per_client, t('currency')),
+        (t('traffic_sources'), spend['Source'].nunique(), ''),
+        (t('cities'), deals['City'].nunique(), ''),
+        (t('managers'), deals['Deal Owner Name'].nunique(), ''),
+        (t('products'), deals['Product'].nunique(), ''),
+        (t('top_product'), top_product_name, ''),
+    ]
+
+    summary_df = pd.DataFrame(summary_rows, columns=['Metric', 'Value', 'Unit'])
+    
+    return summary_df, TOTAL_UA, TOTAL_B_CORRECT, total_revenue, total_marketing_spend
+
+# Вызов функции
+summary_df, TOTAL_UA, TOTAL_B, total_revenue, marketing_spend = calculate_business_metrics()
+
+# ========== ЗАГОЛОВОК ==========
+st.markdown(f'<div class="main-title">{t("full_analytical_report")}</div>', unsafe_allow_html=True)
+st.markdown(f"*{t('data_period')}: {min_date} - {max_date}*")
+st.markdown("---")
+
+# ========== КЛЮЧЕВЫЕ МЕТРИКИ ==========
+st.markdown(f'<div class="section-title">{t("business_summary_metrics")}</div>', unsafe_allow_html=True)
+
+# Форматирование для отображения
+def format_value(val, unit):
+    if pd.isna(val):
+        return '—'
+    if isinstance(val, (pd.Timestamp,)):
+        return str(val.date())
+    if isinstance(val, str):
+        return val
+    if unit == t('percent'):
+        return f"{val:,.1f}%"
+    if unit == t('currency'):
+        return f"{val:,.0f} {t('currency')}"
+    if unit == t('days'):
+        return f"{val:,.0f} {t('days')}"
+    return f"{val:,.0f}"
+
+summary_df['Formatted'] = summary_df.apply(lambda r: format_value(r['Value'], r['Unit']), axis=1)
+
+# Отображаем в 4 колонки
+metrics_display = summary_df[['Metric', 'Formatted']].values.tolist()
+cols = st.columns(4)
+for idx, (label, value) in enumerate(metrics_display):
+    with cols[idx % 4]:
+        st.markdown(f'<div class="metric-box"><b>{label}</b><br>{value}</div>', unsafe_allow_html=True)
+
+st.markdown("---")
+
+# ========== ФУНКЦИЯ ЮНИТ-ЭКОНОМИКИ ==========
+def calculate_unit_economics():
+    """Расчет юнит-экономики как в Vacuum Model"""
+    
+    # Настройки
+    COGS_FIXED_PER_TRANS = 0       
+    COGS_PERCENT_FROM_CHECK = 0.0 
+    
+    # 1. Подготовка данных
+    deals_calc = deals.copy()
+    deals_calc['Transactions'] = np.where(
+        deals_calc['Payment_Type_Recovered'] == 'one payment', 
+        1, 
+        deals_calc['Months of study'].fillna(1)
+    )
+    deals_calc.loc[deals_calc['stage_normalized'] != 'Active Student', 'Transactions'] = 0
+    
+    # 2. Расчет UA и AC
+    TOTAL_UA = contacts['Id'].nunique()
+    total_marketing_spend = spend['Spend'].sum()
+    
+    # 3. Агрегация по Продуктам
+    active_students_df = deals_calc[deals_calc['stage_normalized'] == 'Active Student']
+    
+    if len(active_students_df) == 0:
+        return pd.DataFrame(), pd.DataFrame()
+    
+    # Правильный B для TOTAL (уникальные клиенты)
+    TOTAL_B_CORRECT = active_students_df['Contact Name'].nunique()
+    
+    product_stats = active_students_df.groupby('Product').agg({
+        'Contact Name': 'nunique',
+        'revenue': 'sum',
+        'Transactions': 'sum',
+    }).reset_index().rename(columns={
+        'Contact Name': 'B', 
+        'Transactions': 'T',
+        'revenue': 'Revenue'
+    })
+    
+    # 4. Расчет Метрик
+    product_stats['UA'] = TOTAL_UA
+    product_stats['C1'] = product_stats['B'] / product_stats['UA']
+    product_stats['AC'] = total_marketing_spend
+    product_stats['APC'] = product_stats['T'] / product_stats['B']
+    product_stats['AOV'] = product_stats['Revenue'] / product_stats['T']
+    
+    # COGS (на 1 транзакцию)
+    total_cogs_amt = (product_stats['Revenue'] * COGS_PERCENT_FROM_CHECK) + (product_stats['T'] * COGS_FIXED_PER_TRANS)
+    product_stats['COGS'] = total_cogs_amt / product_stats['T']
+    
+    # CLTV (Прибыль с Клиента)
+    product_stats['CLTV'] = (product_stats['AOV'] - product_stats['COGS']) * product_stats['APC']
+    
+    # LTV (Прибыль с Пользователя/UA)
+    product_stats['LTV'] = product_stats['CLTV'] * product_stats['C1']
+    
+    # CPA (Цена Лида)
+    product_stats['CPA'] = product_stats['AC'] / product_stats['UA']
+    
+    # CAC (Цена Клиента)
+    product_stats['CAC'] = product_stats['AC'] / product_stats['B']
+    
+    # CM (Margin)
+    product_stats['CM'] = product_stats['Revenue'] - product_stats['AC'] - total_cogs_amt
+    
+    # ROMI
+    product_stats['ROMI'] = (product_stats['CM'] / product_stats['AC']) * 100
+    
+    # 5. Расчет TOTAL для справки
+    total_row = {
+        'Product': t('total_business'),
+        'UA': TOTAL_UA,
+        'B': TOTAL_B_CORRECT,
+        'Revenue': product_stats['Revenue'].sum(),
+        'AC': total_marketing_spend,
+        'T': product_stats['T'].sum(),
+        'COGS': 0 
+    }
+    total_row['C1'] = total_row['B'] / total_row['UA']
+    total_row['AOV'] = total_row['Revenue'] / total_row['T'] if total_row['T'] > 0 else 0
+    total_row['APC'] = total_row['T'] / total_row['B'] if total_row['B'] > 0 else 0
+    total_cogs_global = (total_row['Revenue'] * COGS_PERCENT_FROM_CHECK) + (total_row['T'] * COGS_FIXED_PER_TRANS)
+    total_row['COGS'] = total_cogs_global / total_row['T'] if total_row['T'] > 0 else 0
+    total_row['CLTV'] = (total_row['AOV'] - total_row['COGS']) * total_row['APC']
+    total_row['LTV'] = total_row['CLTV'] * total_row['C1'] 
+    total_row['CPA'] = total_row['AC'] / total_row['UA']
+    total_row['CAC'] = total_row['AC'] / total_row['B']
+    total_row['CM'] = total_row['Revenue'] - total_row['AC'] - total_cogs_global
+    total_row['ROMI'] = (total_row['CM'] / total_row['AC']) * 100
+    
+    total_df = pd.DataFrame([total_row])
+    
+    final_cols = ['Product', 'UA', 'B', 'C1', 'AOV', 'T', 'APC', 'COGS', 'Revenue', 
+                  'CLTV', 'LTV', 'AC', 'CPA', 'CAC', 'CM', 'ROMI']
+    
+    unit_econ_products = product_stats[final_cols].sort_values(by='CM', ascending=False).reset_index(drop=True)
+    
+    return total_df[final_cols], unit_econ_products
+
+# ========== ФУНКЦИЯ ТОЧЕК РОСТА ==========
+def calculate_growth_points():
+    """Анализ точек роста с sensitivity analysis"""
+    
+    # Настройки
+    GROWTH_PCT = 0.10
+    COGS_FIXED_PER_TRANS = 0
+    COGS_PERCENT_FROM_CHECK = 0.0
+    AC_SCALING_FACTOR = 0.8
+    
+    # Коэффициенты сложности
+    DIFFICULTY_FACTORS = {'UA': 0.2, 'C1': 0.4, 'AOV': 0.6, 'APC': 0.5, 'CPA': 0.3}
+    REALISM_WEIGHTS = {k: 1 - v for k, v in DIFFICULTY_FACTORS.items()}
+    
+    ACTION_INSIGHTS = {
+        'UA': t('channel_scaling'),
+        'C1': t('funnel_optimization'), 
+        'AOV': t('upsell_pricing'),
+        'APC': t('retention_loyalty'),
+        'CPA': t('ad_optimization')
+    }
+    
+    def calculate_scenario_metrics(ua, c1, aov, apc, ac_base, product_name, scenario_name, growth_pct):
+        b = ua * c1 if ua > 0 and c1 > 0 else 0
+        t = b * apc if b > 0 and apc > 0 else 0
+        revenue = t * aov if t > 0 and aov > 0 else 0
+        
+        if "UA" in scenario_name:
+            ac = ac_base * (1 + growth_pct * AC_SCALING_FACTOR)
+        elif "CPA" in scenario_name:
+            ac = ac_base * (1 - growth_pct)
+        else:
+            ac = ac_base
+
+        cogs_total = (revenue * COGS_PERCENT_FROM_CHECK) + (t * COGS_FIXED_PER_TRANS)
+        cogs_per_trans = cogs_total / t if t > 0 else 0
+        
+        cltv = (aov - cogs_per_trans) * apc if aov > 0 and cogs_per_trans >= 0 and apc > 0 else 0
+        ltv = cltv * c1 if cltv > 0 and c1 > 0 else 0
+        
+        cm = revenue - ac - cogs_total
+        romi = (cm / ac * 100) if ac > 0 else 0
+        cpa = ac / ua if ua > 0 else 0
+        cac = ac / b if b > 0 else 0
+        
+        scenario_type = 'BASELINE'
+        if scenario_name != 'BASELINE':
+            if 'C1' in scenario_name: scenario_type = 'C1'
+            elif 'AOV' in scenario_name: scenario_type = 'AOV'
+            elif 'APC' in scenario_name: scenario_type = 'APC'
+            elif 'CPA' in scenario_name: scenario_type = 'CPA'
+            elif 'UA' in scenario_name: scenario_type = 'UA'
+        
+        return {
+            'Scenario': scenario_name, 'Scenario_Type': scenario_type, 'Growth_Pct': growth_pct,
+            'Product': product_name, 'UA': ua, 'C1': c1, 'B': b, 'AOV': aov, 'APC': apc, 
+            'T': t, 'Revenue': revenue, 'AC': ac, 'CLTV': cltv, 'LTV': ltv, 
+            'CPA': cpa, 'CAC': cac, 'CM': cm, 'ROMI': romi,
+            'Realism_Weight': REALISM_WEIGHTS.get(scenario_type, 0.5)
+        }
+    
+    def generate_scenarios_for_row(row, product_name):
+        base_ua, base_c1, base_aov, base_apc = row['UA'], row['C1'], row['AOV'], row['APC']
+        base_ac = row['AC'] if 'AC' in row else 0
+        
+        scenarios = []
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov, base_apc, base_ac, product_name, "BASELINE", 0))
+        
+        g = GROWTH_PCT
+        scenarios.append(calculate_scenario_metrics(
+            base_ua * (1 + g), base_c1, base_aov, base_apc, base_ac, product_name, f"UA +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1 * (1 + g), base_aov, base_apc, base_ac, product_name, f"C1 +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov * (1 + g), base_apc, base_ac, product_name, f"AOV +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov, base_apc * (1 + g), base_ac, product_name, f"APC +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov, base_apc, base_ac, product_name, f"CPA -{int(g*100)}%", g))
+        
+        return pd.DataFrame(scenarios)
+    
+    # Получаем данные юнит-экономики
+    total_df, product_econ = calculate_unit_economics()
+    
+    if len(product_econ) == 0:
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+    
+    # Отбираем топ-продукты
+    revenue_threshold = product_econ['Revenue'].max() * 0.1
+    top_products = product_econ[product_econ['Revenue'] > revenue_threshold].copy()
+    
+    # Генерируем сценарии для каждого продукта
+    all_scenarios_list = []
+    product_scenarios_dict = {}
+    
+    for _, row in top_products.iterrows():
+        product_name = row['Product']
+        scenarios = generate_scenarios_for_row(row, product_name)
+        product_scenarios_dict[product_name] = scenarios
+        
+        # Добавляем в общий список для сводной таблицы
+        growth_scenarios = scenarios[scenarios['Scenario'] != 'BASELINE']
+        if not growth_scenarios.empty:
+            best = growth_scenarios.sort_values('CM', ascending=False).iloc[0]
+            all_scenarios_list.append({
+                'Product': product_name,
+                'Best_Scenario': best['Scenario'],
+                'Scenario_Type': best['Scenario_Type'],
+                'Growth_CM': best['CM'] - scenarios[scenarios['Scenario'] == 'BASELINE'].iloc[0]['CM'],
+                'Base_CM': scenarios[scenarios['Scenario'] == 'BASELINE'].iloc[0]['CM'],
+                'Action': ACTION_INSIGHTS.get(best['Scenario_Type'], '')
+            })
+    
+    # Сводная таблица приоритетов
+    summary_df = pd.DataFrame(all_scenarios_list) if all_scenarios_list else pd.DataFrame()
+    
+    return total_df, product_econ, summary_df
+
+# ========== ВКЛАДКИ ==========
+tabs = st.tabs([
+    t('tab_marketing'),
+    t('tab_sales'),
+    t('tab_products'),
+    t('tab_geography'),
+    t('tab_unit_economics'),
+    t('tab_growth_points'),
+    t('tab_metrics_tree'),
+])
+
+# ---------- ВКЛАДКА 1: ЮНИТ-ЭКОНОМИКА ----------
+with tabs[4]:
+    st.markdown(f'<div class="section-title">{t("unit_economics_business")}</div>', unsafe_allow_html=True)
+    
+    # Получаем данные
+    total_df, product_econ = calculate_unit_economics()
+    product_econ = product_econ[product_econ['B'] > 1].copy()
+    
+    if len(total_df) == 0 or len(product_econ) == 0:
+        st.warning(t('not_enough_data'))
+    else:
+        # Форматирование числовых значений
+        def format_unit_econ(df):
+            return df.style.format({
+                'UA': '{:,.0f}',
+                'B': '{:,.0f}',
+                'C1': '{:.2%}',
+                'AOV': '{:,.1f}',
+                'T': '{:,.0f}',
+                'APC': '{:.2f}',
+                'COGS': '{:.1f}',
+                'Revenue': '{:,.0f}',
+                'CLTV': '{:,.1f}',
+                'LTV': '{:.1f}',
+                'AC': '{:,.0f}',
+                'CPA': '{:.2f}',
+                'CAC': '{:,.1f}',
+                'CM': '{:,.0f}',
+                'ROMI': '{:.1f}%'
+            })
+        
+        st.subheader(t('economics_whole_business'))
+        st.dataframe(
+            format_unit_econ(total_df).background_gradient(subset=['ROMI', 'LTV'], cmap='Greens'),
+            use_container_width=True,
+            height=150
+        )
+        
+        st.subheader(t('economics_by_products'))
+        st.dataframe(
+            format_unit_econ(product_econ).background_gradient(subset=['ROMI', 'LTV'], cmap='RdYlGn'),
+            use_container_width=True
+        )
+        
+        # Визуализация
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if len(product_econ) > 0:
+                fig = px.bar(product_econ, x='Product', y='Revenue',
+                            title=t('revenue_by_products'), color='LTV',
+                            color_continuous_scale='RdYlGn',
+                            labels={'Revenue': f"{t('revenue')} ({t('currency')})", 'LTV': f"LTV ({t('currency')})"})
+                st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            if len(product_econ) > 0:
+                fig2 = px.scatter(product_econ, x='C1', y='LTV', size='Revenue',
+                                 color='Product', hover_name='Product',
+                                 title=t('matrix_conversion_vs_ltv'),
+                                 labels={'C1': f"{t('conversion')} (C1)", 'LTV': f"LTV ({t('currency')})"})
+                st.plotly_chart(fig2, use_container_width=True)
+        
+        # Легенда метрик
+        with st.expander(t('metric_guide')):
+            st.markdown(f"""
+            **{t('initial_data')}**
+            - **UA** = {t('ua_desc')}
+            - **B** = {t('b_desc')}
+            - **AC** = {t('ac_desc')}
+            
+            **{t('base_metrics')}**
+            - **C1** = B / UA ({t('c1_desc')})
+            - **Revenue** = {t('revenue')} (First payment + Recurring payments)
+            
+            **{t('transaction_metrics')}**
+            - **T** = {t('t_desc')}
+            - **AOV** = Revenue / T ({t('aov_desc')})
+            - **APC** = T / B ({t('apc_desc')})
+            
+            **{t('costs')}**
+            - **COGS** = {t('cogs_desc')}
+            - **CPA** = AC / UA ({t('cpa_desc')})
+            - **CAC** = AC / B ({t('cac_desc')})
+            
+            **{t('economics_profit')}**
+            - **CLTV** = (AOV - COGS) × APC ({t('cltv_desc')})
+            - **LTV** = CLTV × C1 ({t('ltv_desc')})
+            - **CM** = Revenue - AC - COGS ({t('cm_desc')})
+            - **ROMI** = CM / AC × 100% ({t('romi_desc')})
+            
+            *{t('no_data')} о постоянных затратах*
+            """)
+
+# ---------- ВКЛАДКА 2: ТОЧКИ РОСТА ----------
+with tabs[5]:
+    st.markdown(f'<div class="section-title">{t("growth_points_analysis")}</div>', unsafe_allow_html=True)
+    
+    # --- НАСТРОЙКИ ---
+    GROWTH_PCT = 0.10
+    COGS_FIXED_PER_TRANS = 0
+    COGS_PERCENT_FROM_CHECK = 0.0
+    
+    ACTION_INSIGHTS = {
+        'UA': t('channel_scaling'),
+        'C1': t('funnel_optimization'), 
+        'AOV': t('upsell_pricing'),
+        'APC': t('retention_loyalty'),
+        'CPA': t('ad_optimization')
+    }
+    
+    # --- ФУНКЦИИ ---
+    def calculate_scenario_metrics(ua, c1, aov, apc, ac_base, product_name, scenario_name, growth_pct):
+        b = ua * c1 if ua > 0 and c1 > 0 else 0
+        t = b * apc if b > 0 and apc > 0 else 0
+        revenue = t * aov if t > 0 and aov > 0 else 0
+        
+        if "UA" in scenario_name:
+            ac = ac_base * (1 + growth_pct)
+        elif "CPA" in scenario_name:
+            ac = ac_base * (1 - growth_pct)
+        else:
+            ac = ac_base
+
+        cogs_total = (revenue * COGS_PERCENT_FROM_CHECK) + (t * COGS_FIXED_PER_TRANS)
+        cogs_per_trans = cogs_total / t if t > 0 else 0
+        
+        cltv = (aov - cogs_per_trans) * apc if aov > 0 and cogs_per_trans >= 0 and apc > 0 else 0
+        ltv = cltv * c1 if cltv > 0 and c1 > 0 else 0
+        
+        cm = revenue - ac - cogs_total
+        romi = (cm / ac * 100) if ac > 0 else 0
+        cpa = ac / ua if ua > 0 else 0
+        cac = ac / b if b > 0 else 0
+        
+        scenario_type = 'BASELINE'
+        if scenario_name != 'BASELINE':
+            if 'C1' in scenario_name: scenario_type = 'C1'
+            elif 'AOV' in scenario_name: scenario_type = 'AOV'
+            elif 'APC' in scenario_name: scenario_type = 'APC'
+            elif 'CPA' in scenario_name: scenario_type = 'CPA'
+            elif 'UA' in scenario_name: scenario_type = 'UA'
+        
+        return {
+            'Scenario': scenario_name, 'Scenario_Type': scenario_type, 'Growth_Pct': growth_pct,
+            'Product': product_name, 'UA': ua, 'C1': c1, 'B': b, 'AOV': aov, 'APC': apc, 
+            'T': t, 'Revenue': revenue, 'AC': ac, 'CLTV': cltv, 'LTV': ltv, 
+            'CPA': cpa, 'CAC': cac, 'CM': cm, 'ROMI': romi
+        }
+
+    def generate_scenarios_for_row(row, product_name):
+        base_ua, base_c1, base_aov, base_apc = row['UA'], row['C1'], row['AOV'], row['APC']
+        base_ac = row['AC'] if 'AC' in row else 0
+        
+        scenarios = []
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov, base_apc, base_ac, product_name, "BASELINE", 0))
+        
+        g = GROWTH_PCT
+        scenarios.append(calculate_scenario_metrics(
+            base_ua * (1 + g), base_c1, base_aov, base_apc, base_ac, product_name, f"UA +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1 * (1 + g), base_aov, base_apc, base_ac, product_name, f"C1 +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov * (1 + g), base_apc, base_ac, product_name, f"AOV +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov, base_apc * (1 + g), base_ac, product_name, f"APC +{int(g*100)}%", g))
+        scenarios.append(calculate_scenario_metrics(
+            base_ua, base_c1, base_aov, base_apc, base_ac, product_name, f"CPA -{int(g*100)}%", g))
+        
+        return pd.DataFrame(scenarios)
+
+    def run_sensitivity_analysis(row, product_name):
+        base_cm = row['CM'] if 'CM' in row else 0
+        results = []
+        
+        metrics = ['UA', 'C1', 'AOV', 'APC']
+        steps = [-0.10, -0.05, 0.05, 0.10]
+        
+        for metric in metrics:
+            for step in steps:
+                u = row['UA'] * (1 + step) if metric == 'UA' else row['UA']
+                c = row['C1'] * (1 + step) if metric == 'C1' else row['C1']
+                a = row['AOV'] * (1 + step) if metric == 'AOV' else row['AOV']
+                p = row['APC'] * (1 + step) if metric == 'APC' else row['APC']
+                
+                cost = row['AC'] * (1 + step) if metric == 'UA' else row['AC']
+                
+                b = u * c if u > 0 and c > 0 else 0
+                t = b * p if b > 0 and p > 0 else 0
+                rev = t * a if t > 0 and a > 0 else 0
+                cogs = (rev * COGS_PERCENT_FROM_CHECK) + (t * COGS_FIXED_PER_TRANS)
+                cm = rev - cost - cogs
+                
+                cm_impact = cm - base_cm
+                cm_impact_pct = (cm_impact / abs(base_cm) * 100) if abs(base_cm) > 0 else 0
+                
+                results.append({
+                    'Metric': metric, 'Change': f"{step:+.0%}",
+                    'New_Value': (u if metric=='UA' else c if metric=='C1' else a if metric=='AOV' else p),
+                    'CM_Impact': cm_impact, 'CM_Impact_Pct': cm_impact_pct
+                })
+        
+        return pd.DataFrame(results)
+    
+    # --- РАСЧЕТ TOTAL BUSINESS ---
+    st.subheader(t('total_business_analysis'))
+    
+    TOTAL_UA = contacts['Id'].nunique()
+    total_marketing_spend = spend['Spend'].sum()
+    active_students_df = deals[deals['stage_normalized'] == 'Active Student']
+    TOTAL_B_CORRECT = active_students_df['Contact Name'].nunique()
+    total_t = active_students_df['Transactions'].sum() if 'Transactions' in active_students_df.columns else 0
+    total_revenue = active_students_df['revenue'].sum()
+
+    cogs_global = (total_revenue * COGS_PERCENT_FROM_CHECK) + (total_t * COGS_FIXED_PER_TRANS)
+    
+    global_row = {
+        'UA': TOTAL_UA,
+        'B': TOTAL_B_CORRECT,
+        'Revenue': total_revenue,
+        'T': total_t,
+        'AC': total_marketing_spend,
+        'C1': TOTAL_B_CORRECT / TOTAL_UA if TOTAL_UA > 0 else 0,
+        'AOV': total_revenue / total_t if total_t > 0 else 0,
+        'APC': total_t / TOTAL_B_CORRECT if TOTAL_B_CORRECT > 0 else 0,
+        'CM': total_revenue - total_marketing_spend - cogs_global
+    }
+    
+    global_scenarios = generate_scenarios_for_row(global_row, t('total_business'))
+    
+    if not global_scenarios.empty:
+        base_scenario = global_scenarios[global_scenarios['Scenario'] == 'BASELINE']
+        if not base_scenario.empty:
+            base_cm = base_scenario.iloc[0]['CM']
+            global_scenarios['CM_Growth_€'] = global_scenarios['CM'] - base_cm
+    
+    st.subheader(t('growth_scenarios_total_business'))
+    
+    format_dict = {
+        'UA': '{:,.0f}', 'B': '{:,.0f}', 'T': '{:,.0f}', 'Revenue': '{:,.0f}', 
+        'C1': '{:.2%}', 'ROMI': '{:.0f}%', 'AOV': '{:,.1f}', 'APC': '{:.2f}', 
+        'CLTV': '{:,.0f}', 'LTV': '{:,.1f}', 'AC': '{:,.0f}', 'CPA': '{:,.2f}', 
+        'CAC': '{:,.1f}', 'CM': '{:,.0f}', 'CM_Growth_€': '{:+,.0f}'
+    }
+    
+    cols = ['Scenario', 'UA', 'C1', 'B', 'T', 'AOV', 'APC', 'Revenue', 'AC', 
+            'CPA', 'CAC', 'CLTV', 'LTV', 'CM', 'CM_Growth_€', 'ROMI']
+    
+    if 'CM_Growth_€' in global_scenarios.columns:
+        sorted_df = global_scenarios[cols].sort_values('CM_Growth_€', ascending=False)
+    else:
+        sorted_df = global_scenarios[cols]
+    
+    st.dataframe(
+        sorted_df.style.format(format_dict).background_gradient(
+            subset=['CM_Growth_€' if 'CM_Growth_€' in global_scenarios.columns else 'CM'], 
+            cmap='Greens', vmin=0),
+        use_container_width=True
+    )
+    
+    growth_scenarios = global_scenarios[global_scenarios['Scenario'] != 'BASELINE']
+    if not growth_scenarios.empty and 'CM_Growth_€' in growth_scenarios.columns:
+        # Округляем для корректного сравнения
+        growth_scenarios['CM_Growth_Rounded'] = growth_scenarios['CM_Growth_€'].round(0)
+        max_growth = growth_scenarios['CM_Growth_Rounded'].max()
+        best_scenarios = growth_scenarios[growth_scenarios['CM_Growth_Rounded'] == max_growth]
+        
+        st.write(f"**{t('best_scenarios')} ({len(best_scenarios)} с одинаковым эффектом):**")
+        for _, scenario in best_scenarios.iterrows():
+            st.write(f"- **{scenario['Scenario']}**: {t('cm_growth')} {scenario['CM_Growth_€']:+,.0f} {t('currency')}")
+            st.write(f"  ROMI: {scenario['ROMI']:.1f}%")
+            st.write(f"  {t('action')}: {ACTION_INSIGHTS.get(scenario['Scenario_Type'], '')}")
+    
+    # Анализ чувствительности
+    st.subheader(t('sensitivity_analysis'))
+    
+    sens_df = run_sensitivity_analysis(global_row, "TOTAL")
+    if not sens_df.empty:
+        sens_df = sens_df.sort_values('CM_Impact', ascending=False)
+        
+        st.dataframe(
+            sens_df.style.format({
+                'New_Value': '{:.2f}', 'CM_Impact': '{:+,.0f}', 'CM_Impact_Pct': '{:+.1f}%'
+            }).background_gradient(subset=['CM_Impact'], cmap='RdYlGn'),
+            use_container_width=True
+        )
+        
+        st.write(f"**{t('sensitivity_insights')}**")
+        for metric in ['UA', 'C1', 'AOV', 'APC']:
+            metric_data = sens_df[sens_df['Metric'] == metric]
+            if not metric_data.empty:
+                max_impact = metric_data.loc[metric_data['CM_Impact'].idxmax()]
+                st.write(f"- **{metric}**: {max_impact['Change']} → {t('cm_growth')}: {max_impact['CM_Impact']:+,.0f} {t('currency')}")
+    
+    # --- АНАЛИЗ ПО ПРОДУКТАМ ---
+    st.subheader(t('product_analysis'))
+    
+    product_stats = active_students_df.groupby('Product').agg({
+        'Contact Name': 'nunique', 'revenue': 'sum', 'Transactions': 'sum'
+    }).reset_index().rename(columns={'Contact Name': 'B', 'Transactions': 'T', 'revenue': 'Revenue'})
+
+    product_stats['UA'] = TOTAL_UA
+    product_stats['AC'] = total_marketing_spend
+    product_stats['C1'] = product_stats['B'] / product_stats['UA']
+    product_stats['AOV'] = product_stats['Revenue'] / product_stats['T']
+    product_stats['APC'] = product_stats['T'] / product_stats['B']
+
+    total_cogs_amt = (product_stats['Revenue'] * COGS_PERCENT_FROM_CHECK) + (product_stats['T'] * COGS_FIXED_PER_TRANS)
+    product_stats['COGS'] = total_cogs_amt / product_stats['T']
+    product_stats['CLTV'] = (product_stats['AOV'] - product_stats['COGS']) * product_stats['APC']
+    product_stats['LTV'] = product_stats['CLTV'] * product_stats['C1']
+    product_stats['CPA'] = product_stats['AC'] / product_stats['UA']
+    product_stats['CAC'] = product_stats['AC'] / product_stats['B']
+    product_stats['CM'] = product_stats['Revenue'] - product_stats['AC'] - total_cogs_amt
+    product_stats['ROMI'] = (product_stats['CM'] / product_stats['AC']) * 100
+
+    revenue_threshold = product_stats['Revenue'].max() * 0.1
+    top_products = product_stats[product_stats['Revenue'] > revenue_threshold].copy()
+    
+    if len(top_products) > 0:
+        all_scenarios = []
+        
+        for _, row in top_products.iterrows():
+            product_name = row['Product']
+            
+            with st.expander(f"**{product_name.upper()}**"):
+                scenarios = generate_scenarios_for_row(row, product_name)
+                if not scenarios.empty:
+                    base_scenario = scenarios[scenarios['Scenario'] == 'BASELINE']
+                    if not base_scenario.empty:
+                        base_cm = base_scenario.iloc[0]['CM']
+                        scenarios['CM_Growth_€'] = scenarios['CM'] - base_cm
+                    
+                    display_cols = ['Scenario', 'UA', 'C1', 'B', 'AOV', 'APC', 'Revenue', 'CM', 'CM_Growth_€', 'ROMI']
+                    
+                    if 'CM_Growth_€' in scenarios.columns:
+                        display_df = scenarios[display_cols].sort_values('CM_Growth_€', ascending=False)
+                    else:
+                        display_df = scenarios[display_cols]
+                    
+                    st.dataframe(
+                        display_df.style.format({
+                            'UA': '{:,.0f}', 'B': '{:,.0f}', 'Revenue': '{:,.0f}', 
+                            'CM': '{:,.0f}', 'CM_Growth_€': '{:+,.0f}' if 'CM_Growth_€' in scenarios.columns else '{}', 
+                            'ROMI': '{:.1f}%',
+                            'C1': '{:.2%}', 'AOV': '{:,.1f}', 'APC': '{:.2f}'
+                        }).background_gradient(
+                            subset=['CM_Growth_€' if 'CM_Growth_€' in scenarios.columns else 'CM', 'ROMI'], 
+                            cmap='RdYlGn'),
+                        use_container_width=True
+                    )
+                    
+                    growth_scenarios = scenarios[scenarios['Scenario'] != 'BASELINE']
+                    if not growth_scenarios.empty and 'CM_Growth_€' in growth_scenarios.columns:
+                        # Округляем для корректного сравнения
+                        growth_scenarios['CM_Growth_Rounded'] = growth_scenarios['CM_Growth_€'].round(0)
+                        max_growth = growth_scenarios['CM_Growth_Rounded'].max()
+                        best_scenarios = growth_scenarios[growth_scenarios['CM_Growth_Rounded'] == max_growth]
+                        
+                        st.write(f"**{t('best_scenarios')} ({len(best_scenarios)} с одинаковым эффектом):**")
+                        for _, scenario in best_scenarios.iterrows():
+                            st.write(f"- **{scenario['Scenario']}**: {t('cm_growth')} {scenario['CM_Growth_€']:+,.0f} {t('currency')}")
+                            st.write(f"  {t('action')}: {ACTION_INSIGHTS.get(scenario['Scenario_Type'], '')}")
+                        
+                        # Собираем ВСЕХ лидеров для сводной карты
+                        for _, best_scenario in best_scenarios.iterrows():
+                            all_scenarios.append({
+                                'Product': product_name, 
+                                'Best_Scenario': best_scenario['Scenario'],
+                                'Scenario_Type': best_scenario['Scenario_Type'], 
+                                'CM_Growth_€': best_scenario['CM_Growth_€'],
+                                'Base_CM': scenarios[scenarios['Scenario'] == 'BASELINE'].iloc[0]['CM'],
+                                'Action': ACTION_INSIGHTS.get(best_scenario['Scenario_Type'], '')
+                            })
+        
+        # Сводная карта приоритетов
+        if all_scenarios:
+            st.subheader(t('priority_map'))
+            
+            summary = pd.DataFrame(all_scenarios)
+            summary['Growth_Pct'] = (summary['CM_Growth_€'] / summary['Base_CM'].abs() * 100)
+            summary['Growth_Pct'] = summary['Growth_Pct'].apply(lambda x: x if abs(x) < 1000 else (1000 if x > 0 else -1000))
+            summary = summary.sort_values(['CM_Growth_€', 'Product'], ascending=[False, True])
+            
+            st.dataframe(
+                summary.style.format({
+                    'CM_Growth_€': '{:+,.0f}', 
+                    'Base_CM': '{:,.0f}', 
+                    'Growth_Pct': '{:+.1f}%'
+                }).background_gradient(subset=['CM_Growth_€'], cmap='Greens', vmin=0)
+                .background_gradient(subset=['Growth_Pct'], cmap='RdYlGn', vmin=-100, vmax=100),
+                use_container_width=True
+            )
+            
+            # Пояснение методологии
+            st.info(f"""
+**{t('growth_insights')}**
+- Несколько сценариев (C1, AOV, APC) показывают **идентичный математический эффект** на прирост CM
+- Это происходит потому, что в текущей модели:
+  - Revenue = UA × C1 × APC × AOV
+  - Увеличение ЛЮБОЙ из этих метрик на 10% дает одинаковый рост Revenue
+  - AC и COGS не меняются для этих сценариев (кроме UA)
+
+**{t('methodology_explanation')}**
+1. **Отсутствие данных о затратах** - у нас нет информации о стоимости изменения каждой метрики
+2. **Стратегические соображения** - улучшение конверсии:
+   - Дает синергетический эффект с другими метриками
+   - Улучшает пользовательский опыт в целом
+   - Часто требует меньших капитальных затрат vs масштабирование трафика (UA)
+3. **Практическая реализуемость** - для C1 уже разработаны:
+   - Готовые HADI-циклы
+   - Конкретные A/B тесты
+   - Измеримые гипотезы
+
+**Где найти детали реализации:**
+- **Готовые HADI-циклы для тестирования** → вкладка "{t('tab_metrics_tree')}"
+""")
+
+# ---------- ВКЛАДКА 1: МАРКЕТИНГ ----------
+with tabs[0]:
+    st.markdown(f'<div class="section-title">{t("marketing_analytics")}</div>', unsafe_allow_html=True)
+    
+    # ========== 0. ПОДГОТОВКА ЕДИНЫХ ДАННЫХ ==========
+    # Студенты по источникам (единый расчет)
+    students_by_source = deals[deals['stage_normalized'] == 'Active Student'].groupby('Source')['Id'].count().reset_index()
+    students_by_source.columns = ['Source', 'Students']
+    
+    # Лиды по источникам
+    leads_by_source = deals.groupby('Source')['Id'].count().reset_index()
+    leads_by_source.columns = ['Source', 'Leads']
+    
+    # Качественные лиды (A-B)
+    quality_filter = ['A - High', 'B - Medium']
+    quality_leads_by_source = deals[deals['Quality'].isin(quality_filter)].groupby('Source')['Id'].count().reset_index()
+    quality_leads_by_source.columns = ['Source', 'Quality_Leads']
+    
+    # Выручка по источникам
+    revenue_by_source = deals[deals['stage_normalized'] == 'Active Student'].groupby('Source')['revenue'].sum().reset_index()
+    revenue_by_source.columns = ['Source', 'Revenue']
+    
+    # Расходы по источникам
+    spend_by_source = spend.groupby('Source').agg({
+        'Spend': 'sum',
+        'Clicks': 'sum',
+        'Impressions': 'sum'
+    }).reset_index()
+    
+    # ========== 1. МАРКЕТИНГОВАЯ ВОРОНКА ==========
+    st.subheader(t('marketing_funnel'))
+    
+    if 'Source' in spend.columns and 'Source' in deals.columns:
+        # Объединение всех метрик
+        funnel_df = spend_by_source.merge(leads_by_source, on='Source', how='left')\
+                                   .merge(quality_leads_by_source, on='Source', how='left')\
+                                   .merge(students_by_source, on='Source', how='left')\
+                                   .merge(revenue_by_source, on='Source', how='left').fillna(0)
+        
+        # Дополнительные расчеты
+        funnel_df['CPC'] = (funnel_df['Spend'] / funnel_df['Clicks']).replace([np.inf, 0], np.nan).fillna(0).round(2)
+        funnel_df['CPL'] = (funnel_df['Spend'] / funnel_df['Leads']).replace([np.inf, 0], np.nan).fillna(0).round(2)
+        funnel_df['CPS'] = (funnel_df['Spend'] / funnel_df['Students']).replace([np.inf, 0], np.nan).fillna(0).round(2)
+        funnel_df['CPQ'] = (funnel_df['Spend'] / funnel_df['Quality_Leads']).replace([np.inf, 0], np.nan).fillna(0).round(2)
+        funnel_df['CTR'] = (funnel_df['Clicks'] / funnel_df['Impressions'] * 100).fillna(0).round(2)
+        
+        # Топ-7 по расходам
+        top_funnel = funnel_df.sort_values(by='Spend', ascending=False).head(7)
+        
+        # График воронки
+        fig1 = make_subplots(
+            rows=2, cols=1,
+            subplot_titles=(t('conversion_funnel_channels'), t('result_cost')),
+            vertical_spacing=0.15,
+            specs=[[{"type": "bar"}], [{"type": "table"}]]
+        )
+        
+        # График 1: Группированная воронка
+        stages = ['Impressions', 'Clicks', 'Leads', 'Students']
+        colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA']
+        
+        for i, stage in enumerate(stages):
+            fig1.add_trace(
+                go.Bar(
+                    name=stage,
+                    x=top_funnel['Source'],
+                    y=top_funnel[stage],
+                    text=top_funnel[stage].apply(lambda x: f"{x:,.0f}"),
+                    textposition='auto',
+                    marker_color=colors[i]
+                ),
+                row=1, col=1
+            )
+        
+        fig1.update_yaxes(type="log", title_text=f"{t('leads')} (Log Scale)", row=1, col=1)
+        
+        # График 2: Таблица с деньгами
+        fig1.add_trace(
+            go.Table(
+                header=dict(
+                    values=[t('source'), t('spend'), t('clicks'), t('leads'), t('students'), t('cpc'), t('cpl'), t('cps')],
+                    fill_color="#0235C4",
+                    font_color='white',
+                    align='left',
+                    font_size=12
+                ),
+                cells=dict(
+                    values=[
+                        top_funnel['Source'],
+                        top_funnel['Spend'].apply(lambda x: f"{x:,.0f}{t('currency')}"),
+                        top_funnel['Clicks'].apply(lambda x: f"{x:,.0f}"),
+                        top_funnel['Leads'].apply(lambda x: f"{x:,.0f}"),
+                        top_funnel['Students'].apply(lambda x: f"{x:,.0f}"),
+                        top_funnel['CPC'].apply(lambda x: f"{x:.2f}"),
+                        top_funnel['CPL'].apply(lambda x: f"{x:.2f}"),
+                        top_funnel['CPS'].apply(lambda x: f"{x:.2f}")
+                    ],
+                    fill_color="#456AD3",
+                    font_color='white',
+                    align='left',
+                    font_size=11
+                )
+            ),
+            row=2, col=1
+        )
+
+        fig1.update_layout(height=800, title_text=f"{t('marketing_analytics')}: {t('leads')} и {t('currency')}", barmode='group')
+        st.plotly_chart(fig1, use_container_width=True)
+    
+    # ========== 2. АНАЛИЗ ПЛАТНЫХ ИСТОЧНИКОВ ==========
+    st.subheader(t('paid_sources_analysis'))
+    
+    if 'Source' in spend.columns and 'Source' in deals.columns:
+        # Объединение данных
+        marketing_deep = spend_by_source.merge(leads_by_source, on='Source', how='left')\
+                                        .merge(students_by_source, on='Source', how='left')\
+                                        .merge(revenue_by_source, on='Source', how='left').fillna(0)
+        
+        # Расчет метрик
+        marketing_deep['CPC'] = (marketing_deep['Spend'] / marketing_deep['Clicks']).replace([np.inf], 0).fillna(0).round(2)
+        marketing_deep['Conversion'] = (marketing_deep['Students'] / marketing_deep['Leads'] * 100).fillna(0).round(2)
+        marketing_deep['CAC'] = (marketing_deep['Spend'] / marketing_deep['Students']).replace([np.inf, 0], np.nan).fillna(0).round(2)
+        marketing_deep['Avg_Check'] = (marketing_deep['Revenue'] / marketing_deep['Students']).replace([np.inf, 0], np.nan).fillna(0).round(2)
+        marketing_deep['ROAS'] = (marketing_deep['Revenue'] / marketing_deep['Spend'] * 100).replace([np.inf, 0], np.nan).fillna(0).round(2)
+        
+        # Фильтр платных источников
+        paid_marketing = marketing_deep[(marketing_deep['Spend'] > 10)].sort_values(by='Spend', ascending=False).copy()
+        
+        if len(paid_marketing) > 0:
+            # График CPC vs Конверсия
+            fig2 = px.scatter(
+                paid_marketing,
+                x='CPC',
+                y='Conversion',
+                size='Spend',
+                color='Source',
+                text='Source',
+                title=t('cpc_vs_conversion'),
+                labels={'CPC': f"{t('cpc')} ({t('currency')})", 'Conversion': f"{t('conversion')} (%)"},
+                height=500
+            )
+            fig2.add_vline(x=paid_marketing['CPC'].median(), line_dash="dash", line_color="gray", annotation_text=f"{t('median_speed')} CPC")
+            fig2.add_hline(y=paid_marketing['Conversion'].median(), line_dash="dash", line_color="gray", annotation_text=f"{t('median_speed')} {t('conversion')}")
+            fig2.update_traces(textposition='top center')
+            st.plotly_chart(fig2, use_container_width=True)
+            
+            # Таблица по источникам
+            st.markdown(f"**{t('detailed_source_stats')}**")
+            
+            display_cols = ['Source', 'Spend', 'Leads', 'Students', 'Conversion', 
+                           'CAC', 'Avg_Check', 'ROAS']
+            
+            st.dataframe(
+                paid_marketing[display_cols].sort_values('Spend', ascending=False).style.format({
+                    'Spend': '{:,.0f}',
+                    'Leads': '{:,.0f}',
+                    'Students': '{:,.0f}',
+                    'Conversion': '{:.1f}%',
+                    'CAC': '{:.0f}',
+                    'Avg_Check': '{:,.0f}',
+                    'ROAS': '{:.0f}%'
+                }).background_gradient(subset=['Conversion', 'ROAS'], cmap='RdYlGn'),
+                use_container_width=True,
+                height=300
+            )
+    
+    # ========== 3. МАТРИЦА ЭФФЕКТИВНОСТИ ИСТОЧНИКОВ ==========
+    st.subheader(t('source_efficiency_matrix'))
+    
+    if 'Source' in deals.columns:
+        # Подготовка данных
+        source_matrix = spend_by_source.merge(leads_by_source, on='Source', how='left')\
+                                       .merge(quality_leads_by_source, on='Source', how='left')\
+                                       .merge(students_by_source, on='Source', how='left')\
+                                       .merge(revenue_by_source, on='Source', how='left').fillna(0)
+        
+        # Качественные метрики
+        source_matrix['Quality_Pct'] = (source_matrix['Quality_Leads'] / source_matrix['Leads'] * 100).round(1)
+        source_matrix['Conversion_Pct'] = (source_matrix['Students'] / source_matrix['Leads'] * 100).round(1)
+        source_matrix['Avg_Check'] = (source_matrix['Revenue'] / source_matrix['Students']).replace([np.inf, 0], np.nan).fillna(0).round(0)
+        source_matrix['ROAS'] = (source_matrix['Revenue'] / source_matrix['Spend'] * 100).replace([np.inf, 0], np.nan).fillna(0).round(1)
+        
+        # Скорость сделок по источникам
+        deals_success = deals[deals['stage_normalized'] == 'Active Student'].copy()
+        speed_by_source = deals_success.groupby('Source')['Deal_Age_days'].median().reset_index()
+        speed_by_source.columns = ['Source', 'Median_Speed_Days']
+        
+        source_matrix = source_matrix.merge(speed_by_source, on='Source', how='left').fillna(0)
+        
+        # Фильтр по минимальному количеству студентов
+        source_matrix_filtered = source_matrix[source_matrix['Students'] >= 5].copy()
+        
+        if len(source_matrix_filtered) > 0:
+            # График матрицы
+            fig3 = px.scatter(
+                source_matrix_filtered,
+                x='Median_Speed_Days',
+                y='Avg_Check',
+                size='Revenue',
+                color='Source',
+                text='Source',
+                title=t('source_matrix_speed_vs_check'),
+                labels={
+                    'Median_Speed_Days': f'{t("median_speed")} {t("conversion")} ({t("days")})', 
+                    'Avg_Check': f'{t("avg_check")} ({t("currency")})',
+                    'Revenue': f'{t("total_revenue")}'
+                },
+                height=600
+            )
+            
+            avg_speed = source_matrix_filtered['Median_Speed_Days'].mean()
+            avg_check = source_matrix_filtered['Avg_Check'].mean()
+            fig3.add_vline(x=avg_speed, line_dash="dash", line_color="gray", annotation_text=f"{t('avg_speed')}")
+            fig3.add_hline(y=avg_check, line_dash="dash", line_color="gray", annotation_text=f"{t('avg_check')}")
+            fig3.update_traces(textposition='top center')
+            st.plotly_chart(fig3, use_container_width=True)
+            
+            # Таблица с лидами
+            st.markdown(f"**{t('detailed_lead_stats')}**")
+            
+            display_cols = ['Source', 'Leads', 'Quality_Leads', 'Quality_Pct', 'Students', 
+                           'Conversion_Pct', 'Revenue', 'Avg_Check', 'ROAS']
+            
+            st.dataframe(
+                source_matrix_filtered[display_cols].sort_values('Revenue', ascending=False).style.format({
+                    'Leads': '{:,.0f}',
+                    'Quality_Leads': '{:,.0f}',
+                    'Quality_Pct': '{:.1f}%',
+                    'Students': '{:,.0f}',
+                    'Conversion_Pct': '{:.1f}%',
+                    'Revenue': '{:,.0f}',
+                    'Avg_Check': '{:,.0f}',
+                    'ROAS': '{:.1f}%'
+                }).background_gradient(subset=['Conversion_Pct', 'ROAS'], cmap='RdYlGn'),
+                use_container_width=True,
+                height=300
+            )
+    
+    # ========== 4. ROAS ПО ИСТОЧНИКАМ ==========
+    st.subheader(t('roas_by_sources'))
+    
+    if 'Source' in spend.columns and 'Source' in deals.columns:
+        # Используем уже подготовленные данные
+        roi_analysis = marketing_deep[(marketing_deep['Spend'] > 0) & (marketing_deep['Students'] > 0)].copy()
+        roi_analysis = roi_analysis.sort_values(by='ROAS', ascending=False)
+        
+        if len(roi_analysis) > 0:
+            # График ROAS
+            fig4 = px.scatter(
+                roi_analysis,
+                x='Spend',
+                y='ROAS',
+                size='Revenue',
+                color='Source',
+                text='Source',
+                title=t('roas_return_on_sources'),
+                labels={'ROAS': f'ROAS (%)', 'Spend': f'{t("spend")} ({t("currency")})'}
+            )
+            fig4.update_traces(textposition='bottom center')
+            fig4.add_hline(y=100, line_dash="dash", line_color="red", annotation_text=f"{t('margin')}")
+            st.plotly_chart(fig4, use_container_width=True)
+            
+            # Таблица ROI
+            st.markdown(f"**{t('roas_table')}**")
+            
+            display_cols = ['Source', 'Spend', 'Students', 'Revenue', 'CAC', 'ROAS']
+            
+            st.dataframe(
+                roi_analysis[display_cols].style.format({
+                    'Spend': '{:,.0f}',
+                    'Students': '{:,.0f}',
+                    'Revenue': '{:,.0f}',
+                    'CAC': '{:.0f}',
+                    'ROAS': '{:.0f}%'
+                }).background_gradient(subset=['ROAS'], cmap='RdYlGn'),
+                use_container_width=True,
+                height=250
+            )
+    
+    # ========== 5. АНАЛИЗ КАМПАНИЙ ==========
+    st.subheader(t('campaign_analysis'))
+    
+    if 'Campaign' in deals.columns:
+        # Efficiency Ratio кампаний
+        lead_counts = deals[deals['stage_normalized'] == 'Lead'].groupby('Campaign')['Id'].nunique().reset_index()
+        lead_counts.columns = ['Campaign', 'Count_Leads']
+        active_counts = deals[deals['stage_normalized'] == 'Active Student'].groupby('Campaign')['Id'].nunique().reset_index()
+        active_counts.columns = ['Campaign', 'Count_Active_Students']
+        
+        campaign_df = lead_counts.merge(active_counts, on='Campaign', how='outer').fillna(0)
+        campaign_df['Efficiency_Ratio'] = (campaign_df['Count_Active_Students'] / campaign_df['Count_Leads'] * 100).replace([np.inf, -np.inf], 0).fillna(0).round(2)
+        campaign_efficiency = campaign_df[(campaign_df['Count_Leads'] + campaign_df['Count_Active_Students']) > 20].copy()
+        
+        if len(campaign_efficiency) > 0:
+            # График
+            fig5 = px.bar(
+                campaign_efficiency.sort_values('Efficiency_Ratio', ascending=False).head(15),
+                x='Campaign', 
+                y='Efficiency_Ratio', 
+                color='Efficiency_Ratio',
+                title=t('top_campaigns_efficiency'),
+                labels={'Efficiency_Ratio': f'{t("conversion")} {t("leads")} в {t("students")} (%)', 'Campaign': f'{t("source")}'},
+                color_continuous_scale='RdYlGn',
+                height=500
+            )
+            fig5.update_layout(xaxis={'categoryorder': 'total descending'})
+            st.plotly_chart(fig5, use_container_width=True)
+            
+            # Таблица
+            st.markdown(f"**{t('campaign_detailed_stats')}**")
+            st.dataframe(
+                campaign_efficiency.sort_values('Efficiency_Ratio', ascending=False).head(15).style.format({
+                    'Count_Leads': '{:,.0f}',
+                    'Count_Active_Students': '{:,.0f}',
+                    'Efficiency_Ratio': '{:.2f}%'
+                }).background_gradient(subset=['Efficiency_Ratio'], cmap='RdYlGn'),
+                use_container_width=True,
+                height=350
+            )
+
+# ---------- ВКЛАДКА 2: ПРОДАЖИ ----------
+with tabs[1]:
+    st.markdown(f'<div class="section-title">{t("sales_efficiency")}</div>', unsafe_allow_html=True)
+    
+    # ========== 0. АНАЛИЗ ЗВОНКОВ И ДИНАМИКИ ==========
+    st.subheader(t('dynamics_analysis'))
+    
+    # --- Подготовка данных для трендов ---
+    weekly_deals = deals.set_index('Created Time').resample('W').agg({
+        'Id': 'count',
+        'stage_normalized': lambda x: (x == 'Active Student').sum()
+    }).reset_index()
+    weekly_deals.columns = ['Week', 'Leads_Count', 'Success_Count']
+    
+    weekly_calls = calls.set_index('Call Start Time').resample('W')['Id'].count().reset_index()
+    weekly_calls.columns = ['Week', 'Calls_Count']
+    
+    weekly_stats = weekly_deals.merge(weekly_calls, on='Week', how='inner').fillna(0)
+    weekly_stats['Conversion_Rate'] = (weekly_stats['Success_Count'] / weekly_stats['Leads_Count'] * 100).round(1)
+    weekly_stats['Calls_Per_Lead'] = (weekly_stats['Calls_Count'] / weekly_stats['Leads_Count']).round(1)
+    
+    # 1. ГРАФИК ДИНАМИКИ ЛИДОВ, ЗВОНКОВ И ПРОДАЖ
+    fig_trend = make_subplots(specs=[[{"secondary_y": True}]])
+
+    fig_trend.add_trace(
+        go.Scatter(
+            x=weekly_stats['Week'], 
+            y=weekly_stats['Leads_Count'], 
+            name=f'{t("leads")}', 
+            line=dict(color='blue', width=3),
+            fill='tozeroy',
+            fillcolor='rgba(0, 0, 255, 0.1)'
+        ),
+        secondary_y=False,
+    )
+
+    multiplier = 50
+    success_scaled = weekly_stats['Success_Count'] * multiplier
+
+    fig_trend.add_trace(
+        go.Scatter(
+            x=weekly_stats['Week'], 
+            y=success_scaled, 
+            name=f'{t("sales")} (×{multiplier})',
+            line=dict(color='green', width=3),
+            fill='tozeroy',
+            fillcolor='rgba(0, 255, 0, 0.3)'
+        ),
+        secondary_y=True,
+    )
+
+    fig_trend.add_trace(
+        go.Scatter(
+            x=weekly_stats['Week'], 
+            y=weekly_stats['Calls_Count'], 
+            name=f'{t("calls")}', 
+            line=dict(dash='dot', color='red', width=2)
+        ),
+        secondary_y=True,
+    )
+
+    fig_trend.update_yaxes(
+        title_text=f"<b>{t('leads')}</b>", 
+        secondary_y=False,
+        title_font=dict(color='white', size=14),
+        showgrid=True
+    )
+
+    fig_trend.update_yaxes(
+        title_text=f"<b>{t('calls')}</b>", 
+        secondary_y=True,
+        title_font=dict(color='white', size=14),
+        showgrid=False
+    )
+
+    fig_trend.data[0].hovertemplate = f"{t('week')}: %{{x}}<br>{t('leads')}: %{{y:.0f}}<extra></extra>"
+    fig_trend.data[1].hovertemplate = f"{t('week')}: %{{x}}<br>{t('sales')}: %{{customdata:.0f}}<extra></extra>"
+    fig_trend.data[1].customdata = weekly_stats['Success_Count']
+    fig_trend.data[2].hovertemplate = f"{t('week')}: %{{x}}<br>{t('calls')}: %{{y:.0f}}<extra></extra>"
+
+    fig_trend.update_layout(
+        title_text=f"<b>{t('leads_calls_sales_dynamics')}</b><br><span style='font-size:12px'>{t('sales')} увеличены для наглядности</span>",
+        hovermode="x unified",
+        height=450
+    )
+
+    st.plotly_chart(fig_trend, use_container_width=True)
+    
+    # 2. ГРАФИК ВЛИЯНИЯ ЗВОНКОВ НА ПРОДАЖИ
+    fig_impact = px.scatter(
+        weekly_stats,
+        x='Calls_Count',
+        y='Success_Count',
+        size='Leads_Count',
+        color='Conversion_Rate',
+        hover_data=['Week', 'Calls_Per_Lead'],
+        title=t('calls_impact_on_sales'),
+        labels={
+            'Calls_Count': f'{t("calls")}',
+            'Success_Count': f'{t("sales")}',
+            'Leads_Count': f'{t("leads")}',
+            'Conversion_Rate': f'{t("conversion")} {t("week")} (%)'
+        },
+        color_continuous_scale='Viridis',
+        height=400
+    )
+    fig_impact.add_traces(
+        px.scatter(weekly_stats, x='Calls_Count', y='Success_Count', trendline="ols").data[1]
+    )
+    st.plotly_chart(fig_impact, use_container_width=True)
+    
+    # КОРРЕЛЯЦИОННЫЙ АНАЛИЗ
+    corr_calls_sales = weekly_stats['Calls_Count'].corr(weekly_stats['Success_Count'])
+    corr_leads_sales = weekly_stats['Leads_Count'].corr(weekly_stats['Success_Count'])
+    
+    st.markdown(f"**{t('correlation_analysis')}**")
+    st.markdown(f"- {t('calls')} → {t('sales')}: **{corr_calls_sales:.2f}**")
+    st.markdown(f"- {t('leads')} → {t('sales')}: **{corr_leads_sales:.2f}**")
+    
+    # ИСПРАВЛЕННЫЙ ВЫВОД
+    st.info(f"""
+    **{t('conclusion')}** {t('weak_correlation')} (0.43-0.54). 
+    {t('no_direct_relationship')}  
+    **{t('possible_reasons')}**
+    - {t('time_lag')}
+    - {t('lead_quality')}
+    - {t('other_factors')}
+    """)
+    
+    # 3. РАСПРЕДЕЛЕНИЕ ЗВОНКОВ ДО ПРОДАЖИ
+    st.subheader(t('calls_distribution'))
+    
+    success_deals = deals[
+        (deals['stage_normalized'] == 'Active Student') & 
+        (deals['Closing Date'].notna()) &
+        (deals['Contact Name'].notna()) & 
+        (deals['Contact Name'] != '')
+    ][['Id', 'Contact Name', 'Closing Date', 'Deal Owner Name']].copy()
+    
+    calls_dates = calls[
+        (calls['CONTACTID'].notna()) & 
+        (calls['CONTACTID'] != '')
+    ][['CONTACTID', 'Call Start Time']].copy()
+    
+    merged_calls = success_deals.merge(
+        calls_dates, 
+        left_on='Contact Name', 
+        right_on='CONTACTID', 
+        how='left'
+    )
+    
+    valid_calls = merged_calls[
+        (merged_calls['Call Start Time'].notna()) &
+        (merged_calls['Call Start Time'].dt.normalize() <= merged_calls['Closing Date'].dt.normalize())
+    ]
+    
+    calls_per_deal = valid_calls.groupby('Id')['Call Start Time'].count().reset_index()
+    calls_per_deal.columns = ['Id', 'Calls_Count']
+    
+    final_calls_stats = pd.DataFrame(success_deals[['Id', 'Deal Owner Name']]).merge(calls_per_deal, on='Id', how='left').fillna(0)
+    
+    percentile_95 = final_calls_stats['Calls_Count'].quantile(0.95)
+    calls_for_histogram = final_calls_stats[final_calls_stats['Calls_Count'] <= percentile_95].copy()
+    
+    avg_calls = final_calls_stats['Calls_Count'].mean()
+    median_calls = final_calls_stats['Calls_Count'].median()
+    total_deals = len(final_calls_stats)
+    
+    fig_calls_dist = px.histogram(
+        calls_for_histogram, 
+        x='Calls_Count',
+        title=f'{t("calls_distribution")} (показано {len(calls_for_histogram)} из {total_deals} сделок, до {int(percentile_95)} звонков)',
+        labels={'Calls_Count': f'{t("calls")}', 'count': f'{t("total_deals")}'},
+        text_auto=True,
+        color_discrete_sequence=['#FFA15A'],
+        nbins=int(percentile_95) + 1
+    )
+    
+    fig_calls_dist.update_xaxes(dtick=1, title_text=f"{t('calls')} до {t('sales')}")
+    fig_calls_dist.update_yaxes(title_text=f"{t('total_deals')}")
+
+    
+    fig_calls_dist.add_vline(
+        x=median_calls, 
+        line_dash="dash", 
+        line_color="green", 
+        annotation_text=f"{t('median_speed')}: {median_calls}",
+        annotation_position="top left",
+        annotation_y=0.95
+    )
+    
+    fig_calls_dist.add_vline(
+        x=avg_calls, 
+        line_dash="dash", 
+        line_color="blue", 
+        annotation_text=f"{t('avg_speed')}: {avg_calls:.1f}",
+        annotation_position="top right",
+        annotation_y=0.85
+    )
+    
+    fig_calls_dist.update_layout(bargap=0.1, height=400, showlegend=False)
+    st.plotly_chart(fig_calls_dist, use_container_width=True)
+
+        # ========== 3. СКОРОСТЬ ЗАКРЫТИЯ СДЕЛОК ==========
+    st.subheader(t('deal_closing_speed'))
+
+    # Фильтрация (только успешные сделки)
+    active_student_ids = deals[deals['stage_normalized'] == 'Active Student']['Id'].unique()
+    closed_deals_clean = deals[
+        (deals['Id'].isin(active_student_ids)) & 
+        (deals['Closing Date'].notna()) & 
+        (deals['Deal_Age_days'].notna()) & 
+        (deals['Deal_Age_days'] >= 0)
+    ].copy()
+
+    if len(closed_deals_clean) > 0:
+        # --- Статистика ---
+        mean_age = closed_deals_clean['Deal_Age_days'].mean()
+        median_age = closed_deals_clean['Deal_Age_days'].median()
+        min_age = closed_deals_clean['Deal_Age_days'].min()
+        max_age = closed_deals_clean['Deal_Age_days'].max()
+        
+        # --- Таблица статистик ---
+        stats_df = pd.DataFrame({
+            t('metric'): [t('avg_speed'), t('median_speed'), t('min'), t('max')],
+            t('days'): [mean_age, median_age, min_age, max_age]
+        })
+        st.dataframe(stats_df, use_container_width=True)
+        
+        # --- ГРАФИК БЕЗ БОКСПЛОТА ---
+        fig = px.histogram(
+            closed_deals_clean, 
+            x='Deal_Age_days', 
+            title=t('deal_closing_distribution'),
+            color_discrete_sequence=['#FFA15A'],
+            opacity=0.75
+        )
+        
+        # Настройка бинов
+        fig.update_traces(xbins=dict(start=0, size=5), selector=dict(type='histogram'))
+        
+        # Линии медианы и среднего
+        fig.add_vline(
+            x=median_age, line_width=2, line_dash="dash", line_color="red",
+            annotation_text=f"{t('median_speed')}: {median_age:.1f}", annotation_position="top left"
+        )
+        fig.add_vline(
+            x=mean_age, line_width=2, line_dash="dash", line_color="green",
+            annotation_text=f"{t('avg_speed')}: {mean_age:.1f}", annotation_position="top right"
+        )
+        
+        # Настройки осей
+        fig.update_xaxes(range=[-1, 120], title_text=f'{t("deal_closing_speed")} ({t("days")})')
+        fig.update_layout(
+            yaxis_title=f'{t("total_deals")}', 
+            showlegend=False, 
+            bargap=0.1,
+            height=550
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # --- ТАБЛИЦА ПО МЕНЕДЖЕРАМ ---
+        if 'Deal Owner Name' in closed_deals_clean.columns:
+            manager_stats = closed_deals_clean.groupby('Deal Owner Name').agg({
+                'Id': 'count',
+                'Deal_Age_days': ['min', 'median', 'mean', 'max']
+            }).reset_index()
+            
+            # Выравниваем колонки
+            manager_stats.columns = [t('manager'), t('total_deals'), t('min'), t('median_speed'), t('avg_speed'), t('max')]
+            
+            # Фильтруем менеджеров с >=3 сделками
+            manager_stats = manager_stats[manager_stats[t('total_deals')] >= 3]
+            
+            if len(manager_stats) > 0:
+                st.subheader(t('manager_closing_speed'))
+                
+                # Сортируем по медиане (быстрее → медленнее)
+                manager_stats = manager_stats.sort_values(t('median_speed'), ascending=True)
+                
+                st.dataframe(
+                    manager_stats.style\
+                        .background_gradient(subset=[t('median_speed')], cmap='RdYlGn_r')\
+                        .background_gradient(subset=[t('avg_speed')], cmap='RdYlGn_r')\
+                        .format({
+                            t('min'): '{:.0f}',
+                            t('median_speed'): '{:.1f}',
+                            t('avg_speed'): '{:.1f}',
+                            t('max'): '{:.0f}'
+                        }),
+                    use_container_width=True,
+                    height=400
+                )
+    else:
+        st.info(t('insufficient_data'))
+
+            # 4. МЕСЯЧНАЯ ДИНАМИКА ВЫРУЧКИ, ЛИДОВ И СТУДЕНТОВ
+    st.subheader(t('monthly_dynamics'))
+
+    # Работаем с копией, не трогаем оригинал
+    deals_monthly = deals.copy()
+    deals_monthly['Created_Month'] = deals_monthly['Created Time'].dt.to_period('M').dt.to_timestamp()
+
+    monthly_stats = deals_monthly.groupby('Created_Month').agg({
+        'Id': 'count',
+        'stage_normalized': lambda x: (x == 'Active Student').sum(),
+        'revenue': 'sum'
+    }).reset_index()
+
+    monthly_stats.columns = ['Month', 'Total_Deals', 'Active_Students', 'Total_Revenue']
+
+    if len(monthly_stats) > 0:
+        monthly_stats['Month_Year'] = monthly_stats['Month'].dt.strftime('%b %Y')
+        monthly_stats['Conversion_Rate_%'] = (monthly_stats['Active_Students'] / monthly_stats['Total_Deals'] * 100).round(1)
+        
+        # Разделенный график: 2 строки, 1 колонка
+        fig_split = make_subplots(
+            rows=2, cols=1,
+            subplot_titles=(
+                f"<b>{t('revenue_active_students')}</b>",
+                f"<b>{t('leads_conversion')}</b>"
+            ),
+            vertical_spacing=0.2,
+            shared_xaxes=True,
+            specs=[[{"secondary_y": True}], [{"secondary_y": True}]]
+        )
+        
+        # ========== ВЕРХНИЙ ГРАФИК ==========
+        fig_split.add_trace(
+            go.Bar(
+                x=monthly_stats['Month_Year'],
+                y=monthly_stats['Total_Revenue'],
+                name=f'{t("revenue")} ({t("currency")})',
+                marker_color='#FFA15A',
+                opacity=0.9,
+                text=monthly_stats['Total_Revenue'].apply(lambda x: f'{x:,.0f}'),
+                textposition='inside',
+                textfont=dict(color='white', size=10),
+                insidetextanchor='start'
+            ),
+            secondary_y=False,
+            row=1, col=1
+        )
+        
+        fig_split.add_trace(
+            go.Scatter(
+                x=monthly_stats['Month_Year'],
+                y=monthly_stats['Active_Students'],
+                name=f'{t("active_students")}',
+                mode='lines+markers+text',
+                line=dict(color='#2E86AB', width=3),
+                marker=dict(size=10, symbol='diamond'),
+                text=monthly_stats['Active_Students'],
+                textposition='top center',
+            ),
+            secondary_y=True,
+            row=1, col=1
+        )
+        
+        # ========== НИЖНИЙ ГРАФИК ==========
+        fig_split.add_trace(
+            go.Bar(
+                x=monthly_stats['Month_Year'],
+                y=monthly_stats['Total_Deals'],
+                name=f'{t("leads")}',
+                marker_color='#00CC96',
+                opacity=0.9,
+                text=monthly_stats['Total_Deals'],
+                textposition='inside',
+                textfont=dict(color='white', size=10),
+                insidetextanchor='start'
+            ),
+            secondary_y=False,
+            row=2, col=1
+        )
+        
+        fig_split.add_trace(
+            go.Scatter(
+                x=monthly_stats['Month_Year'],
+                y=monthly_stats['Conversion_Rate_%'],
+                name=f'{t("conversion")} (%)',
+                mode='lines+markers+text',
+                line=dict(color='#AB63FA', width=3),
+                marker=dict(size=10, symbol='square'),
+                text=monthly_stats['Conversion_Rate_%'].apply(lambda x: f'{x:.1f}%'),
+                textposition='top center',
+            ),
+            secondary_y=True,
+            row=2, col=1
+        )
+        
+        # ========== НАСТРОЙКА ОСЕЙ ==========
+        fig_split.update_yaxes(
+            title_text=f"<b>{t('revenue')} ({t('currency')})</b>",
+            secondary_y=False,
+            row=1, col=1,
+            showgrid=False,
+        )
+        
+        fig_split.update_yaxes(
+            title_text=f"<b>{t('students')}</b>",
+            secondary_y=True,
+            row=1, col=1,
+            showgrid=False,
+            rangemode='tozero'
+        )
+        
+        fig_split.update_yaxes(
+            title_text=f"<b>{t('leads')}</b>",
+            secondary_y=False,
+            row=2, col=1,
+            showgrid=False,
+            rangemode='tozero'
+        )
+        
+        fig_split.update_yaxes(
+            title_text=f"<b>{t('conversion')} (%)</b>",
+            secondary_y=True,
+            row=2, col=1,
+            showgrid=False,
+            range=[0, min(100, monthly_stats['Conversion_Rate_%'].max() * 1.5)]
+        )
+        
+        fig_split.update_xaxes(
+            title_text=f"{t('month')}",
+            row=2, col=1
+        )
+        
+        fig_split.update_layout(
+            height=800,
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            ),
+            hovermode="x unified",
+            bargap=0.3,
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='white')
+        )
+        
+        st.plotly_chart(fig_split, use_container_width=True)
+        
+        # Статистика по месяцам
+        st.markdown(f"**{t('monthly_detailed_stats')}**")
+        
+        month_summary = monthly_stats.copy()
+        month_summary['Avg_Check'] = (month_summary['Total_Revenue'] / month_summary['Active_Students']).replace([np.inf, 0], np.nan).fillna(0).round(0)
+        
+        # Сортируем по Month, но отображаем Month_Year
+        month_summary = month_summary.sort_values('Month', ascending=False)
+        
+        display_cols = ['Month_Year', 'Total_Deals', 'Active_Students', 'Conversion_Rate_%', 
+                    'Total_Revenue', 'Avg_Check']
+        
+        st.dataframe(
+            month_summary[display_cols].style.format({
+                'Total_Deals': '{:,.0f}',
+                'Active_Students': '{:,.0f}',
+                'Total_Revenue': '{:,.0f}',
+                'Avg_Check': '{:,.0f}',
+                'Conversion_Rate_%': '{:.1f}%'
+            }).background_gradient(subset=['Total_Revenue', 'Conversion_Rate_%'], cmap='RdYlGn'),
+            use_container_width=True,
+            height=300
+        )
+    else:
+        st.info(t('insufficient_data'))
+        
+        
+    # ========== 1. ТОП МЕНЕДЖЕРОВ ПО ВЫРУЧКЕ И КОНВЕРСИИ ==========
+    st.subheader(t('top_managers'))
+    
+    if 'Deal Owner Name' in deals.columns:
+        # Подготовка данных
+        df_clean = deals.copy()
+        
+        # Базовые метрики
+        manager_stats = df_clean.groupby('Deal Owner Name').agg(
+            Leads=('Id', 'count'),
+            Revenue=('revenue', 'sum'),
+            Sales=('stage_normalized', lambda x: (x == 'Active Student').sum())
+        ).reset_index().rename(columns={'Deal Owner Name': 'Manager'})
+        
+        # Скорость закрытия
+        speed_stats = df_clean[df_clean['stage_normalized'] == 'Active Student'].groupby('Deal Owner Name')['Deal_Age_days'].median().reset_index()
+        speed_stats.columns = ['Manager', 'Median_Deal_Age_Days']
+        
+        # Звонки (ТОЛЬКО по успешным сделкам)
+        if 'calls' in locals() and len(calls) > 0:
+            calls_agg = calls.groupby('CONTACTID')['Id'].count().reset_index().rename(columns={'Id': 'Calls_Count', 'CONTACTID': 'Contact Name'})
+            successful_deals = df_clean[df_clean['stage_normalized'] == 'Active Student']
+            deals_with_calls = successful_deals[['Id', 'Deal Owner Name', 'Contact Name']].merge(calls_agg, on='Contact Name', how='left').fillna(0)
+            calls_stats = deals_with_calls.groupby('Deal Owner Name')['Calls_Count'].mean().reset_index()
+            calls_stats.columns = ['Manager', 'Avg_Calls_Per_Deal']
+        else:
+            calls_stats = pd.DataFrame({'Manager': manager_stats['Manager'], 'Avg_Calls_Per_Deal': 0})
+        
+        # Сборка
+        final_stats = manager_stats.merge(speed_stats, on='Manager', how='left').fillna(0)
+        final_stats = final_stats.merge(calls_stats, on='Manager', how='left').fillna(0)
+        
+        # KPI
+        final_stats['Win_Rate'] = (final_stats['Sales'] / final_stats['Leads'] * 100).round(2)
+        final_stats['Avg_Check'] = (final_stats['Revenue'] / final_stats['Sales']).replace([np.inf], 0).fillna(0).round(0)
+        
+        # Фильтр
+        top_managers = final_stats[final_stats['Leads'] >= 10].sort_values(by='Revenue', ascending=False)
+        
+        if len(top_managers) > 0:
+            fig1 = px.bar(
+                top_managers.head(15),
+                x='Manager', y='Revenue', 
+                color='Win_Rate',
+                text_auto='.2s',
+                title=t('top_managers_revenue'),
+                labels={'Revenue': f'{t("revenue")}', 'Win_Rate': f'{t("win_rate")} (%)'},
+                color_continuous_scale='RdYlGn',
+                height=500
+            )
+            fig1.update_layout(xaxis={'categoryorder':'total descending'})
+            st.plotly_chart(fig1, use_container_width=True)
+            
+            efficiency_view = top_managers.sort_values(by='Win_Rate', ascending=True).tail(15)
+            fig2 = px.bar(
+                efficiency_view,
+                x='Win_Rate', 
+                y='Manager', 
+                orientation='h', 
+                color='Median_Deal_Age_Days',
+                text_auto='.1f',
+                title=t('top_conversion'),
+                labels={'Win_Rate': f'{t("conversion")} (%)', 'Manager': f'{t("manager")}', 'Median_Deal_Age_Days': f'{t("deal_closing_speed")} ({t("days")})'},
+                color_continuous_scale='Bluered',
+                height=600
+            )
+            st.plotly_chart(fig2, use_container_width=True)
+            
+            st.subheader(t('manager_detailed_stats'))
+            
+            display_cols = ['Manager', 'Leads', 'Sales', 'Revenue', 'Win_Rate', 
+                           'Avg_Check', 'Median_Deal_Age_Days', 'Avg_Calls_Per_Deal']
+            display_df = final_stats[display_cols].sort_values('Revenue', ascending=False).head(20)
+            
+            st.dataframe(
+                display_df.style\
+                    .background_gradient(subset=['Revenue', 'Win_Rate'], cmap='Greens')\
+                    .format({
+                        'Revenue': '{:,.0f}', 
+                        'Avg_Check': '{:,.0f}', 
+                        'Median_Deal_Age_Days': '{:.0f}',
+                        'Win_Rate': '{:.1f}%',
+                        'Avg_Calls_Per_Deal': '{:.1f}'
+                    }),
+                use_container_width=True
+            )
+    
+    # ========== 2. АНАЛИЗ СКОРОСТИ И КАЧЕСТВА ==========
+    st.subheader(t('speed_quality_analysis'))
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if 'SLA_Segment' in deals.columns:
+            sla_global = deals[
+                (deals['SLA_Segment'].notna()) & 
+                (deals['SLA_Segment'] != 'Unknown')
+            ].copy()
+            
+            if len(sla_global) > 0:
+                sla_impact = sla_global.groupby('SLA_Segment').agg({
+                    'Id': 'count',
+                    'is_paid': 'mean'
+                }).reset_index()
+                sla_impact.columns = ['SLA_Segment', 'Total_Deals', 'Win_Rate_Pct']
+                sla_impact['Win_Rate_Pct'] = (sla_impact['Win_Rate_Pct'] * 100).round(2)
+                
+                sla_order = ['Top Speed (< 1h)', 'Fast (1h-4h)', 'Normal (4h-24h)', 'Slow (1d-7d)', 'Too Slow (> 7d)']
+                sla_impact['SLA_Segment'] = pd.Categorical(sla_impact['SLA_Segment'], categories=sla_order, ordered=True)
+                sla_impact = sla_impact.sort_values('SLA_Segment')
+                
+                fig3 = px.bar(
+                    sla_impact,
+                    x='SLA_Segment',
+                    y='Win_Rate_Pct',
+                    color='Total_Deals',
+                    text_auto='.1f',
+                    title=t('conversion_by_sla'),
+                    labels={'Win_Rate_Pct': f'{t("conversion")} (%)', 'Total_Deals': f'{t("total_deals")}'},
+                    color_continuous_scale='RdYlGn',
+                    height=400
+                )
+                st.plotly_chart(fig3, use_container_width=True)
+    
+    with col2:
+        if 'Quality' in deals.columns:
+            deals_quality = deals[deals['Quality'].notna()].copy()
+            
+            if len(deals_quality) > 0:
+                quality_stats = deals_quality.groupby('Quality').agg({
+                    'Id': 'count',
+                    'stage_normalized': lambda x: (x == 'Active Student').sum()
+                }).reset_index()
+                quality_stats.columns = ['Quality', 'Total_Leads', 'Active_Students']
+                quality_stats['Win_Rate_Pct'] = (quality_stats['Active_Students'] / quality_stats['Total_Leads'] * 100).round(2)
+                
+                # Фильтр: показываем только категории с >10 лидами
+                quality_stats = quality_stats[quality_stats['Total_Leads'] > 10].copy()
+                
+                fig4 = px.bar(
+                    quality_stats,
+                    x='Quality',
+                    y='Win_Rate_Pct',
+                    color='Total_Leads',
+                    text_auto='.1f',
+                    title=t('conversion_by_quality'),
+                    labels={'Win_Rate_Pct': f'{t("conversion")} (%)', 'Quality': f'{t("quality")}'},
+                    color_continuous_scale='RdYlGn',
+                    height=400
+                )
+                fig4.update_layout(xaxis={'categoryorder':'category ascending'})
+                st.plotly_chart(fig4, use_container_width=True)
+    
+    st.markdown(f"**{t('manager_sla_analysis')}**")
+    
+    if 'SLA_seconds' in deals.columns:
+        deals_sla = deals[deals['SLA_seconds'].notna()].copy()
+        deals_sla['SLA_Hours'] = deals_sla['SLA_seconds'] / 3600
+        
+        manager_sla_stats = deals_sla.groupby('Deal Owner Name').agg({
+            'Id': 'count',
+            'SLA_Hours': 'median',
+            'is_paid': 'mean'
+        }).reset_index()
+        manager_sla_stats.columns = ['Manager', 'Deals_Count', 'Median_SLA_Hours', 'Win_Rate_Pct']
+        manager_sla_stats['Win_Rate_Pct'] = (manager_sla_stats['Win_Rate_Pct'] * 100).round(2)
+        manager_sla_stats = manager_sla_stats[manager_sla_stats['Deals_Count'] > 10]
+        
+        if len(manager_sla_stats) > 0:
+            fig5 = px.scatter(
+                manager_sla_stats,
+                x='Median_SLA_Hours',
+                y='Win_Rate_Pct',
+                size='Deals_Count',
+                color='Win_Rate_Pct',
+                hover_name='Manager',
+                title=t('sla_vs_conversion'),
+                labels={'Median_SLA_Hours': f'{t("median_speed")} {t("conversion")} ({t("hours")})', 'Win_Rate_Pct': f'{t("conversion")} (%)'},
+                color_continuous_scale='RdYlGn',
+                height=600
+            )
+            
+            avg_sla = manager_sla_stats['Median_SLA_Hours'].median()
+            avg_win = manager_sla_stats['Win_Rate_Pct'].median()
+            fig5.add_vline(x=avg_sla, line_dash="dash", line_color="gray", annotation_text=f"{t('avg_speed')} SLA")
+            fig5.add_hline(y=avg_win, line_dash="dash", line_color="gray", annotation_text=f"{t('avg_speed')} {t('conversion')}")
+            st.plotly_chart(fig5, use_container_width=True)
+            
+        # ========== ТАБЛИЦА SLA ПО МЕНЕДЖЕРАМ ==========
+    st.markdown(f"**{t('manager_sla_analysis')}**")
+
+    all_deals_with_sla = deals.copy()
+    all_deals_with_sla['SLA_Hours'] = all_deals_with_sla['SLA_seconds'] / 3600
+
+    manager_table = all_deals_with_sla.groupby('Deal Owner Name').agg({
+        'Id': 'count',
+        'SLA_Hours': ['median', 'mean'],
+        'stage_normalized': lambda x: (x == 'Active Student').sum()
+    }).reset_index()
+
+    manager_table.columns = ['Manager', 'Deals_Count', 'Median_SLA_Hours', 'Mean_SLA_Hours', 'Active_Students']
+    manager_table['Win_Rate_Pct'] = (manager_table['Active_Students'] / manager_table['Deals_Count'] * 100).round(2)
+    manager_table = manager_table[manager_table['Deals_Count'] > 10]
+
+    if len(manager_table) > 0:
+        manager_table = manager_table.sort_values('Median_SLA_Hours', ascending=True)
+        
+        display_df = manager_table[['Manager', 'Deals_Count', 'Median_SLA_Hours', 'Mean_SLA_Hours', 'Win_Rate_Pct']]
+        display_df.columns = [t('manager'), t('total_deals'), t('median_speed'), t('avg_speed'), f'{t("conversion")} %']
+        
+        st.dataframe(
+            display_df.style\
+                .background_gradient(subset=[t('median_speed')], cmap='RdYlGn_r')\
+                .background_gradient(subset=[t('avg_speed')], cmap='RdYlGn_r')\
+                .background_gradient(subset=[f'{t("conversion")} %'], cmap='RdYlGn')\
+                .format({
+                    t('median_speed'): '{:.1f} ч',
+                    t('avg_speed'): '{:.1f} ч',
+                    f'{t("conversion")} %': '{:.1f}%'
+                }),
+            use_container_width=True,
+            height=300
+        )
+    
+    if 'SLA_seconds' in deals.columns:
+        sla_clean = deals[deals['SLA_seconds'].notna()].copy()
+        sla_clean['SLA_Minutes'] = sla_clean['SLA_seconds'] / 60
+        sla_clean = sla_clean[(sla_clean['SLA_Minutes'] > 0) & (sla_clean['SLA_Minutes'] < 43200)]
+        
+        if len(sla_clean) > 0:
+            sla_clean['SLA_Decile'] = pd.qcut(sla_clean['SLA_Minutes'], q=10, labels=False)
+            conversion_by_speed = sla_clean.groupby('SLA_Decile').agg({
+                'SLA_Minutes': 'median',
+                'stage_normalized': lambda x: (x == 'Active Student').mean() * 100
+            }).reset_index()
+            conversion_by_speed['Time_Label'] = conversion_by_speed['SLA_Minutes'].apply(
+                lambda m: f"{m/60:.1f} ч" if m >= 60 else f"{m:.0f} мин"
+            )
+            conversion_by_speed.columns = ['Decile', 'SLA_Minutes', 'Win_Rate_Pct', 'Time_Label']
+            
+            if len(conversion_by_speed) > 0:
+                fig6 = px.line(
+                    conversion_by_speed,
+                    x='SLA_Minutes',
+                    y='Win_Rate_Pct',
+                    markers=True,
+                    text='Time_Label',
+                    title=f'{t("conversion")} vs {t("avg_speed")} {t("conversion")}',
+                    labels={'SLA_Minutes': f'{t("avg_speed")} {t("conversion")} (мин)', 'Win_Rate_Pct': f'{t("conversion")} (%)'},
+                    height=400
+                )
+                fig6.update_traces(textposition="top center")
+                st.plotly_chart(fig6, use_container_width=True)
+                
+                def format_time(minutes):
+                    if minutes < 60: return f"{minutes:.1f} мин"
+                    if minutes < 1440: return f"{minutes/60:.1f} ч"
+                    return f"{minutes/1440:.1f} дн"
+                
+                mean_sla = sla_clean['SLA_Minutes'].mean()
+                median_sla = sla_clean['SLA_Minutes'].median()
+                q25 = sla_clean['SLA_Minutes'].quantile(0.25)
+                q75 = sla_clean['SLA_Minutes'].quantile(0.75)
+                
+                metrics_df = pd.DataFrame({
+                    t('metric'): [f'{t("avg_speed")} {t("avg_speed")}', f'{t("median_speed")} {t("avg_speed")}', '25% сделок быстрее', '75% сделок быстрее'],
+                    t('value'): [format_time(mean_sla), format_time(median_sla), format_time(q25), format_time(q75)]
+                })
+                
+                st.markdown(f"**{t('sla_vs_conversion')}:**")
+                st.dataframe(
+                    metrics_df.style.set_table_styles([
+                        {'selector': 'thead th', 'props': [('background-color', '#0235C4'), ('color', 'white')]},
+                        {'selector': 'tbody td', 'props': [('background-color', '#f8fafc')]},
+                    ]).hide(axis='index'),
+                    use_container_width=True,
+                    height=200
+                )
+    
+        # ========== 3. ПРИЧИНЫ ОТКАЗОВ ПО МЕНЕДЖЕРАМ ==========
+    st.subheader(t('lost_reasons_analysis'))
+
+    if 'Lost Reason' in deals.columns and 'Deal Owner Name' in deals.columns:
+        lost_deals = deals[
+            (deals['stage_normalized'] == 'Churned') & 
+            (deals['Lost Reason'].notna()) &
+            (deals['Lost Reason'] != 'unknown') &
+            (deals['Lost Reason'] != 'Unknown')
+        ].copy()
+        
+        if len(lost_deals) > 0:
+            # Основная таблица БЕЗ итогов
+            pivot_table = lost_deals.pivot_table(
+                index='Deal Owner Name',
+                columns='Lost Reason',
+                values='Id',
+                aggfunc='count',
+                fill_value=0
+            )
+            
+            # Сортируем менеджеров по общему числу отказов
+            pivot_table_sorted = pivot_table.loc[pivot_table.sum(axis=1).sort_values(ascending=False).index]
+            
+            # Добавляем строку "ВСЕГО" ВНИЗУ
+            pivot_table_with_total = pivot_table_sorted.copy()
+            pivot_table_with_total.loc['ВСЕГО'] = pivot_table_sorted.sum()
+            
+            # Добавляем колонку "ВСЕГО" СПРАВА
+            pivot_table_with_total['ВСЕГО'] = pivot_table_with_total.sum(axis=1)
+            
+            # Создаем стиль
+            styled_table = pivot_table_with_total.style.format("{:.0f}")
+            
+            # 1. МЕНЕДЖЕРЫ: построчное окрашивание (кроме колонки "ВСЕГО")
+            reason_columns = [col for col in pivot_table_with_total.columns if col != 'ВСЕГО']
+            for idx in pivot_table_with_total.index:
+                if idx != 'ВСЕГО':
+                    styled_table = styled_table.background_gradient(
+                        subset=pd.IndexSlice[idx, reason_columns],
+                        cmap='YlOrBr', 
+                        vmin=0,
+                        axis=1
+                    )
+            
+            # 2. СТРОКА "ВСЕГО": горизонтальное окрашивание ВСЕЙ строки
+            styled_table = styled_table.background_gradient(
+                subset=pd.IndexSlice['ВСЕГО', :],
+                cmap='YlOrBr',
+                vmin=0,
+                axis=1
+            )
+            
+            # 3. КОЛОНКА "ВСЕГО": вертикальное окрашивание (кроме строки "ВСЕГО")
+            styled_table = styled_table.background_gradient(
+                subset=pd.IndexSlice[pivot_table_with_total.index.drop('ВСЕГО'), 'ВСЕГО'],
+                cmap='Reds',
+                vmin=0,
+                axis=0
+            )
+            
+            # 4. ЯЧЕЙКА ПЕРЕСЕЧЕНИЯ ('ВСЕГО', 'ВСЕГО'): убираем цвет
+            styled_table = styled_table.map(
+                lambda val: 'background-color: transparent !important',
+                subset=pd.IndexSlice['ВСЕГО', 'ВСЕГО']
+            )
+            
+            st.markdown(f"**{t('lost_reasons_distribution')}**")
+            st.dataframe(
+                styled_table,
+                use_container_width=True,
+                height=600
+            )
+            
+            # Общее распределение причин
+            st.markdown(f"**{t('lost_reasons_total_distribution')}**")
+            reason_total = lost_deals['Lost Reason'].value_counts().reset_index()
+            reason_total.columns = ['Причина', 'Кол-во']
+            reason_total['Доля %'] = (reason_total['Кол-во'] / len(lost_deals) * 100).round(1)
+            
+            st.dataframe(
+                reason_total.style\
+                    .background_gradient(subset=['Доля %'], cmap='YlOrBr')\
+                    .format({'Доля %': '{:.1f}%'}),
+                use_container_width=True,
+                height=300
+            )
+
+# ---------- ВКЛАДКА 3: ПРОДУКТЫ ----------
+with tabs[2]:
+    st.markdown(f'<div class="section-title">{t("products_payments_analysis")}</div>', unsafe_allow_html=True)
+    
+    # Подготовка данных
+    deals_success = deals[deals['stage_normalized'] == 'Active Student'].copy()
+    pay_col = 'Payment_Type_Recovered' if 'Payment_Type_Recovered' in deals_success.columns else 'Payment Type'
+    
+    if len(deals_success) > 0:
+        # Рассчитываем Transactions как в юнит-экономике
+        deals_success['Transactions'] = np.where(
+            deals_success[pay_col] == 'one payment', 
+            1, 
+            deals_success['Months of study'].fillna(1)
+        )
+        
+        # 1. ПОЛНЫЕ МЕТРИКИ ПО ПРОДУКТАМ
+        st.subheader(t('full_product_metrics'))
+        
+        # Базовые метрики
+        product_metrics = deals_success.groupby('Product').agg({
+            'Contact Name': 'nunique',
+            'revenue': 'sum',
+            'Offer Total Amount': ['mean', 'sum'],
+            'Transactions': 'sum',
+            'Initial Amount Paid': 'mean'
+        }).round(0)
+        
+        product_metrics.columns = ['B', 'Revenue', 'Avg_Contract', 'Total_Contract', 'T', 'Avg_Initial']
+        
+        # Фильтрация: удаляем продукты с 1 клиентом
+        product_metrics = product_metrics[product_metrics['B'] > 1].copy()
+        
+        if len(product_metrics) > 0:
+            # Расчет производных метрик
+            product_metrics['Avg_Check'] = (product_metrics['Revenue'] / product_metrics['B']).round(0)
+            product_metrics['Collection_Ratio'] = (product_metrics['Revenue'] / product_metrics['Total_Contract'] * 100).round(1)
+            product_metrics['APC'] = (product_metrics['T'] / product_metrics['B']).round(2)
+            product_metrics['AOV'] = (product_metrics['Revenue'] / product_metrics['T']).round(0)
+            
+            # Юнит-экономика (автономные расчеты)
+            TOTAL_UA = contacts['Id'].nunique()
+            total_marketing_spend = spend['Spend'].sum()
+            COGS_PERCENT = 0.0
+            COGS_FIXED = 0
+            
+            product_metrics['UA'] = TOTAL_UA
+            product_metrics['C1'] = (product_metrics['B'] / TOTAL_UA).round(4)
+            product_metrics['AC'] = total_marketing_spend
+            product_metrics['CPA'] = (total_marketing_spend / TOTAL_UA).round(2)
+            product_metrics['CAC'] = (total_marketing_spend / product_metrics['B']).round(0)
+            
+            # COGS и прибыль
+            product_metrics['COGS_per_T'] = (product_metrics['Revenue'] * COGS_PERCENT + product_metrics['T'] * COGS_FIXED) / product_metrics['T']
+            product_metrics['CLTV'] = ((product_metrics['AOV'] - product_metrics['COGS_per_T']) * product_metrics['APC']).round(0)
+            product_metrics['LTV'] = (product_metrics['CLTV'] * product_metrics['C1']).round(2)
+            product_metrics['CM'] = (product_metrics['Revenue'] - total_marketing_spend - (product_metrics['Revenue'] * COGS_PERCENT + product_metrics['T'] * COGS_FIXED)).round(0)
+            
+            # Таблица для вывода
+            display_cols = ['B', 'Revenue', 'Avg_Check', 'Avg_Contract', 'Collection_Ratio', 
+                            'C1', 'CLTV', 'LTV', 'CAC', 'CM']
+            display_df = product_metrics[display_cols].sort_values('Revenue', ascending=False)
+            
+            st.dataframe(
+                display_df.style.format({
+                    'B': '{:,.0f}',
+                    'Revenue': '{:,.0f}',
+                    'Avg_Check': '{:,.0f}',
+                    'Avg_Contract': '{:,.0f}',
+                    'Collection_Ratio': '{:.1f}%',
+                    'C1': '{:.2%}',
+                    'CLTV': '{:,.0f}',
+                    'LTV': '{:.2f}',
+                    'CAC': '{:,.0f}',
+                    'CM': '{:,.0f}'
+                }).background_gradient(subset=['Revenue', 'LTV', 'CM'], cmap='RdYlGn'),
+                use_container_width=True
+            )
+            
+            # 2. ВИЗУАЛИЗАЦИИ
+            st.subheader(t('products_visualizations'))
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # График 1: Выручка по продуктам (цвет = LTV)
+                fig1 = px.bar(
+                    display_df.reset_index(),
+                    x='Product', y='Revenue',
+                    color='LTV',
+                    title=t('revenue_by_products_ltv'),
+                    labels={'Revenue': f'{t("revenue")} ({t("currency")})', 'LTV': f'LTV ({t("currency")})'},
+                    color_continuous_scale='RdYlGn',
+                    height=500
+                )
+                fig1.update_layout(xaxis={'categoryorder': 'total descending'})
+                st.plotly_chart(fig1, use_container_width=True)
+            
+            with col2:
+                # График 2: Матрица продуктов (Клиенты vs Средний чек)
+                fig2 = px.scatter(
+                    display_df.reset_index(),
+                    x='B', y='Avg_Check',
+                    size='Revenue',
+                    color='Collection_Ratio',
+                    text='Product',
+                    title=t('products_matrix_clients_vs_check'),
+                    labels={'B': f'{t("unique_clients")}', 'Avg_Check': f'{t("avg_check")} ({t("currency")})', 'Collection_Ratio': f'% {t("margin")}'},
+                    color_continuous_scale='Viridis',
+                    height=500
+                )
+                fig2.update_traces(textposition='top center')
+                st.plotly_chart(fig2, use_container_width=True)
+            
+            # 3. АНАЛИЗ ТИПОВ ОПЛАТЫ
+            st.subheader(t('payment_type_analysis'))
+            
+            if pay_col in deals_success.columns:
+                # Фильтруем те же продукты
+                deals_filtered = deals_success[deals_success['Product'].isin(display_df.index)]
+                payment_split = deals_filtered.groupby(['Product', pay_col]).size().reset_index(name='Count')
+                
+                if len(payment_split) > 0:
+                    # Stacked bar
+                    fig3 = px.bar(
+                        payment_split,
+                        x='Product', y='Count', color=pay_col,
+                        title=t('payment_distribution'),
+                        labels={'Count': f'{t("total_deals")}'},
+                        color_discrete_sequence=px.colors.qualitative.Set3,
+                        height=500
+                    )
+                    fig3.update_layout(xaxis={'categoryorder': 'total descending'}, barmode='stack')
+                    st.plotly_chart(fig3, use_container_width=True)
+            
+            # 4. АНАЛИЗ ТИПОВ ОБУЧЕНИЯ
+            st.subheader(t('education_type_analysis'))
+            
+            if 'Education Type' in deals_success.columns:
+                edu_stats = deals_success.groupby('Education Type').agg({
+                    'Contact Name': 'nunique',
+                    'revenue': 'sum',
+                    'Offer Total Amount': 'mean'
+                }).round(0)
+                edu_stats.columns = ['Students', 'Revenue', 'Avg_Contract']
+                edu_stats = edu_stats[edu_stats['Students'] > 1]  # Фильтр
+                edu_stats['Avg_Check'] = (edu_stats['Revenue'] / edu_stats['Students']).round(0)
+                
+                if len(edu_stats) > 0:
+                    fig4 = px.bar(
+                        edu_stats.reset_index(),
+                        x='Education Type', y='Revenue',
+                        color='Avg_Check',
+                        title=t('revenue_by_education_type'),
+                        labels={'Revenue': f'{t("revenue")} ({t("currency")})', 'Avg_Check': f'{t("avg_check")} ({t("currency")})'},
+                        color_continuous_scale='RdYlGn',
+                        height=500
+                    )
+                    fig4.update_layout(xaxis={'categoryorder': 'total descending'})
+                    st.plotly_chart(fig4, use_container_width=True)
+    else:
+        st.warning(t('no_successful_deals'))
+
+# ---------- ВКЛАДКА 4: ГЕОГРАФИЯ ----------
+with tabs[3]:
+    st.markdown(f'<div class="section-title">{t("geographical_analysis")}</div>', unsafe_allow_html=True)
+    
+    # Подготовка данных
+    deals_with_city = deals[
+        (deals['City'].notna()) & 
+        (deals['City'] != 'Unknown') &
+        (deals['City'] != 'unknown')
+    ].copy()
+    
+    if len(deals_with_city) > 0:
+        city_stats = deals_with_city.groupby('City').agg({
+            'Id': 'count',
+            'stage_normalized': lambda x: (x == 'Active Student').sum(),
+            'revenue': 'sum',
+            'Source': lambda x: x.mode()[0] if len(x.mode()) > 0 else 'Unknown'
+        }).reset_index()
+        
+        city_stats.columns = ['City', 'Total_Deals', 'Active_Students', 'Total_Revenue', 'Top_Source']
+        city_stats['Win_Rate'] = (city_stats['Active_Students'] / city_stats['Total_Deals'] * 100).round(2)
+        city_stats = city_stats.sort_values('Total_Revenue', ascending=False)
+        
+        # 1. КАРТА ПРОДАЖ
+        geocoded = prepare_geodata(city_stats)
+        geocoded_count = len(geocoded)
+        total_cities = len(city_stats)
+        
+        st.subheader(f"{t('sales_map')} (Топ-{geocoded_count} из {total_cities} {t('cities')})")
+
+        if len(geocoded) > 0:
+            fig_map = px.scatter_mapbox(
+                geocoded,
+                lat="lat",
+                lon="lon",
+                size="Total_Deals",
+                color="Total_Revenue",
+                hover_name="City",
+                hover_data={
+                    'Total_Revenue': ':.0f',
+                    'Total_Deals': True,
+                    'Win_Rate': ':.1f',
+                    'Top_Source': True
+                },
+                zoom=4,
+                height=600,
+                mapbox_style="open-street-map"
+            )
+
+            fig_map.update_layout(
+                margin=dict(l=0, r=0, t=30, b=0),
+                coloraxis_colorbar=dict(title=f"{t('revenue')}"),
+            )
+
+            st.plotly_chart(fig_map, use_container_width=True)
+
+        else:
+            st.info(t('no_city_data'))
+
+        
+        # 2. ТОП ГОРОДОВ ПО ВЫРУЧКЕ
+        top_n = 15
+        st.subheader(f"{t('top_cities_revenue')} (Топ-{top_n})")
+        
+        city_top15 = city_stats.head(top_n).copy()
+        
+        fig_bar = px.bar(
+            city_top15,
+            x='City',
+            y='Total_Revenue',
+            color='Top_Source',
+            text_auto='.2s',
+            title=f'{t("top_cities_revenue")} (Топ-{top_n})',
+            labels={'Total_Revenue': f'{t("revenue")} ({t("currency")})'},
+            color_discrete_sequence=px.colors.qualitative.Set3,
+            height=500
+        )
+        fig_bar.update_layout(xaxis={'categoryorder': 'total descending'})
+        st.plotly_chart(fig_bar, use_container_width=True)
+        
+        # 3. АНАЛИЗ ЭФФЕКТИВНОСТИ ПО ГОРОДАМ
+        st.subheader(t('cities_efficiency_analysis'))
+
+        
+        # ТОП-10 ПО КОНВЕРСИИ (минимум 5 сделок)
+        min_deals = 5
+        top_conversion = city_stats[city_stats['Total_Deals'] >= min_deals].sort_values('Win_Rate', ascending=False).head(10)
+        
+        if len(top_conversion) > 0:
+            fig_conv = px.bar(
+                top_conversion,
+                x='Win_Rate',
+                y='City',
+                orientation='h',
+                text='Win_Rate',
+                title=f'{t("top_cities_conversion")} (≥{min_deals} сделок)',
+                labels={'Win_Rate': f'{t("win_rate")} (%)', 'City': ''},
+                color='Total_Revenue',
+                color_continuous_scale='RdYlGn',
+                height=500
+            )
+            fig_conv.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
+            fig_conv.update_layout(showlegend=False, yaxis={'categoryorder': 'total ascending'},
+                                  margin=dict(r=100))
+            st.plotly_chart(fig_conv, use_container_width=True)
+        
+        # 4. ДОПОЛНИТЕЛЬНЫЕ ГРАФИКИ
+        st.subheader(t('additional_metrics'))
+        
+        # ТОП-10 ПО ОБЪЕМУ СДЕЛОК
+        top_volume = city_stats.head(10).sort_values('Total_Deals', ascending=True)
+        
+        fig_volume = px.bar(
+            top_volume,
+            x='Total_Deals',
+            y='City',
+            orientation='h',
+            text='Total_Deals',
+            title=t('top_cities_volume'),
+            labels={'Total_Deals': f'{t("total_deals")}', 'City': ''},
+            color='Win_Rate',
+            color_continuous_scale='RdYlGn',
+            height=500
+        )
+        fig_volume.update_traces(textposition='outside')
+        fig_volume.update_layout(showlegend=False, yaxis={'categoryorder': 'total ascending'},
+                                margin=dict(r=80))
+        st.plotly_chart(fig_volume, use_container_width=True)
+        
+        # РАСПРЕДЕЛЕНИЕ ИСТОЧНИКОВ - НА ВСЮ ШИРИНУ
+        source_dist = city_stats.groupby('Top_Source').agg({
+            'City': 'count',
+            'Total_Revenue': 'sum'
+        }).reset_index()
+        source_dist.columns = ['Source', 'Cities_Count', 'Total_Revenue']
+        source_dist = source_dist.sort_values('Cities_Count', ascending=False).head(15)
+        
+        fig_sources = px.bar(
+            source_dist,
+            x='Source',
+            y='Cities_Count',
+            color='Total_Revenue',
+            text='Cities_Count',
+            title=t('sources_by_cities'),
+            labels={'Cities_Count': f'{t("cities")}'},
+            color_continuous_scale='Viridis',
+            height=500
+        )
+        fig_sources.update_traces(texttemplate='%{text} {t("cities")}', textposition='outside')
+        fig_sources.update_layout(
+            xaxis_tickangle=-45,
+            xaxis_title=f"{t('source')}",
+            yaxis_title=f"{t('cities')}"
+        )
+        st.plotly_chart(fig_sources, use_container_width=True)
+        
+        # 5. УРОВНИ НЕМЕЦКОГО ПО ГОРОДАМ
+        st.subheader(t('german_levels_by_cities'))
+        
+        if 'Level of Deutsch' in deals.columns:
+            deals_lang = deals[
+                (deals['max_stage_rank'] >= 1) & 
+                (deals['Level of Deutsch'].notna()) &
+                (deals['Level of Deutsch'] != 'Unknown') &
+                (deals['Level of Deutsch'] != 'unknown')
+            ].copy()
+            
+            if len(deals_lang) > 0:
+                # Берем топ-50 городов по выручке
+                city_revenue = deals.groupby('City')['revenue'].sum().nlargest(50).index.tolist()
+                deals_city_lang = deals[
+                    (deals['City'].isin(city_revenue)) &
+                    (deals['Level of Deutsch'].notna()) &
+                    (deals['Level of Deutsch'] != 'Unknown') &
+                    (deals['Level of Deutsch'] != 'unknown') &
+                    (deals['stage_normalized'] == 'Active Student')
+                ].copy()
+                
+                if len(deals_city_lang) > 0:
+                    city_lang_dist = deals_city_lang.groupby(['City', 'Level of Deutsch']).size().reset_index(name='Active_Students')
+                    city_totals = city_lang_dist.groupby('City')['Active_Students'].sum().reset_index(name='Total_Active')
+                    city_lang_dist = pd.merge(city_lang_dist, city_totals, on='City')
+                    city_lang_dist['Percentage'] = (city_lang_dist['Active_Students'] / city_lang_dist['Total_Active'] * 100).round(1)
+                    
+                    # Создаем сводную таблицу
+                    level_order = ['A0', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+                    pivot_table = city_lang_dist.pivot_table(
+                        index='City',
+                        columns='Level of Deutsch',
+                        values='Percentage',
+                        aggfunc='first'
+                    ).fillna(0)
+                    
+                    # Добавляем недостающие уровни
+                    for level in level_order:
+                        if level not in pivot_table.columns:
+                            pivot_table[level] = 0
+                    
+                    # Упорядочиваем колонки
+                    pivot_table = pivot_table[level_order]
+                    
+                    # Добавляем общую статистику по городам
+                    city_stats_summary = deals.groupby('City').agg({
+                        'Id': 'count',
+                        'revenue': 'sum',
+                        'stage_normalized': lambda x: (x == 'Active Student').sum()
+                    }).reset_index()
+                    city_stats_summary.columns = ['City', 'Total_Deals', 'Total_Revenue', 'Active_Students']
+                    city_stats_summary['Win_Rate_Pct'] = (city_stats_summary['Active_Students'] / city_stats_summary['Total_Deals'] * 100).round(1)
+                    city_stats_summary['Avg_Check_City'] = (city_stats_summary['Total_Revenue'] / city_stats_summary['Active_Students']).round(0)
+                    
+                    pivot_table = pd.merge(
+                        pivot_table,
+                        city_stats_summary[['City', 'Total_Deals', 'Total_Revenue', 'Active_Students', 'Win_Rate_Pct', 'Avg_Check_City']],
+                        left_index=True,
+                        right_on='City'
+                    )
+                    
+                    pivot_table = pivot_table.sort_values('Total_Revenue', ascending=False)
+                    
+                    # Отображаем таблицу
+                    st.dataframe(
+                        pivot_table.style.format({
+                            'Total_Revenue': '{:,.0f}',
+                            'Active_Students': '{:,.0f}',
+                            'Avg_Check_City': '{:,.0f}',
+                            'Win_Rate_Pct': '{:.1f}%',
+                            **{level: '{:.1f}%' for level in level_order}
+                        }).background_gradient(subset=['Total_Revenue', 'Avg_Check_City', 'Win_Rate_Pct'], cmap='RdYlGn'),
+                        use_container_width=True,
+                        height=400
+                    )
+        
+        # 6. АНАЛИЗ УРОВНЕЙ ЯЗЫКА
+        st.subheader(t('german_levels_analysis'))
+        
+        if 'Level of Deutsch' in deals.columns:
+            deals_lang = deals[
+                (deals['max_stage_rank'] >= 1) & 
+                (deals['Level of Deutsch'].notna()) &
+                (deals['Level of Deutsch'] != 'Unknown') &
+                (deals['Level of Deutsch'] != 'unknown')
+            ].copy()
+            
+            if len(deals_lang) > 0:
+                lang_stats = deals_lang.groupby('Level of Deutsch').agg({
+                    'Id': 'count',
+                    'stage_normalized': lambda x: (x == 'Active Student').sum(),
+                    'revenue': 'sum'
+                }).reset_index()
+                
+                lang_stats.columns = ['Level', 'Total_Deals', 'Active_Students', 'Total_Revenue']
+                lang_stats['Win_Rate'] = (lang_stats['Active_Students'] / lang_stats['Total_Deals'] * 100).round(2)
+                lang_stats['Avg_Revenue_per_Student'] = (lang_stats['Total_Revenue'] / lang_stats['Active_Students']).round(0)
+                
+                level_order = ['A0', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+                lang_stats['Level'] = pd.Categorical(lang_stats['Level'], categories=level_order, ordered=True)
+                lang_stats = lang_stats.sort_values('Level').dropna()
+                
+                # График конверсии по уровням
+                fig_lang1 = px.bar(
+                    lang_stats,
+                    x='Level',
+                    y='Win_Rate',
+                    color='Total_Deals',
+                    text_auto='.1f',
+                    title=t('conversion_by_german_levels'),
+                    labels={'Win_Rate': f'{t("win_rate")} (%)', 'Level': f'{t("level")}'},
+                    color_continuous_scale='Teal',
+                    height=400
+                )
+                fig_lang1.update_layout(xaxis={'categoryorder': 'array', 'categoryarray': level_order})
+                st.plotly_chart(fig_lang1, use_container_width=True)
+                
+                # Финансовые показатели по уровням
+                fig_lang2 = make_subplots(
+                    rows=1, cols=2,
+                    subplot_titles=[f'{t("revenue")} {t("level")}', f'{t("avg_revenue_per_student")}'],
+                    horizontal_spacing=0.15
+                )
+                
+                fig_lang2.add_trace(
+                    go.Bar(
+                        x=lang_stats['Level'],
+                        y=lang_stats['Total_Revenue'],
+                        text=lang_stats['Total_Revenue'].apply(lambda x: f'{x:,.0f}'),
+                        textposition='auto',
+                        marker_color='#636EFA',
+                        name=f'{t("revenue")}'
+                    ),
+                    row=1, col=1
+                )
+                
+                fig_lang2.add_trace(
+                    go.Bar(
+                        x=lang_stats['Level'],
+                        y=lang_stats['Avg_Revenue_per_Student'],
+                        text=lang_stats['Avg_Revenue_per_Student'].apply(lambda x: f'{x:,.0f}'),
+                        textposition='auto',
+                        marker_color='#00CC96',
+                        name=f'{t("avg_revenue_per_student")}'
+                    ),
+                    row=1, col=2
+                )
+                
+                fig_lang2.update_xaxes(title_text=f"{t('level')}", row=1, col=1)
+                fig_lang2.update_xaxes(title_text=f"{t('level')}", row=1, col=2)
+                fig_lang2.update_yaxes(title_text=f"{t('revenue')} ({t('currency')})", row=1, col=1)
+                fig_lang2.update_yaxes(title_text=f"{t('avg_revenue_per_student')} ({t('currency')})", row=1, col=2)
+                fig_lang2.update_layout(showlegend=False, height=400, title_text=t('financial_metrics_by_levels'))
+                st.plotly_chart(fig_lang2, use_container_width=True)
+                
+                # Таблица статистики по уровням
+                st.markdown(f"**{t('german_levels_stats')}**")
+                st.dataframe(
+                    lang_stats.style.format({
+                        'Total_Revenue': '{:,.0f}',
+                        'Avg_Revenue_per_Student': '{:,.0f}',
+                        'Win_Rate': '{:.1f}%'
+                    }).background_gradient(subset=['Win_Rate', 'Total_Revenue'], cmap='RdYlGn'),
+                    use_container_width=True,
+                    height=300
+                )
+        
+        # 7. СВОДНАЯ СТАТИСТИКА ПО ГЕОГРАФИИ
+        st.subheader(t('geography_summary'))
+        
+        # Распределение городов по группам
+        city_groups = pd.cut(
+            city_stats['Total_Deals'],
+            bins=[0, 1, 3, 10, 30, 100, float('inf')],
+            labels=['1 сделка', '2-3', '4-10', '11-30', '31-100', '100+']
+        )
+        
+        group_stats = pd.DataFrame({
+            'Группа': city_groups,
+            'Города': 1,
+            'Выручка': city_stats['Total_Revenue']
+        }).groupby('Группа', observed=False).agg({
+            'Города': 'count',
+            'Выручка': 'sum'
+        })
+        
+        if len(group_stats) > 0:
+            group_stats['Доля выручки'] = (group_stats['Выручка'] / group_stats['Выручка'].sum() * 100).round(1)
+            group_stats['Выручка на город'] = (group_stats['Выручка'] / group_stats['Города'].replace(0, np.nan)).fillna(0).astype(int)
+            
+            fig_groups = px.bar(
+                group_stats.reset_index(),
+                x='Группа',
+                y='Города',
+                color='Доля выручки',
+                text='Города',
+                title=t('cities_distribution'),
+                labels={'Города': f'{t("cities")}'},
+                color_continuous_scale='RdYlGn',
+                height=400
+            )
+            fig_groups.update_traces(textposition='outside')
+            st.plotly_chart(fig_groups, use_container_width=True)
+        
+        # Ключевые метрики географии - отдельно под графиком
+        source_leadership = city_stats['Top_Source'].value_counts().head(5).reset_index()
+        source_leadership.columns = ['Источник', 'Городов']
+        source_leadership['Доля'] = (source_leadership['Городов'] / len(city_stats) * 100).round(1)
+        
+        # Общее количество студентов по всем городам
+        total_students_all_cities = city_stats['Active_Students'].sum()
+        
+        geo_summary_data = {
+            t('metric'): [
+                f'Всего {t("cities")} с данными',
+                f'{t("cities")} с ≥5 сделками',
+                f'{t("avg_speed")} {t("win_rate")} по {t("cities")}',
+                f'Доля {t("revenue")} топ-3 {t("cities")}',
+                f'Самый частый {t("source")}',
+                f'{t("cities")} с этим {t("source")}',
+                f'Доля {t("students")} топ-3 {t("cities")}'
+            ],
+            t('value'): [
+                f"{len(city_stats)}",
+                f"{len(city_stats[city_stats['Total_Deals'] >= 5])}",
+                f"{city_stats['Win_Rate'].mean():.1f}%",
+                f"{city_stats.head(3)['Total_Revenue'].sum() / city_stats['Total_Revenue'].sum() * 100:.1f}%",
+                f"{source_leadership.iloc[0]['Источник']}",
+                f"{source_leadership.iloc[0]['Городов']} ({source_leadership.iloc[0]['Доля']}%)",
+                f"{(city_stats.head(3)['Active_Students'].sum() / total_students_all_cities * 100):.1f}%"
+            ]
+        }
+        
+        geo_summary_df = pd.DataFrame(geo_summary_data)
+        st.markdown(f"**{t('key_geography_metrics')}**")
+        st.dataframe(
+            geo_summary_df.style.set_table_styles([
+                {'selector': 'thead th', 'props': [('background-color', '#0235C4'), ('color', 'white')]},
+                {'selector': 'tbody td', 'props': [('background-color', '#f8fafc')]},
+            ]).hide(axis='index'),
+            use_container_width=True,
+            height=300
+        )
+    else:
+        st.warning(t('no_city_data'))
+
+# ---------- ВКЛАДКА 7: Дерево метрик и A/B тесты ----------
+with tabs[6]:
+    st.markdown(f'<div class="section-title">{t("methodology_ab_testing")}</div>', unsafe_allow_html=True)
+    
+    # 1. ДЕРЕВО МЕТРИК
+    st.subheader(t('metrics_tree'))
+
+    st.markdown(f"""
+**УРОВЕНЬ 1: {t('top_managers')}**  
+└── **{t('margin')} (CM)** — Revenue - AC - COGS
+
+**УРОВЕНЬ 2: {t('unit_economics_business')}**  
+├── **UA (User Acquisition)** — {t('ua_desc')} → COUNTUNIQUE(CONTACTS['Id'])  
+├── **C1 ({t('conversion')} Rate)** — {t('c1_desc')} → B / UA  
+├── **CPA (Cost Per Acquisition)** — {t('cpa_desc')} → AC / UA  
+├── **AOV (Average Order Value)** — {t('aov_desc')} → Revenue / T  
+├── **COGS (Cost of Goods Sold)** — {t('cogs_desc')}  
+├── **APC (Average Payment Count)** — {t('apc_desc')} → T / B  
+├── **CPC (Cost Per Click)** — {t('cpc')} → AC / Clicks  
+└── **CTR (Click-Through Rate)** — {t('ctr')} → Clicks / Impressions
+
+**УРОВЕНЬ 2.1: {t('financial_metrics_by_levels')}**  
+├── **{t('revenue')} (Revenue)** — {t('revenue')} → SUM(DEALS['revenue'])  
+└── **ROMI (Return on Marketing)** — {t('romi_desc')} → CM / AC
+
+**УРОВЕНЬ 3: {t('product_analysis')}**  
+├── **B (Buyers)** — {t('b_desc')}  
+├── **AC (Advertising Cost)** — {t('ac_desc')} → SUM(SPEND['Spend'])  
+├── **CAC (Customer Acquisition Cost)** — {t('cac_desc')} → AC / B  
+├── **CLTV (Customer Lifetime Value)** — {t('cltv_desc')} → (AOV - COGS) × APC  
+├── **LTV (Lifetime Value)** — {t('ltv_desc')} → CLTV × C1  
+└── **T (Transactions)** — {t('t_desc')} → SUM(DEALS['Transactions'])
+
+**УРОВЕНЬ 4: {t('detailed_source_stats')}**  
+├── DEALS['Created Time'] — {t('month')} {t('leads')}  
+├── DEALS['Closing Date'] — {t('month')} {t('sales')}  
+├── DEALS['Source'] / SPEND['Source'] — {t('source')}  
+├── DEALS['Campaign'] — {t('campaign_analysis')}  
+├── DEALS['Product'] — {t('product')}  
+├── DEALS['Stage'] — {t('conversion')}  
+├── DEALS['Quality'] — {t('quality')}  
+├── DEALS['City'] — {t('city')}  
+├── SPEND['Clicks'] — {t('clicks')}  
+└── SPEND['Impressions'] — {t('impressions')}
+
+**УРОВЕНЬ 5: {t('additional_metrics')}**  
+├── DEALS['SLA'] — {t('avg_speed')} {t('conversion')}  
+├── DEALS['Level of Deutsch'] — {t('level')}  
+├── DEALS['Course duration'] — {t('deal_closing_speed')}  
+├── CALLS['Call Duration (in seconds)'] — {t('calls')} {t('avg_speed')}  
+├── CALLS['Call Type'] — {t('calls')} {t('type')}  
+├── CALLS['Call Status'] — {t('calls')} {t('status')}  
+├── SPEND['AdGroup'] — {t('source')} {t('group')}  
+└── SPEND['Ad'] — {t('source')}
+
+**{t('growth_insights')}**  
+- **B = UA × C1** ({t('unique_clients')} = {t('ua')} × {t('conversion')})  
+- **Revenue = AOV × T** ({t('revenue')} = {t('aov_per_transaction')} × {t('t_desc')})  
+- **T = B × APC** ({t('t_desc')} = {t('unique_clients')} × {t('apc_desc')})  
+- **CAC = AC / B** ({t('cac_desc')} = {t('ac_desc')} / {t('unique_clients')})  
+- **CLTV = (AOV - COGS) × APC** ({t('cltv_desc')} = ({t('aov_per_transaction')} - {t('cogs_desc')}) × {t('apc_desc')})  
+- **LTV = CLTV × C1** ({t('ltv_desc')} = {t('cltv_desc')} × {t('c1_desc')})  
+- **CM = Revenue - AC - COGS** ({t('cm_desc')} = {t('revenue')} - {t('ac_desc')} - {t('cogs_desc')})  
+- **ROMI = CM / AC** ({t('romi_desc')} = {t('cm_desc')} / {t('ac_desc')})  
+
+*{t('no_data')} о постоянных затратах*
+""")
+    
+    # 2. HADI-ЦИКЛЫ И A/B ТЕСТЫ
+    st.subheader(t('hadi_cycles_ab_tests'))
+    
+    # Основные продукты для анализа
+    main_products = ["digital marketing", "ux/ui design", "web developer"]
+    
+    # Подготовка данных
+    contacts_local = contacts.copy()
+    if 'created_date' not in contacts_local.columns:
+        contacts_local['created_date'] = pd.to_datetime(contacts_local['Created Time']).dt.date
+    
+    TOTAL_UA = contacts_local['Id'].nunique()
+    active_students_df = deals[deals['stage_normalized'] == 'Active Student']
+    buyers_per_product = active_students_df.groupby('Product')['Contact Name'].nunique()
+    c1_per_product = buyers_per_product / TOTAL_UA if TOTAL_UA > 0 else 0
+    
+    product_stats = pd.DataFrame({
+        t('product'): buyers_per_product.index,
+        "B (Покупатели)": buyers_per_product.values,
+        "UA (Общий трафик)": TOTAL_UA,
+        "C1 (Конверсия)": c1_per_product.values
+    })
+    product_stats = product_stats[product_stats[t('product')].isin(main_products)]
+    
+    if len(product_stats) > 0:
+        st.write(f"**{t('basic_metrics_ab_tests')}**")
+        st.dataframe(
+            product_stats.style.format({
+                'B (Покупатели)': '{:,.0f}',
+                'UA (Общий трафик)': '{:,.0f}',
+                'C1 (Конверсия)': '{:.2%}'
+            }),
+            use_container_width=True
+        )
+        
+        # Гипотезы для A/B тестов
+        hypotheses = [
+            (t('hadi_1'), t('hadi_1_desc')),
+            (t('hadi_2'), t('hadi_2_desc')),
+            (t('hadi_3'), t('hadi_3_desc'))
+        ]
+        
+        st.write(f"**{t('ready_hadi_cycles')}**")
+        
+        for hyp_name, hyp_text in hypotheses:
+            with st.expander(f"{hyp_name}"):
+                st.write(f"**{t('hypothesis')}:** {hyp_text}")
+                st.write(f"**HADI-цикл:**")
+                
+                hadi_df = pd.DataFrame({
+                    "Этап": ["Hypothesis (H)", "Action (A)", "Data (D)", "Insight (I)"],
+                    "Формулировка": [
+                        f"{hyp_text}. {t('growth_insights')} {t('conversion')} на 10%.",
+                        f"{t('action')} согласно {t('hypothesis')} для тестовой группы (50%). Контрольная группа — текущий процесс.",
+                        f"Срок теста — 2 недели. Сравниваются две группы лидов. Метрика — {t('conversion')} (C1). Цель — прирост ≥ 10%.",
+                        f"{t('hypothesis')} подтверждается, если прирост {t('conversion')} ≥ целевого уровня и результат статистически значим."
+                    ]
+                })
+                
+                st.table(hadi_df)
+                
+                abtest_df = pd.DataFrame({
+                    "Параметр": [
+                        t('hypothesis'),
+                        "Нулевая гипотеза",
+                        "Условия проведения A-теста",
+                        "Условия проведения B-теста",
+                        "Метрика для отслеживания",
+                        "Граница подтверждения гипотезы",
+                        "Уровень значимости"
+                    ],
+                    "Описание": [
+                        f"{hyp_text} увеличит {t('conversion')} (C1) на 10%.",
+                        f"Нет различий: C1_B ≤ C1_A.",
+                        f"Группа A — текущий процесс. Случайное распределение 50% новых лидов. Длительность: 14 дней.",
+                        f"Группа B — {hyp_text}. Случайное распределение 50% новых лидов. Длительность: 14 дней.",
+                        f"Основная: C1 ({t('sales')} / {t('leads')}). Дополнительные: TTFC, дозвоны, CPA.",
+                        f"C1_B ≥ C1_A × 1.10 и различие статистически значимо.",
+                        "α = 0.05"
+                    ]
+                })
+                
+                st.table(abtest_df)
+    
+    # 3. РАСЧЕТ ПАРАМЕТРОВ A/B ТЕСТОВ
+    st.subheader(t('ab_test_parameters_calculation'))
+    
+    st.markdown(f"**{t('ab_tests_sample_calculation')}**")
+    
+    if len(product_stats) > 0:
+        # Параметры эксперимента
+        ALPHA = 0.05
+        POWER = 0.8
+        MDE_LIST = [0.10, 0.20, 0.30]
+        
+        # Расчет среднего количества лидов в день (на одну группу)
+        daily_leads = contacts_local.groupby('created_date')['Id'].nunique().mean()
+        DAILY_LEADS_PER_GROUP = daily_leads / 2 if daily_leads > 0 else 10
+        
+        # Функция для расчетов
+        def required_sample(p, mde, alpha=ALPHA, power=POWER):
+            p1 = p
+            p2 = p * (1 + mde)
+            diff = abs(p2 - p1)
+            pooled_var = (p1*(1-p1) + p2*(1-p2)) / 2
+            effect_size = diff / np.sqrt(pooled_var)
+            
+            n_required = NormalIndPower().solve_power(
+                effect_size=effect_size,
+                nobs1=None,
+                alpha=alpha,
+                power=power,
+                ratio=1.0,
+                alternative='two-sided'
+            )
+            return n_required
+        
+        def required_days(n_required, daily_leads):
+            return int(np.ceil(n_required / daily_leads)) if daily_leads > 0 else 999
+        
+        # Генерация таблицы расчетов
+        results = []
+        
+        for _, row in product_stats.iterrows():
+            product_name = row[t('product')]
+            p = row["C1 (Конверсия)"]
+            
+            for mde in MDE_LIST:
+                n_required = required_sample(p, mde)
+                days_needed = required_days(n_required, DAILY_LEADS_PER_GROUP)
+                
+                for hyp_name, _ in hypotheses:
+                    results.append({
+                        t('product'): product_name,
+                        t('hypothesis'): hyp_name,
+                        "Базовый C1": f"{p:.2%}",
+                        "Целевой эффект (MDE)": f"{mde*100:.0f}%",
+                        "Лидов на группу": int(np.ceil(n_required)),
+                        "Лидов/день (группа)": f"{DAILY_LEADS_PER_GROUP:.1f}",
+                        "Дней для теста": days_needed
+                    })
+        
+        results_df = pd.DataFrame(results)
+        
+        # Цветовое кодирование для столбца "Дней для теста"
+        def highlight_days(val):
+            try:
+                val_int = int(val)
+                if val_int <= 14:
+                    return 'background-color: #006400; color: white'
+                elif val_int <= 30:
+                    return 'background-color: #FFA500; color: black'
+                else:
+                    return 'background-color: #8B0000; color: white'
+            except:
+                return ''
+        
+        # Отображение таблицы
+        st.markdown(f"**{t('avg_speed')} приток лидов в день (на одну группу):** {DAILY_LEADS_PER_GROUP:.1f}")
+        
+        styled_df = results_df.style.applymap(highlight_days, subset=["Дней для теста"])
+        
+        st.dataframe(
+            styled_df.format({
+                "Лидов на группу": "{:,.0f}",
+                "Дней для теста": "{:,.0f}"
+            }),
+            use_container_width=True,
+            height=400
+        )
+        
+        # Легенда цветов
+        st.markdown(f"""
+        **{t('color_legend')}**  
+        🟩 **≤14 дней** — {t('test_implementable')}  
+        🟧 **15-30 дней** — {t('extended_test_needed')}  
+        🟥 **>30 дней** — {t('hypothesis_testing_difficult')}  
+        """)
+    else:
+        st.info(t('insufficient_data'))
+
+# ---------- ФУТЕР ----------
+st.markdown(
+    f"""
+    <div style='text-align: center; color: #ffffff; font-size: 0.9rem; padding: 2rem 0;'>
+        Analytics Dashboard • Built by <b>Dmitriy Chumachenko</b>
+    </div>
+    """, 
+    unsafe_allow_html=True
+)
