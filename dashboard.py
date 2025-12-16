@@ -375,6 +375,50 @@ TRANSLATIONS = {
         'goal_growth': 'Цель — прирост ≥ 10%',
         'main_metric': 'Основная: C1 (Продажи / Лиды)',
         'additional_metrics_ab': 'Дополнительные: TTFC, дозвоны, CPA',
+        
+        # НОВЫЕ ДОБАВЛЕННЫЕ ПЕРЕВОДЫ ДЛЯ ПОЛНОЙ МУЛЬТИЯЗЫЧНОСТИ
+        'conversion_by_10_percent': 'конверсию на 10%',
+        'and': 'и',
+        'leads_inflow_per_day': 'приток лидов в день',
+        'with_same_effect': 'с одинаковым эффектом',
+        'level_2_1_financial_metrics': 'Финансовые показатели по уровням',
+        'leads_inflow_per_day_group': 'Приток лидов в день (на группу)',
+        'equal_effect': 'с одинаковым эффектом',
+        'test_duration': 'Срок теста',
+        'hypothesis_confirmed_if': 'Гипотеза подтверждается, если',
+        'statistically_significant_result': 'результат статистически значим',
+        'will_increase': 'увеличит',
+        'no_difference': 'Разницы нет',
+        'group_a': 'Группа A',
+        'group_b': 'Группа B',
+        'random_distribution': 'случайное распределение',
+        'new_leads': 'новых лидов',
+        'duration': 'Длительность',
+        'difference_statistically_significant': 'различие статистически значимо',
+        'confirmed': 'подтверждается',
+        'if_growth': 'если прирост',
+        'target_level': 'целевой уровень',
+        'result_statistically_significant': 'результат статистически значим',
+        'duration_test': 'Длительность теста',
+        'of': 'из',
+        'top': 'Топ',
+        'financial_metrics_by_levels_2': 'Финансовые показатели по уровням',
+        'month_leads': 'Месяц лидов',
+        'month_sales': 'Месяц продаж',
+        'campaign_analysis_2': 'Анализ кампаний',
+        'conversion_2': 'Конверсия',
+        'quality_2': 'Качество',
+        'city_2': 'Город',
+        'clicks_2': 'Клики',
+        'impressions_2': 'Показы',
+        'avg_response_time_2': 'Средняя скорость ответа',
+        'level_2': 'Уровень',
+        'deal_closing_speed_2': 'Скорость закрытия сделок',
+        'calls_avg_speed': 'Средняя скорость звонков',
+        'calls_type': 'Тип звонков',
+        'calls_status': 'Статус звонков',
+        'source_group': 'Группа источников',
+        'source_2': 'Источник',
     },
     'DE': {
         # Основные заголовки
@@ -735,6 +779,50 @@ TRANSLATIONS = {
         'goal_growth': 'Ziel — Zuwachs ≥ 10%',
         'main_metric': 'Hauptmetrik: C1 (Verkäufe / Leads)',
         'additional_metrics_ab': 'Zusätzliche: TTFC, Anrufe, CPA',
+        
+        # НОВЫЕ ДОБАВЛЕННЫЕ ПЕРЕВОДЫ ДЛЯ ПОЛНОЙ МУЛЬТИЯЗЫЧНОСТИ
+        'conversion_by_10_percent': 'Konversion um 10%',
+        'and': 'und',
+        'leads_inflow_per_day': 'Lead-Zufluss pro Tag',
+        'with_same_effect': 'mit gleichem Effekt',
+        'level_2_1_financial_metrics': 'FINANZKENNZAHLEN NACH NIVEAUS',
+        'leads_inflow_per_day_group': 'Lead-Zufluss pro Tag (pro Gruppe)',
+        'equal_effect': 'mit gleichem Effekt',
+        'test_duration': 'Testdauer',
+        'hypothesis_confirmed_if': 'Hypothese wird bestätigt, wenn',
+        'statistically_significant_result': 'Ergebnis statistisch signifikant ist',
+        'will_increase': 'erhöht',
+        'no_difference': 'Kein Unterschied',
+        'group_a': 'Gruppe A',
+        'group_b': 'Gruppe B',
+        'random_distribution': 'zufällige Verteilung',
+        'new_leads': 'neue Leads',
+        'duration': 'Dauer',
+        'difference_statistically_significant': 'Unterschied statistisch signifikant',
+        'confirmed': 'bestätigt',
+        'if_growth': 'wenn der Zuwachs',
+        'target_level': 'Zielniveau',
+        'result_statistically_significant': 'Ergebnis statistisch signifikant',
+        'duration_test': 'Testdauer',
+        'of': 'von',
+        'top': 'Top',
+        'financial_metrics_by_levels_2': 'Finanzkennzahlen nach Niveaus',
+        'month_leads': 'Monat Leads',
+        'month_sales': 'Monat Verkäufe',
+        'campaign_analysis_2': 'Kampagnenanalyse',
+        'conversion_2': 'Konversion',
+        'quality_2': 'Qualität',
+        'city_2': 'Stadt',
+        'clicks_2': 'Klicks',
+        'impressions_2': 'Impressions',
+        'avg_response_time_2': 'Durchschnittliche Antwortzeit',
+        'level_2': 'Niveau',
+        'deal_closing_speed_2': 'Abschlussgeschwindigkeit',
+        'calls_avg_speed': 'Durchschnittliche Anrufgeschwindigkeit',
+        'calls_type': 'Anruftyp',
+        'calls_status': 'Anrufstatus',
+        'source_group': 'Quellengruppe',
+        'source_2': 'Quelle',
     }
 }
 
@@ -1579,7 +1667,7 @@ with tabs[5]:
         max_growth = growth_scenarios['CM_Growth_Rounded'].max()
         best_scenarios = growth_scenarios[growth_scenarios['CM_Growth_Rounded'] == max_growth]
         
-        st.write(f"**{t('best_scenarios')} ({len(best_scenarios)} с одинаковым эффектом):**")
+        st.write(f"**{t('best_scenarios')} ({len(best_scenarios)} {t('with_same_effect')}):**")
         for _, scenario in best_scenarios.iterrows():
             st.write(f"- **{scenario['Scenario']}**: {t('cm_growth')} {scenario['CM_Growth_€']:+,.0f} {t('currency')}")
             st.write(f"  ROMI: {scenario['ROMI']:.1f}%")
@@ -1678,7 +1766,7 @@ with tabs[5]:
                         max_growth = growth_scenarios['CM_Growth_Rounded'].max()
                         best_scenarios = growth_scenarios[growth_scenarios['CM_Growth_Rounded'] == max_growth]
                         
-                        st.write(f"**{t('best_scenarios')} ({len(best_scenarios)} с одинаковым эффектом):**")
+                        st.write(f"**{t('best_scenarios')} ({len(best_scenarios)} {t('with_same_effect')}):**")
                         for _, scenario in best_scenarios.iterrows():
                             st.write(f"- **{scenario['Scenario']}**: {t('cm_growth')} {scenario['CM_Growth_€']:+,.0f} {t('currency')}")
                             st.write(f"  {t('action')}: {ACTION_INSIGHTS.get(scenario['Scenario_Type'], '')}")
@@ -1843,7 +1931,7 @@ with tabs[0]:
             row=2, col=1
         )
 
-        fig1.update_layout(height=800, title_text=f"{t('marketing_analytics')}: {t('leads')} и {t('currency')}", barmode='group')
+        fig1.update_layout(height=800, title_text=f"{t('marketing_analytics')}: {t('leads')} {t('and')} {t('currency')}", barmode='group')
         st.plotly_chart(fig1, use_container_width=True)
     
     # ========== 2. АНАЛИЗ ПЛАТНЫХ ИСТОЧНИКОВ ==========
@@ -2038,7 +2126,7 @@ with tabs[0]:
                 y='Efficiency_Ratio', 
                 color='Efficiency_Ratio',
                 title=t('top_campaigns_efficiency'),
-                labels={'Efficiency_Ratio': f'{t("conversion")} {t("leads")} в {t("students")} (%)', 'Campaign': f'{t("source")}'},
+                labels={'Efficiency_Ratio': f'{t("conversion")} {t("leads")} {t("to")} {t("students")} (%)', 'Campaign': f'{t("source")}'},
                 color_continuous_scale='RdYlGn',
                 height=500
             )
@@ -2234,7 +2322,7 @@ with tabs[1]:
         nbins=int(percentile_95) + 1
     )
     
-    fig_calls_dist.update_xaxes(dtick=1, title_text=f"{t('calls')} до {t('sales')}")
+    fig_calls_dist.update_xaxes(dtick=1, title_text=f"{t('calls')} {t('to')} {t('sales')}")
     fig_calls_dist.update_yaxes(title_text=f"{t('total_deals')}")
 
     fig_calls_dist.add_vline(
@@ -3497,7 +3585,7 @@ with tabs[6]:
 ├── **CPC (Cost Per Click)** — {t('cpc')} → AC / Clicks  
 └── **CTR (Click-Through Rate)** — {t('ctr')} → Clicks / Impressions
 
-**УРОВЕНЬ 2.1: {t('financial_metrics_by_levels')}**  
+**{t('level_2_1_financial_metrics')}**  
 ├── **{t('revenue')} (Revenue)** — {t('revenue')} → SUM(DEALS['revenue'])  
 └── **ROMI (Return on Marketing)** — {t('romi_desc')} → CM / AC
 
@@ -3510,26 +3598,26 @@ with tabs[6]:
 └── **T (Transactions)** — {t('t_desc')} → SUM(DEALS['Transactions'])
 
 **{t('tree_level_4')}**  
-├── DEALS['Created Time'] — {t('month')} {t('leads')}  
-├── DEALS['Closing Date'] — {t('month')} {t('sales')}  
-├── DEALS['Source'] / SPEND['Source'] — {t('source')}  
-├── DEALS['Campaign'] — {t('campaign_analysis')}  
+├── DEALS['Created Time'] — {t('month_leads')}  
+├── DEALS['Closing Date'] — {t('month_sales')}  
+├── DEALS['Source'] / SPEND['Source'] — {t('source_2')}  
+├── DEALS['Campaign'] — {t('campaign_analysis_2')}  
 ├── DEALS['Product'] — {t('product')}  
-├── DEALS['Stage'] — {t('conversion')}  
-├── DEALS['Quality'] — {t('quality')}  
-├── DEALS['City'] — {t('city')}  
-├── SPEND['Clicks'] — {t('clicks')}  
-└── SPEND['Impressions'] — {t('impressions')}
+├── DEALS['Stage'] — {t('conversion_2')}  
+├── DEALS['Quality'] — {t('quality_2')}  
+├── DEALS['City'] — {t('city_2')}  
+├── SPEND['Clicks'] — {t('clicks_2')}  
+└── SPEND['Impressions'] — {t('impressions_2')}
 
 **{t('tree_level_5')}**  
-├── DEALS['SLA'] — {t('avg_response_time')}  
-├── DEALS['Level of Deutsch'] — {t('level')}  
-├── DEALS['Course duration'] — {t('deal_closing_speed')}  
-├── CALLS['Call Duration (in seconds)'] — {t('calls')} {t('avg_speed')}  
-├── CALLS['Call Type'] — {t('calls')} {t('type')}  
-├── CALLS['Call Status'] — {t('calls')} {t('status')}  
-├── SPEND['AdGroup'] — {t('source')} {t('group')}  
-└── SPEND['Ad'] — {t('source')}
+├── DEALS['SLA'] — {t('avg_response_time_2')}  
+├── DEALS['Level of Deutsch'] — {t('level_2')}  
+├── DEALS['Course duration'] — {t('deal_closing_speed_2')}  
+├── CALLS['Call Duration (in seconds)'] — {t('calls_avg_speed')}  
+├── CALLS['Call Type'] — {t('calls_type')}  
+├── CALLS['Call Status'] — {t('calls_status')}  
+├── SPEND['AdGroup'] — {t('source_group')}  
+└── SPEND['Ad'] — {t('source_2')}
 
 **{t('tree_insights_title')}**  
 - **{t('tree_formula_b')}**  
@@ -3596,10 +3684,10 @@ with tabs[6]:
                 hadi_df = pd.DataFrame({
                     t('stage'): ["Hypothesis (H)", "Action (A)", "Data (D)", "Insight (I)"],
                     t('formulation'): [
-                        f"{hyp_text}. {t('growth_insights')} {t('conversion')} на 10%.",
+                        f"{hyp_text}. {t('growth_insights')} {t('conversion')} {t('by')} 10%.",
                         f"{t('action')} {t('according_to_hypothesis')} {t('for_test_group')}. {t('control_group')} — {t('current_process')}.",
-                        f"{t('duration_test')} — 2 {t('week')}. {t('compare_two_groups')}. {t('main_metric')}. {t('goal_growth')}.",
-                        f"{t('hypothesis')} {t('confirmed')}, {t('if_growth')} {t('conversion')} ≥ {t('target_level')} и {t('result_statistically_significant')}."
+                        f"{t('test_duration')} — 2 {t('week')}. {t('compare_two_groups')}. {t('main_metric')}. {t('goal_growth')}.",
+                        f"{t('hypothesis')} {t('confirmed')}, {t('if_growth')} {t('conversion')} ≥ {t('target_level')} {t('and')} {t('result_statistically_significant')}."
                     ]
                 })
                 
@@ -3616,12 +3704,12 @@ with tabs[6]:
                         t('significance_level')
                     ],
                     t('description'): [
-                        f"{hyp_text} {t('will_increase')} {t('conversion')} (C1) на 10%.",
+                        f"{hyp_text} {t('will_increase')} {t('conversion')} (C1) {t('by')} 10%.",
                         f"{t('no_difference')}: C1_B ≤ C1_A.",
                         f"{t('group_a')} — {t('current_process')}. {t('random_distribution')} 50% {t('new_leads')}. {t('duration')}: 14 {t('days')}.",
                         f"{t('group_b')} — {hyp_text}. {t('random_distribution')} 50% {t('new_leads')}. {t('duration')}: 14 {t('days')}.",
                         f"{t('main_metric')}: C1 ({t('sales')} / {t('leads')}). {t('additional_metrics_ab')}.",
-                        f"C1_B ≥ C1_A × 1.10 и {t('difference_statistically_significant')}.",
+                        f"C1_B ≥ C1_A × 1.10 {t('and')} {t('difference_statistically_significant')}.",
                         "α = 0.05"
                     ]
                 })
@@ -3702,7 +3790,7 @@ with tabs[6]:
                 return ''
         
         # Отображение таблицы
-        st.markdown(f"**{t('avg_speed')} приток лидов в день (на одну группу):** {DAILY_LEADS_PER_GROUP:.1f}")
+        st.markdown(f"**{t('avg_speed')} {t('leads_inflow_per_day')} ({t('for_test_group')}):** {DAILY_LEADS_PER_GROUP:.1f}")
         
         styled_df = results_df.style.applymap(highlight_days, subset=[t('days_for_test')])
         
