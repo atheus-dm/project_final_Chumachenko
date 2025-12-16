@@ -65,6 +65,8 @@ TRANSLATIONS = {
         'transaction_metrics': 'ТРАНЗАКЦИОННЫЕ МЕТРИКИ:',
         'costs': 'ЗАТРАТЫ:',
         'economics_profit': 'ЭКОНОМИКА (ПРИБЫЛЬ):',
+        'first_payment_recurring': 'Первый платеж + Повторные платежи',
+        'no_fixed_costs_data': 'данные о постоянных затратах отсутствуют',
         
         # Точки роста
         'growth_points_analysis': 'АНАЛИЗ ТОЧКИ РОСТА (SENSITIVITY ANALYSIS)',
@@ -77,6 +79,22 @@ TRANSLATIONS = {
         'priority_map': 'СВОДНАЯ КАРТА ПРИОРИТЕТОВ ПО ПРОДУКТАМ',
         'growth_insights': 'Ключевой вывод анализа:',
         'methodology_explanation': 'Почему выбран фокус на C1 (конверсия):',
+        'several_scenarios': 'Несколько сценариев (C1, AOV, APC) показывают **идентичный математический эффект** на прирост CM',
+        'scenario_explanation': 'Это происходит потому, что в текущей модели:',
+        'revenue_formula': 'Revenue = UA × C1 × APC × AOV',
+        'metric_increase': 'Увеличение ЛЮБОЙ из этих метрик на 10% дает одинаковый рост Revenue',
+        'costs_unchanged': 'AC и COGS не меняются для этих сценариев (кроме UA)',
+        'no_cost_data': '**Отсутствие данных о затратах** - у нас нет информации о стоимости изменения каждой метрики',
+        'strategic_considerations': '**Стратегические соображения** - улучшение конверсии:',
+        'synergy_effect': 'Дает синергетический эффект с другими метриками',
+        'user_experience': 'Улучшает пользовательский опыт в целом',
+        'lower_costs': 'Часто требует меньших капитальных затрат vs масштабирование трафика (UA)',
+        'practical_implementation': '**Практическая реализуемость** - для C1 уже разработаны:',
+        'ready_hadi_cycles': 'Готовые HADI-циклы',
+        'ab_tests': 'Конкретные A/B тесты',
+        'measurable_hypotheses': 'Измеримые гипотезы',
+        'implementation_details': '**Где найти детали реализации:**',
+        'hadi_cycles_for_testing': '**Готовые HADI-циклы для тестирования** → вкладка',
         
         # Маркетинг
         'marketing_analytics': 'МАРКЕТИНГОВАЯ АНАЛИТИКА',
@@ -153,6 +171,13 @@ TRANSLATIONS = {
         'key_geography_metrics': 'Ключевые метрики географии:',
         'sales_increased_for_clarity': 'Продажи увеличены для наглядности',
         'speed_of_response_hours': 'Скорость ответа (часы)',
+        'cities_with_data': 'Города с данными',
+        'cities_with_min_deals': 'Города с ≥5 сделками',
+        'avg_conversion_cities': 'Средняя конверсия по городам',
+        'top_3_cities_revenue_share': 'Доля выручки топ-3 городов',
+        'most_frequent_source': 'Самый частый источник',
+        'cities_with_this_source': 'Города с этим источником',
+        'top_3_cities_students_share': 'Доля студентов топ-3 городов',
         
         # Дерево метрик и A/B тесты
         'methodology_ab_testing': 'МЕТОДОЛОГИЯ И A/B ТЕСТИРОВАНИЕ',
@@ -340,6 +365,16 @@ TRANSLATIONS = {
         'calls_to_sales': 'Звонки до продажи',
         'conversion_week_percent': 'Конверсия недели (%)',
         'deal_closing_speed_days': 'Скорость закрытия сделок (дни)',
+        
+        # A/B тестирование дополнительные тексты
+        'according_to_hypothesis': 'согласно гипотезе',
+        'for_test_group': 'для тестовой группы (50%)',
+        'control_group': 'Контрольная группа',
+        'current_process': 'текущий процесс',
+        'compare_two_groups': 'Сравниваются две группы лидов',
+        'goal_growth': 'Цель — прирост ≥ 10%',
+        'main_metric': 'Основная: C1 (Продажи / Лиды)',
+        'additional_metrics_ab': 'Дополнительные: TTFC, дозвоны, CPA',
     },
     'DE': {
         # Основные заголовки
@@ -390,6 +425,8 @@ TRANSLATIONS = {
         'transaction_metrics': 'TRANSAKTIONSKENNZAHLEN:',
         'costs': 'KOSTEN:',
         'economics_profit': 'ECONOMICS (GEWINN):',
+        'first_payment_recurring': 'Erstzahlung + Wiederkehrende Zahlungen',
+        'no_fixed_costs_data': 'Daten zu Fixkosten fehlen',
         
         # Точки роста
         'growth_points_analysis': 'WACHSTUMSHEBEL-ANALYSE (SENSITIVITY ANALYSIS)',
@@ -402,6 +439,22 @@ TRANSLATIONS = {
         'priority_map': 'ZUSAMMENFASSENDE PRIORITÄTENKARTE NACH PRODUKTEN',
         'growth_insights': 'Wichtige Erkenntnis der Analyse:',
         'methodology_explanation': 'Warum der Fokus auf C1 (Konversion):',
+        'several_scenarios': 'Mehrere Szenarien (C1, AOV, APC) zeigen **identische mathematische Wirkung** auf CM-Zuwachs',
+        'scenario_explanation': 'Dies geschieht, weil im aktuellen Modell:',
+        'revenue_formula': 'Revenue = UA × C1 × APC × AOV',
+        'metric_increase': 'Eine Erhöhung JEDER dieser Kennzahlen um 10% ergibt das gleiche Revenue-Wachstum',
+        'costs_unchanged': 'AC und COGS ändern sich für diese Szenarien nicht (außer UA)',
+        'no_cost_data': '**Fehlende Kostendaten** - Wir haben keine Informationen über die Kosten der Änderung jeder Kennzahl',
+        'strategic_considerations': '**Strategische Überlegungen** - Verbesserung der Konversion:',
+        'synergy_effect': 'Bietet synergetische Effekte mit anderen Kennzahlen',
+        'user_experience': 'Verbessert das Nutzererlebnis insgesamt',
+        'lower_costs': 'Erfordert oft weniger Kapitalkosten vs. Traffic-Skalierung (UA)',
+        'practical_implementation': '**Praktische Umsetzbarkeit** - Für C1 sind bereits entwickelt:',
+        'ready_hadi_cycles': 'Fertige HADI-Zyklen',
+        'ab_tests': 'Konkrete A/B Tests',
+        'measurable_hypotheses': 'Messbare Hypothesen',
+        'implementation_details': '**Wo Sie Implementierungsdetails finden:**',
+        'hadi_cycles_for_testing': '**Fertige HADI-Zyklen zum Testen** → Tab',
         
         # Маркетинг
         'marketing_analytics': 'MARKETING-ANALYTIK',
@@ -466,7 +519,7 @@ TRANSLATIONS = {
         'cities_efficiency_analysis': 'ANALYSE DER EFFIZIENZ NACH STÄDTEN',
         'top_cities_conversion': 'Top-10 Städte nach Konversion',
         'additional_metrics': 'ZUSÄTZLICHE KENNZAHLEN',
-        'top_cities_volume': 'Top-10 Städте nach Deal-Volumen',
+        'top_cities_volume': 'Top-10 Städte nach Deal-Volumen',
         'sources_by_cities': 'Top Quellen nach Stadtabdeckung',
         'german_levels_by_cities': 'DEUTSCH-SPRACHNIVEAUS NACH STÄDTEN',
         'german_levels_analysis': 'ANALYSE DER DEUTSCH-SPRACHNIVEAUS',
@@ -478,6 +531,13 @@ TRANSLATIONS = {
         'key_geography_metrics': 'Wichtige Geografie-Kennzahlen:',
         'sales_increased_for_clarity': 'Verkäufe für bessere Sichtbarkeit erhöht',
         'speed_of_response_hours': 'Antwortzeit (Stunden)',
+        'cities_with_data': 'Städte mit Daten',
+        'cities_with_min_deals': 'Städte mit ≥5 Deals',
+        'avg_conversion_cities': 'Durchschnittliche Konversion nach Städten',
+        'top_3_cities_revenue_share': 'Umsatzanteil Top-3 Städte',
+        'most_frequent_source': 'Häufigste Quelle',
+        'cities_with_this_source': 'Städte mit dieser Quelle',
+        'top_3_cities_students_share': 'Studentenanteil Top-3 Städte',
         
         # Дерево метрик и A/B тесты
         'methodology_ab_testing': 'METHODIK UND A/B TESTING',
@@ -665,6 +725,16 @@ TRANSLATIONS = {
         'calls_to_sales': 'Anrufe bis zum Verkauf',
         'conversion_week_percent': 'Konversion Woche (%)',
         'deal_closing_speed_days': 'Abschlussgeschwindigkeit (Tage)',
+        
+        # A/B тестирование дополнительные тексты
+        'according_to_hypothesis': 'gemäß Hypothese',
+        'for_test_group': 'für Testgruppe (50%)',
+        'control_group': 'Kontrollgruppe',
+        'current_process': 'aktueller Prozess',
+        'compare_two_groups': 'Vergleich von zwei Lead-Gruppen',
+        'goal_growth': 'Ziel — Zuwachs ≥ 10%',
+        'main_metric': 'Hauptmetrik: C1 (Verkäufe / Leads)',
+        'additional_metrics_ab': 'Zusätzliche: TTFC, Anrufe, CPA',
     }
 }
 
@@ -1280,33 +1350,33 @@ with tabs[4]:
         # Легенда метрик
         with st.expander(t('metric_guide')):
             st.markdown(f"""
-            **{t('initial_data')}**
-            - **UA** = {t('ua_desc')}
-            - **B** = {t('b_desc')}
-            - **AC** = {t('ac_desc')}
-            
-            **{t('base_metrics')}**
-            - **C1** = B / UA ({t('c1_desc')})
-            - **Revenue** = {t('revenue')} (First payment + Recurring payments)
-            
-            **{t('transaction_metrics')}**
-            - **T** = {t('t_desc')}
-            - **AOV** = Revenue / T ({t('aov_desc')})
-            - **APC** = T / B ({t('apc_desc')})
-            
-            **{t('costs')}**
-            - **COGS** = {t('cogs_desc')}
-            - **CPA** = AC / UA ({t('cpa_desc')})
-            - **CAC** = AC / B ({t('cac_desc')})
-            
-            **{t('economics_profit')}**
-            - **CLTV** = (AOV - COGS) × APC ({t('cltv_desc')})
-            - **LTV** = CLTV × C1 ({t('ltv_desc')})
-            - **CM** = Revenue - AC - COGS ({t('cm_desc')})
-            - **ROMI** = CM / AC × 100% ({t('romi_desc')})
-            
-            *{t('no_data')} о постоянных затратах*
-            """)
+**{t('initial_data')}**
+- **UA** = {t('ua_desc')}
+- **B** = {t('b_desc')}
+- **AC** = {t('ac_desc')}
+
+**{t('base_metrics')}**
+- **C1** = B / UA ({t('c1_desc')})
+- **Revenue** = {t('revenue')} ({t('first_payment_recurring')})
+
+**{t('transaction_metrics')}**
+- **T** = {t('t_desc')}
+- **AOV** = Revenue / T ({t('aov_desc')})
+- **APC** = T / B ({t('apc_desc')})
+
+**{t('costs')}**
+- **COGS** = {t('cogs_desc')}
+- **CPA** = AC / UA ({t('cpa_desc')})
+- **CAC** = AC / B ({t('cac_desc')})
+
+**{t('economics_profit')}**
+- **CLTV** = (AOV - COGS) × APC ({t('cltv_desc')})
+- **LTV** = CLTV × C1 ({t('ltv_desc')})
+- **CM** = Revenue - AC - COGS ({t('cm_desc')})
+- **ROMI** = CM / AC × 100% ({t('romi_desc')})
+
+*{t('no_fixed_costs_data')}*
+""")
 
 # ---------- ВКЛАДКА 2: ТОЧКИ РОСТА ----------
 with tabs[5]:
@@ -1646,25 +1716,25 @@ with tabs[5]:
             # Пояснение методологии
             st.info(f"""
 **{t('growth_insights')}**
-- Несколько сценариев (C1, AOV, APC) показывают **идентичный математический эффект** на прирост CM
-- Это происходит потому, что в текущей модели:
-  - Revenue = UA × C1 × APC × AOV
-  - Увеличение ЛЮБОЙ из этих метрик на 10% дает одинаковый рост Revenue
-  - AC и COGS не меняются для этих сценариев (кроме UA)
+- {t('several_scenarios')}
+- {t('scenario_explanation')}
+  - {t('revenue_formula')}
+  - {t('metric_increase')}
+  - {t('costs_unchanged')}
 
 **{t('methodology_explanation')}**
-1. **Отсутствие данных о затратах** - у нас нет информации о стоимости изменения каждой метрики
-2. **Стратегические соображения** - улучшение конверсии:
-   - Дает синергетический эффект с другими метриками
-   - Улучшает пользовательский опыт в целом
-   - Часто требует меньших капитальных затрат vs масштабирование трафика (UA)
-3. **Практическая реализуемость** - для C1 уже разработаны:
-   - Готовые HADI-циклы
-   - Конкретные A/B тесты
-   - Измеримые гипотезы
+1. {t('no_cost_data')}
+2. {t('strategic_considerations')}
+   - {t('synergy_effect')}
+   - {t('user_experience')}
+   - {t('lower_costs')}
+3. {t('practical_implementation')}
+   - {t('ready_hadi_cycles')}
+   - {t('ab_tests')}
+   - {t('measurable_hypotheses')}
 
-**Где найти детали реализации:**
-- **Готовые HADI-циклы для тестирования** → вкладка "{t('tab_metrics_tree')}"
+**{t('implementation_details')}**
+- {t('hadi_cycles_for_testing')} "{t('tab_metrics_tree')}"
 """)
 
 # ---------- ВКЛАДКА 1: МАРКЕТИНГ ----------
@@ -2010,7 +2080,6 @@ with tabs[1]:
     
     # 1. ГРАФИК ДИНАМИКИ ЛИДОВ, ЗВОНКОВ И ПРОДАЖ
     fig_trend = make_subplots(specs=[[{"secondary_y": True}]])
-
     fig_trend.add_trace(
         go.Scatter(
             x=weekly_stats['Week'], 
@@ -2168,7 +2237,6 @@ with tabs[1]:
     fig_calls_dist.update_xaxes(dtick=1, title_text=f"{t('calls')} до {t('sales')}")
     fig_calls_dist.update_yaxes(title_text=f"{t('total_deals')}")
 
-    
     fig_calls_dist.add_vline(
         x=median_calls, 
         line_dash="dash", 
@@ -2190,7 +2258,7 @@ with tabs[1]:
     fig_calls_dist.update_layout(bargap=0.1, height=400, showlegend=False)
     st.plotly_chart(fig_calls_dist, use_container_width=True)
 
-        # ========== 3. СКОРОСТЬ ЗАКРЫТИЯ СДЕЛОК ==========
+    # ========== 3. СКОРОСТЬ ЗАКРЫТИЯ СДЕЛОК ==========
     st.subheader(t('deal_closing_speed'))
 
     # Фильтрация (только успешные сделки)
@@ -2284,7 +2352,7 @@ with tabs[1]:
     else:
         st.info(t('insufficient_data'))
 
-            # 4. МЕСЯЧНАЯ ДИНАМИКА ВЫРУЧКИ, ЛИДОВ И СТУДЕНТОВ
+    # 4. МЕСЯЧНАЯ ДИНАМИКА ВЫРУЧКИ, ЛИДОВ И СТУДЕНТОВ
     st.subheader(t('monthly_dynamics'))
 
     # Работаем с копией, не трогаем оригинал
@@ -2460,7 +2528,6 @@ with tabs[1]:
         )
     else:
         st.info(t('insufficient_data'))
-        
         
     # ========== 1. ТОП МЕНЕДЖЕРОВ ПО ВЫРУЧКЕ И КОНВЕРСИИ ==========
     st.subheader(t('top_managers'))
@@ -3033,7 +3100,7 @@ with tabs[3]:
         geocoded_count = len(geocoded)
         total_cities = len(city_stats)
         
-        st.subheader(f"{t('sales_map')} (Топ-{geocoded_count} из {total_cities} {t('cities')})")
+        st.subheader(f"{t('sales_map')} ({t('top')}-{geocoded_count} {t('of')} {total_cities} {t('cities')})")
 
         if len(geocoded) > 0:
             fig_map = px.scatter_mapbox(
@@ -3060,14 +3127,12 @@ with tabs[3]:
             )
 
             st.plotly_chart(fig_map, use_container_width=True)
-
         else:
             st.info(t('no_city_data'))
-
         
         # 2. ТОП ГОРОДОВ ПО ВЫРУЧКЕ
         top_n = 15
-        st.subheader(f"{t('top_cities_revenue')} (Топ-{top_n})")
+        st.subheader(f"{t('top_cities_revenue')} ({t('top')}-{top_n})")
         
         city_top15 = city_stats.head(top_n).copy()
         
@@ -3077,7 +3142,7 @@ with tabs[3]:
             y='Total_Revenue',
             color='Top_Source',
             text_auto='.2s',
-            title=f'{t("top_cities_revenue")} (Топ-{top_n})',
+            title=f'{t("top_cities_revenue")} ({t("top")}-{top_n})',
             labels={'Total_Revenue': f'{t("revenue")} ({t("currency")})'},
             color_discrete_sequence=px.colors.qualitative.Set3,
             height=500
@@ -3088,7 +3153,6 @@ with tabs[3]:
         # 3. АНАЛИЗ ЭФФЕКТИВНОСТИ ПО ГОРОДАМ
         st.subheader(t('cities_efficiency_analysis'))
 
-        
         # ТОП-10 ПО КОНВЕРСИИ (минимум 5 сделок)
         min_deals = 5
         top_conversion = city_stats[city_stats['Total_Deals'] >= min_deals].sort_values('Win_Rate', ascending=False).head(10)
@@ -3100,7 +3164,7 @@ with tabs[3]:
                 y='City',
                 orientation='h',
                 text='Win_Rate',
-                title=f'{t("top_cities_conversion")} (≥{min_deals} сделок)',
+                title=f'{t("top_cities_conversion")} (≥{min_deals} {t("total_deals")})',
                 labels={'Win_Rate': f'{t("win_rate")} (%)', 'City': ''},
                 color='Total_Revenue',
                 color_continuous_scale='RdYlGn',
@@ -3380,13 +3444,13 @@ with tabs[3]:
         
         geo_summary_data = {
             t('metric'): [
-                f'{t("cities")} с данными',
-                f'{t("cities")} с ≥5 сделками',
-                f'{t("avg_speed")} {t("win_rate")} по {t("cities")}',
-                f'{t("revenue_share")} топ-3 {t("cities")}',
-                f'Самый частый {t("source")}',
-                f'{t("cities")} с этим {t("source")}',
-                f'{t("share")} {t("students")} топ-3 {t("cities")}'
+                t('cities_with_data'),
+                t('cities_with_min_deals'),
+                t('avg_conversion_cities'),
+                t('top_3_cities_revenue_share'),
+                t('most_frequent_source'),
+                t('cities_with_this_source'),
+                t('top_3_cities_students_share')
             ],
             t('value'): [
                 f"{len(city_stats)}",
@@ -3477,7 +3541,7 @@ with tabs[6]:
 - **{t('tree_formula_cm')}**  
 - **{t('tree_formula_romi')}**  
 
-*{t('tree_footer')}*
+*{t('no_fixed_costs_data')}*
 """)
     
     # 2. HADI-ЦИКЛЫ И A/B ТЕСТЫ
@@ -3533,9 +3597,9 @@ with tabs[6]:
                     t('stage'): ["Hypothesis (H)", "Action (A)", "Data (D)", "Insight (I)"],
                     t('formulation'): [
                         f"{hyp_text}. {t('growth_insights')} {t('conversion')} на 10%.",
-                        f"{t('action')} согласно {t('hypothesis')} для тестовой группы (50%). Контрольная группа — текущий процесс.",
-                        f"Срок теста — 2 недели. Сравниваются две группы лидов. Метрика — {t('conversion')} (C1). Цель — прирост ≥ 10%.",
-                        f"{t('hypothesis')} подтверждается, если прирост {t('conversion')} ≥ целевого уровня и результат статистически значим."
+                        f"{t('action')} {t('according_to_hypothesis')} {t('for_test_group')}. {t('control_group')} — {t('current_process')}.",
+                        f"{t('duration_test')} — 2 {t('week')}. {t('compare_two_groups')}. {t('main_metric')}. {t('goal_growth')}.",
+                        f"{t('hypothesis')} {t('confirmed')}, {t('if_growth')} {t('conversion')} ≥ {t('target_level')} и {t('result_statistically_significant')}."
                     ]
                 })
                 
@@ -3552,12 +3616,12 @@ with tabs[6]:
                         t('significance_level')
                     ],
                     t('description'): [
-                        f"{hyp_text} увеличит {t('conversion')} (C1) на 10%.",
-                        f"Нет различий: C1_B ≤ C1_A.",
-                        f"Группа A — текущий процесс. Случайное распределение 50% новых лидов. Длительность: 14 дней.",
-                        f"Группа B — {hyp_text}. Случайное распределение 50% новых лидов. Длительность: 14 дней.",
-                        f"Основная: C1 ({t('sales')} / {t('leads')}). Дополнительные: TTFC, {t('calls')}, CPA.",
-                        f"C1_B ≥ C1_A × 1.10 и различие статистически значимо.",
+                        f"{hyp_text} {t('will_increase')} {t('conversion')} (C1) на 10%.",
+                        f"{t('no_difference')}: C1_B ≤ C1_A.",
+                        f"{t('group_a')} — {t('current_process')}. {t('random_distribution')} 50% {t('new_leads')}. {t('duration')}: 14 {t('days')}.",
+                        f"{t('group_b')} — {hyp_text}. {t('random_distribution')} 50% {t('new_leads')}. {t('duration')}: 14 {t('days')}.",
+                        f"{t('main_metric')}: C1 ({t('sales')} / {t('leads')}). {t('additional_metrics_ab')}.",
+                        f"C1_B ≥ C1_A × 1.10 и {t('difference_statistically_significant')}.",
                         "α = 0.05"
                     ]
                 })
@@ -3654,9 +3718,9 @@ with tabs[6]:
         # Легенда цветов
         st.markdown(f"""
         **{t('color_legend')}**  
-        🟩 **≤14 дней** — {t('test_implementable')}  
-        🟧 **15-30 дней** — {t('extended_test_needed')}  
-        🟥 **>30 дней** — {t('hypothesis_testing_difficult')}  
+        🟩 **≤14 {t('days')}** — {t('test_implementable')}  
+        🟧 **15-30 {t('days')}** — {t('extended_test_needed')}  
+        🟥 **>30 {t('days')}** — {t('hypothesis_testing_difficult')}  
         """)
 
 # ---------- ФУТЕР ----------
