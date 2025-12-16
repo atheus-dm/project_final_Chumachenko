@@ -1469,7 +1469,7 @@ with tabs[5]:
         
         return pd.DataFrame(results)
     
-    # --- РАСЧЕТ TOTAL BUSINESS ---
+        # --- РАСЧЕТ TOTAL BUSINESS ---
     st.subheader(t('total_business_analysis'))
     
     TOTAL_UA = contacts['Id'].nunique()
@@ -1503,29 +1503,9 @@ with tabs[5]:
     
     st.subheader(t('growth_scenarios_total_business'))
     
-    # ИСПРАВЛЕННОЕ ФОРМАТИРОВАНИЕ ДЛЯ ТАБЛИЦЫ "СЦЕНАРИИ РОСТА"
     # Получаем переводы для форматирования
     currency_text = t('currency')
     percent_text = t('percent')
-    
-    # Правильное форматирование: C1 как проценты, ROMI как проценты
-    format_dict = {
-        'UA': '{:,.0f}', 
-        'B': '{:,.0f}', 
-        'T': '{:,.0f}', 
-        'Revenue': lambda x: f"{x:,.2f} {currency_text}",
-        'C1': '{:.2%}',  # Исправлено: форматирование как процент
-        'ROMI': lambda x: f"{x:.2f}{percent_text}",  # Исправлено: добавлен символ процента
-        'AOV': lambda x: f"{x:,.2f} {currency_text}",
-        'APC': '{:.2f}', 
-        'CLTV': lambda x: f"{x:,.2f} {currency_text}",
-        'LTV': lambda x: f"{x:,.2f} {currency_text}",
-        'AC': lambda x: f"{x:,.2f} {currency_text}",
-        'CPA': lambda x: f"{x:,.2f} {currency_text}",
-        'CAC': lambda x: f"{x:,.2f} {currency_text}",
-        'CM': lambda x: f"{x:,.2f} {currency_text}",
-        'CM_Growth_€': lambda x: f"{x:+,.2f} {currency_text}"
-    }
     
     cols = ['Scenario', 'UA', 'C1', 'B', 'T', 'AOV', 'APC', 'Revenue', 'AC', 
             'CPA', 'CAC', 'CLTV', 'LTV', 'CM', 'CM_Growth_€', 'ROMI']
@@ -1535,24 +1515,61 @@ with tabs[5]:
     else:
         sorted_df = global_scenarios[cols]
     
-    # Создаем стиль с правильным форматированием
-    styled_df = sorted_df.style
+    # ФОРМАТИРОВАНИЕ ВСЕХ ПОЛЕЙ ЧЕРЕЗ .apply() - РАБОТАЕТ 100% В STREAMLIT
+    display_df = sorted_df.copy()
     
-    # Применяем форматирование для каждой колонки
-    for col, format_func in format_dict.items():
-        if col in sorted_df.columns:
-            if callable(format_func):
-                styled_df = styled_df.format({col: format_func})
-            else:
-                styled_df = styled_df.format({col: format_func})
+    # Люди (целые числа)
+    if 'UA' in display_df.columns:
+        display_df['UA'] = display_df['UA'].apply(lambda x: f"{int(x):,}")
     
-    # Применяем градиент для визуализации
-    if 'CM_Growth_€' in global_scenarios.columns:
-        styled_df = styled_df.background_gradient(subset=['CM_Growth_€'], cmap='Greens', vmin=0)
-    else:
-        styled_df = styled_df.background_gradient(subset=['CM'], cmap='Greens', vmin=0)
+    if 'B' in display_df.columns:
+        display_df['B'] = display_df['B'].apply(lambda x: f"{int(x):,}")
     
-    st.dataframe(styled_df, use_container_width=True)
+    # Транзакции (целые числа)
+    if 'T' in display_df.columns:
+        display_df['T'] = display_df['T'].apply(lambda x: f"{int(x):,}")
+    
+    # Проценты
+    if 'C1' in display_df.columns:
+        display_df['C1'] = display_df['C1'].apply(lambda x: f"{x:.2%}")
+    
+    if 'ROMI' in display_df.columns:
+        display_df['ROMI'] = display_df['ROMI'].apply(lambda x: f"{x:.2f}%")
+    
+    # APC (одна десятичная)
+    if 'APC' in display_df.columns:
+        display_df['APC'] = display_df['APC'].apply(lambda x: f"{x:.2f}")
+    
+    # Валюты
+    if 'Revenue' in display_df.columns:
+        display_df['Revenue'] = display_df['Revenue'].apply(lambda x: f"{x:,.0f} {currency_text}")
+    
+    if 'AOV' in display_df.columns:
+        display_df['AOV'] = display_df['AOV'].apply(lambda x: f"{x:,.2f} {currency_text}")
+    
+    if 'AC' in display_df.columns:
+        display_df['AC'] = display_df['AC'].apply(lambda x: f"{x:,.0f} {currency_text}")
+    
+    if 'CPA' in display_df.columns:
+        display_df['CPA'] = display_df['CPA'].apply(lambda x: f"{x:.2f} {currency_text}")
+    
+    if 'CAC' in display_df.columns:
+        display_df['CAC'] = display_df['CAC'].apply(lambda x: f"{x:,.0f} {currency_text}")
+    
+    if 'CLTV' in display_df.columns:
+        display_df['CLTV'] = display_df['CLTV'].apply(lambda x: f"{x:,.0f} {currency_text}")
+    
+    if 'LTV' in display_df.columns:
+        display_df['LTV'] = display_df['LTV'].apply(lambda x: f"{x:.2f} {currency_text}")
+    
+    if 'CM' in display_df.columns:
+        display_df['CM'] = display_df['CM'].apply(lambda x: f"{x:,.0f} {currency_text}")
+    
+    if 'CM_Growth_€' in display_df.columns:
+        display_df['CM_Growth_€'] = display_df['CM_Growth_€'].apply(lambda x: f"{x:+,.0f} {currency_text}")
+    
+    # Отображаем таблицу
+    st.dataframe(display_df, use_container_width=True)
     
     growth_scenarios = global_scenarios[global_scenarios['Scenario'] != 'BASELINE']
     if not growth_scenarios.empty and 'CM_Growth_€' in growth_scenarios.columns:
@@ -1563,7 +1580,7 @@ with tabs[5]:
         
         st.write(f"**{t('best_scenarios')} ({len(best_scenarios)} {t('with_same_effect')}):**")
         for _, scenario in best_scenarios.iterrows():
-            st.write(f"- **{scenario['Scenario']}**: {t('cm_growth')} {scenario['CM_Growth_€']:+,.2f} {t('currency')}")
+            st.write(f"- **{scenario['Scenario']}**: {t('cm_growth')} {scenario['CM_Growth_€']:+,.0f} {t('currency')}")
             st.write(f"  ROMI: {scenario['ROMI']:.2f}%")
             st.write(f"  {t('action')}: {ACTION_INSIGHTS.get(scenario['Scenario_Type'], '')}")
     
