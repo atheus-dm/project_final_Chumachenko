@@ -1,5 +1,4 @@
-"""
-ПОЛНЫЙ АНАЛИТИЧЕСКИЙ ДАШБОРД IT ШКОЛЫ
+"""ПОЛНЫЙ АНАЛИТИЧЕСКИЙ ДАШБОРД IT ШКОЛЫ
 Версия 3.0 - Мультиязычная версия (Русский/Немецкий)
 """
 
@@ -131,7 +130,7 @@ TRANSLATIONS = {
         'revenue_by_products_ltv': 'Выручка по продуктам (Цвет = LTV)',
         'products_matrix_clients_vs_check': 'Матрица продуктов: Клиенты vs Средний чек',
         'payment_type_analysis': 'АНАЛИЗ ТИПОВ ОПЛАТЫ',
-        'payment_distribution': 'Распределение типов оплата по продуктам',
+        'payment_distribution': 'Распределение типов оплаты по продуктам',
         'education_type_analysis': 'АНАЛИЗ ТИПОВ ОБУЧЕНИЯ',
         'revenue_by_education_type': 'Выручка по типам обучения (Цвет = Средний чек)',
         
@@ -152,6 +151,8 @@ TRANSLATIONS = {
         'geography_summary': 'СВОДНАЯ СТАТИСТИКА ПО ГЕОГРАФИИ',
         'cities_distribution': 'Распределение городов по объему сделок',
         'key_geography_metrics': 'Ключевые метрики географии:',
+        'sales_increased_for_clarity': 'Продажи увеличены для наглядности',
+        'speed_of_response_hours': 'Скорость ответа (часы)',
         
         # Дерево метрик и A/B тесты
         'methodology_ab_testing': 'МЕТОДОЛОГИЯ И A/B ТЕСТИРОВАНИЕ',
@@ -175,7 +176,7 @@ TRANSLATIONS = {
         'month': 'Месяц',
         'leads': 'Лиды',
         'sales': 'Продажи',
-        'calls': 'Звонки',
+        'calls': 'Дозвоны',
         'students': 'Студенты',
         'conversion': 'Конверсия',
         'revenue': 'Выручка',
@@ -274,7 +275,6 @@ TRANSLATIONS = {
         'thirty_one_hundred': '31-100',
         'hundred_plus': '100+',
         'group': 'Группа',
-        'cities': 'Города',
         'revenue_share': 'Доля выручки',
         'revenue_per_city': 'Выручка на город',
         'cities_count': 'Городов',
@@ -315,6 +315,31 @@ TRANSLATIONS = {
         'tree_formula_cm': 'CM = Revenue - AC - COGS (Маржинальный вклад = Выручка - Маркетинг бюджет - Себестоимость)',
         'tree_formula_romi': 'ROMI = CM / AC (Окупаемость рекламы = Маржинальный вклад / Маркетинг бюджет)',
         'tree_footer': 'Примечание: данные о постоянных затратах отсутствуют',
+        
+        # Новые тексты из кода
+        'metric': 'Метрика',
+        'value': 'Значение',
+        'min': 'Минимум',
+        'max': 'Максимум',
+        'hours': 'часы',
+        'minutes': 'минуты',
+        'deals_faster_25': '25% сделок быстрее',
+        'deals_faster_75': '75% сделок быстрее',
+        'avg_response_time': 'Средняя скорость ответа',
+        'median_response_time': 'Медианная скорость ответа',
+        'quality': 'Качество',
+        'total_active': 'Всего активных',
+        'percentage': 'Процент',
+        'collection_ratio': 'Коэффициент сбора',
+        'avg_contract': 'Средний контракт',
+        'total_contract': 'Всего контрактов',
+        'avg_initial': 'Средний первоначальный',
+        'type': 'Тип',
+        'status': 'Статус',
+        'sales_multiplied': 'Продажи увеличены для наглядности',
+        'calls_to_sales': 'Звонки до продажи',
+        'conversion_week_percent': 'Конверсия недели (%)',
+        'deal_closing_speed_days': 'Скорость закрытия сделок (дни)',
     },
     'DE': {
         # Основные заголовки
@@ -441,7 +466,7 @@ TRANSLATIONS = {
         'cities_efficiency_analysis': 'ANALYSE DER EFFIZIENZ NACH STÄDTEN',
         'top_cities_conversion': 'Top-10 Städte nach Konversion',
         'additional_metrics': 'ZUSÄTZLICHE KENNZAHLEN',
-        'top_cities_volume': 'Top-10 Städte nach Deal-Volumen',
+        'top_cities_volume': 'Top-10 Städте nach Deal-Volumen',
         'sources_by_cities': 'Top Quellen nach Stadtabdeckung',
         'german_levels_by_cities': 'DEUTSCH-SPRACHNIVEAUS NACH STÄDTEN',
         'german_levels_analysis': 'ANALYSE DER DEUTSCH-SPRACHNIVEAUS',
@@ -451,6 +476,8 @@ TRANSLATIONS = {
         'geography_summary': 'ZUSAMMENFASSENDE GEOGRAFIE-STATISTIKEN',
         'cities_distribution': 'Verteilung der Städte nach Deal-Volumen',
         'key_geography_metrics': 'Wichtige Geografie-Kennzahlen:',
+        'sales_increased_for_clarity': 'Verkäufe für bessere Sichtbarkeit erhöht',
+        'speed_of_response_hours': 'Antwortzeit (Stunden)',
         
         # Дерево метрик и A/B тесты
         'methodology_ab_testing': 'METHODIK UND A/B TESTING',
@@ -504,8 +531,8 @@ TRANSLATIONS = {
         'avg_revenue_per_student': 'Durchschnittlicher Umsatz pro Student',
         'hypothesis': 'Hypothese',
         'action': 'Aktion',
-        'scenario': 'Szenario',
-        'scenario_type': 'Szenario-Typ',
+        'scenario': 'Sценарио',
+        'scenario_type': 'Сценарий-Typ',
         'growth_pct': 'Wachstum %',
         'cm_growth': 'CM-Zuwachs',
         'base_cm': 'Basis-CM',
@@ -573,7 +600,6 @@ TRANSLATIONS = {
         'thirty_one_hundred': '31-100',
         'hundred_plus': '100+',
         'group': 'Gruppe',
-        'cities': 'Städte',
         'revenue_share': 'Umsatzanteil',
         'revenue_per_city': 'Umsatz pro Stadt',
         'cities_count': 'Städteanzahl',
@@ -614,6 +640,31 @@ TRANSLATIONS = {
         'tree_formula_cm': 'CM = Revenue - AC - COGS (Deckungsbeitrag = Umsatz - Marketingbudget - Selbstkosten)',
         'tree_formula_romi': 'ROMI = CM / AC (Rentabilität der Werbung = Deckungsbeitrag / Marketingbudget)',
         'tree_footer': 'Hinweis: Daten zu Fixkosten fehlen',
+        
+        # Новые тексты из кода
+        'metric': 'Kennzahl',
+        'value': 'Wert',
+        'min': 'Minimum',
+        'max': 'Maximum',
+        'hours': 'Stunden',
+        'minutes': 'Minuten',
+        'deals_faster_25': '25% Deals schneller',
+        'deals_faster_75': '75% Deals schneller',
+        'avg_response_time': 'Durchschnittliche Antwortzeit',
+        'median_response_time': 'Median-Antwortzeit',
+        'quality': 'Qualität',
+        'total_active': 'Gesamt aktiv',
+        'percentage': 'Prozentsatz',
+        'collection_ratio': 'Einzugsquote',
+        'avg_contract': 'Durchschnittlicher Vertrag',
+        'total_contract': 'Gesamtverträge',
+        'avg_initial': 'Durchschnittlich initial',
+        'type': 'Typ',
+        'status': 'Status',
+        'sales_multiplied': 'Verkäufe für bessere Sichtbarkeit erhöht',
+        'calls_to_sales': 'Anrufe bis zum Verkauf',
+        'conversion_week_percent': 'Konversion Woche (%)',
+        'deal_closing_speed_days': 'Abschlussgeschwindigkeit (Tage)',
     }
 }
 
@@ -705,8 +756,6 @@ def load_data():
     for col in td_cols:
         # Создаем числовую версию в секундах для анализа
         deals[f'{col}_seconds'] = deals[col].dt.total_seconds()
-        # Оригинальную колонку оставляем как есть (timedelta)
-        # Её Streamlit может сконвертировать в строку, но у нас есть backup в секундах
     
     return deals, spend, contacts, calls
 
@@ -1045,10 +1094,6 @@ def calculate_growth_points():
     COGS_PERCENT_FROM_CHECK = 0.0
     AC_SCALING_FACTOR = 0.8
     
-    # Коэффициенты сложности
-    DIFFICULTY_FACTORS = {'UA': 0.2, 'C1': 0.4, 'AOV': 0.6, 'APC': 0.5, 'CPA': 0.3}
-    REALISM_WEIGHTS = {k: 1 - v for k, v in DIFFICULTY_FACTORS.items()}
-    
     ACTION_INSIGHTS = {
         'UA': t('channel_scaling'),
         'C1': t('funnel_optimization'), 
@@ -1092,8 +1137,7 @@ def calculate_growth_points():
             'Scenario': scenario_name, 'Scenario_Type': scenario_type, 'Growth_Pct': growth_pct,
             'Product': product_name, 'UA': ua, 'C1': c1, 'B': b, 'AOV': aov, 'APC': apc, 
             'T': t, 'Revenue': revenue, 'AC': ac, 'CLTV': cltv, 'LTV': ltv, 
-            'CPA': cpa, 'CAC': cac, 'CM': cm, 'ROMI': romi,
-            'Realism_Weight': REALISM_WEIGHTS.get(scenario_type, 0.5)
+            'CPA': cpa, 'CAC': cac, 'CM': cm, 'ROMI': romi
         }
     
     def generate_scenarios_for_row(row, product_name):
@@ -1179,22 +1223,26 @@ with tabs[4]:
     else:
         # Форматирование числовых значений
         def format_unit_econ(df):
+            # Получаем переводы для единиц измерения
+            currency_text = t('currency')
+            percent_text = t('percent')
+            
             return df.style.format({
                 'UA': '{:,.0f}',
                 'B': '{:,.0f}',
                 'C1': '{:.2%}',
-                'AOV': '{:,.1f}',
+                'AOV': lambda x: f"{x:,.1f} {currency_text}",
                 'T': '{:,.0f}',
                 'APC': '{:.2f}',
-                'COGS': '{:.1f}',
-                'Revenue': '{:,.0f}',
-                'CLTV': '{:,.1f}',
-                'LTV': '{:.1f}',
-                'AC': '{:,.0f}',
-                'CPA': '{:.2f}',
-                'CAC': '{:,.1f}',
-                'CM': '{:,.0f}',
-                'ROMI': '{:.1f}%'
+                'COGS': lambda x: f"{x:.1f} {currency_text}",
+                'Revenue': lambda x: f"{x:,.0f} {currency_text}",
+                'CLTV': lambda x: f"{x:,.1f} {currency_text}",
+                'LTV': lambda x: f"{x:.1f} {currency_text}",
+                'AC': lambda x: f"{x:,.0f} {currency_text}",
+                'CPA': lambda x: f"{x:.2f} {currency_text}",
+                'CAC': lambda x: f"{x:,.1f} {currency_text}",
+                'CM': lambda x: f"{x:,.0f} {currency_text}",
+                'ROMI': lambda x: f"{x:.1f}{percent_text}"
             })
         
         st.subheader(t('economics_whole_business'))
@@ -1405,11 +1453,26 @@ with tabs[5]:
     
     st.subheader(t('growth_scenarios_total_business'))
     
+    # Получаем переводы для форматирования
+    currency_text = t('currency')
+    percent_text = t('percent')
+    
     format_dict = {
-        'UA': '{:,.0f}', 'B': '{:,.0f}', 'T': '{:,.0f}', 'Revenue': '{:,.0f}', 
-        'C1': '{:.2%}', 'ROMI': '{:.0f}%', 'AOV': '{:,.1f}', 'APC': '{:.2f}', 
-        'CLTV': '{:,.0f}', 'LTV': '{:,.1f}', 'AC': '{:,.0f}', 'CPA': '{:,.2f}', 
-        'CAC': '{:,.1f}', 'CM': '{:,.0f}', 'CM_Growth_€': '{:+,.0f}'
+        'UA': '{:,.0f}', 
+        'B': '{:,.0f}', 
+        'T': '{:,.0f}', 
+        'Revenue': lambda x: f"{x:,.0f} {currency_text}",
+        'C1': '{:.2%}', 
+        'ROMI': lambda x: f"{x:.0f}{percent_text}",
+        'AOV': lambda x: f"{x:,.1f} {currency_text}",
+        'APC': '{:.2f}', 
+        'CLTV': lambda x: f"{x:,.0f} {currency_text}",
+        'LTV': lambda x: f"{x:,.1f} {currency_text}",
+        'AC': lambda x: f"{x:,.0f} {currency_text}",
+        'CPA': lambda x: f"{x:,.2f} {currency_text}",
+        'CAC': lambda x: f"{x:,.1f} {currency_text}",
+        'CM': lambda x: f"{x:,.0f} {currency_text}",
+        'CM_Growth_€': lambda x: f"{x:+,.0f} {currency_text}"
     }
     
     cols = ['Scenario', 'UA', 'C1', 'B', 'T', 'AOV', 'APC', 'Revenue', 'AC', 
@@ -1420,12 +1483,24 @@ with tabs[5]:
     else:
         sorted_df = global_scenarios[cols]
     
-    st.dataframe(
-        sorted_df.style.format(format_dict).background_gradient(
-            subset=['CM_Growth_€' if 'CM_Growth_€' in global_scenarios.columns else 'CM'], 
-            cmap='Greens', vmin=0),
-        use_container_width=True
-    )
+    # Создаем стиль с правильным форматированием
+    styled_df = sorted_df.style
+    
+    # Применяем форматирование для каждой колонки
+    for col, format_func in format_dict.items():
+        if col in sorted_df.columns:
+            if callable(format_func):
+                styled_df = styled_df.format({col: format_func})
+            else:
+                styled_df = styled_df.format({col: format_func})
+    
+    # Применяем градиент для визуализации
+    if 'CM_Growth_€' in global_scenarios.columns:
+        styled_df = styled_df.background_gradient(subset=['CM_Growth_€'], cmap='Greens', vmin=0)
+    else:
+        styled_df = styled_df.background_gradient(subset=['CM'], cmap='Greens', vmin=0)
+    
+    st.dataframe(styled_df, use_container_width=True)
     
     growth_scenarios = global_scenarios[global_scenarios['Scenario'] != 'BASELINE']
     if not growth_scenarios.empty and 'CM_Growth_€' in growth_scenarios.columns:
@@ -1449,7 +1524,9 @@ with tabs[5]:
         
         st.dataframe(
             sens_df.style.format({
-                'New_Value': '{:.2f}', 'CM_Impact': '{:+,.0f}', 'CM_Impact_Pct': '{:+.1f}%'
+                'New_Value': '{:.2f}', 
+                'CM_Impact': lambda x: f"{x:+,.0f} {currency_text}", 
+                'CM_Impact_Pct': '{:+.1f}%'
             }).background_gradient(subset=['CM_Impact'], cmap='RdYlGn'),
             use_container_width=True
         )
@@ -1507,17 +1584,22 @@ with tabs[5]:
                     else:
                         display_df = scenarios[display_cols]
                     
-                    st.dataframe(
-                        display_df.style.format({
-                            'UA': '{:,.0f}', 'B': '{:,.0f}', 'Revenue': '{:,.0f}', 
-                            'CM': '{:,.0f}', 'CM_Growth_€': '{:+,.0f}' if 'CM_Growth_€' in scenarios.columns else '{}', 
-                            'ROMI': '{:.1f}%',
-                            'C1': '{:.2%}', 'AOV': '{:,.1f}', 'APC': '{:.2f}'
-                        }).background_gradient(
-                            subset=['CM_Growth_€' if 'CM_Growth_€' in scenarios.columns else 'CM', 'ROMI'], 
-                            cmap='RdYlGn'),
-                        use_container_width=True
-                    )
+                    # Форматируем с учетом перевода
+                    formatted_df = display_df.style.format({
+                        'UA': '{:,.0f}', 
+                        'B': '{:,.0f}', 
+                        'Revenue': lambda x: f"{x:,.0f} {currency_text}",
+                        'CM': lambda x: f"{x:,.0f} {currency_text}", 
+                        'CM_Growth_€': lambda x: f"{x:+,.0f} {currency_text}" if 'CM_Growth_€' in scenarios.columns else '{}', 
+                        'ROMI': lambda x: f"{x:.1f}{percent_text}",
+                        'C1': '{:.2%}', 
+                        'AOV': lambda x: f"{x:,.1f} {currency_text}", 
+                        'APC': '{:.2f}'
+                    }).background_gradient(
+                        subset=['CM_Growth_€' if 'CM_Growth_€' in scenarios.columns else 'CM', 'ROMI'], 
+                        cmap='RdYlGn')
+                    
+                    st.dataframe(formatted_df, use_container_width=True)
                     
                     growth_scenarios = scenarios[scenarios['Scenario'] != 'BASELINE']
                     if not growth_scenarios.empty and 'CM_Growth_€' in growth_scenarios.columns:
@@ -1553,8 +1635,8 @@ with tabs[5]:
             
             st.dataframe(
                 summary.style.format({
-                    'CM_Growth_€': '{:+,.0f}', 
-                    'Base_CM': '{:,.0f}', 
+                    'CM_Growth_€': lambda x: f"{x:+,.0f} {currency_text}", 
+                    'Base_CM': lambda x: f"{x:,.0f} {currency_text}", 
                     'Growth_Pct': '{:+.1f}%'
                 }).background_gradient(subset=['CM_Growth_€'], cmap='Greens', vmin=0)
                 .background_gradient(subset=['Growth_Pct'], cmap='RdYlGn', vmin=-100, vmax=100),
@@ -1739,12 +1821,12 @@ with tabs[0]:
             
             st.dataframe(
                 paid_marketing[display_cols].sort_values('Spend', ascending=False).style.format({
-                    'Spend': '{:,.0f}',
+                    'Spend': lambda x: f"{x:,.0f} {t('currency')}",
                     'Leads': '{:,.0f}',
                     'Students': '{:,.0f}',
                     'Conversion': '{:.1f}%',
-                    'CAC': '{:.0f}',
-                    'Avg_Check': '{:,.0f}',
+                    'CAC': lambda x: f"{x:.0f} {t('currency')}",
+                    'Avg_Check': lambda x: f"{x:,.0f} {t('currency')}",
                     'ROAS': '{:.0f}%'
                 }).background_gradient(subset=['Conversion', 'ROAS'], cmap='RdYlGn'),
                 use_container_width=True,
@@ -1815,8 +1897,8 @@ with tabs[0]:
                     'Quality_Pct': '{:.1f}%',
                     'Students': '{:,.0f}',
                     'Conversion_Pct': '{:.1f}%',
-                    'Revenue': '{:,.0f}',
-                    'Avg_Check': '{:,.0f}',
+                    'Revenue': lambda x: f"{x:,.0f} {t('currency')}",
+                    'Avg_Check': lambda x: f"{x:,.0f} {t('currency')}",
                     'ROAS': '{:.1f}%'
                 }).background_gradient(subset=['Conversion_Pct', 'ROAS'], cmap='RdYlGn'),
                 use_container_width=True,
@@ -1854,10 +1936,10 @@ with tabs[0]:
             
             st.dataframe(
                 roi_analysis[display_cols].style.format({
-                    'Spend': '{:,.0f}',
+                    'Spend': lambda x: f"{x:,.0f} {t('currency')}",
                     'Students': '{:,.0f}',
-                    'Revenue': '{:,.0f}',
-                    'CAC': '{:.0f}',
+                    'Revenue': lambda x: f"{x:,.0f} {t('currency')}",
+                    'CAC': lambda x: f"{x:.0f} {t('currency')}",
                     'ROAS': '{:.0f}%'
                 }).background_gradient(subset=['ROAS'], cmap='RdYlGn'),
                 use_container_width=True,
@@ -1986,7 +2068,7 @@ with tabs[1]:
     fig_trend.data[2].hovertemplate = f"{t('week')}: %{{x}}<br>{t('calls')}: %{{y:.0f}}<extra></extra>"
 
     fig_trend.update_layout(
-        title_text=f"<b>{t('leads_calls_sales_dynamics')}</b><br><span style='font-size:12px'>{t('sales')} увеличены для наглядности</span>",
+        title_text=f"<b>{t('leads_calls_sales_dynamics')}</b><br><span style='font-size:12px'>{t('sales_increased_for_clarity')}</span>",
         hovermode="x unified",
         height=450
     )
@@ -2006,7 +2088,7 @@ with tabs[1]:
             'Calls_Count': f'{t("calls")}',
             'Success_Count': f'{t("sales")}',
             'Leads_Count': f'{t("leads")}',
-            'Conversion_Rate': f'{t("conversion")} {t("week")} (%)'
+            'Conversion_Rate': f'{t("conversion_week_percent")}'
         },
         color_continuous_scale='Viridis',
         height=400
@@ -2076,7 +2158,7 @@ with tabs[1]:
     fig_calls_dist = px.histogram(
         calls_for_histogram, 
         x='Calls_Count',
-        title=f'{t("calls_distribution")} (показано {len(calls_for_histogram)} из {total_deals} сделок, до {int(percentile_95)} звонков)',
+        title=f'{t("calls_distribution")} ({t("calls_to_sales")})',
         labels={'Calls_Count': f'{t("calls")}', 'count': f'{t("total_deals")}'},
         text_auto=True,
         color_discrete_sequence=['#FFA15A'],
@@ -2157,7 +2239,7 @@ with tabs[1]:
         )
         
         # Настройки осей
-        fig.update_xaxes(range=[-1, 120], title_text=f'{t("deal_closing_speed")} ({t("days")})')
+        fig.update_xaxes(range=[-1, 120], title_text=f'{t("deal_closing_speed_days")}')
         fig.update_layout(
             yaxis_title=f'{t("total_deals")}', 
             showlegend=False, 
@@ -2369,8 +2451,8 @@ with tabs[1]:
             month_summary[display_cols].style.format({
                 'Total_Deals': '{:,.0f}',
                 'Active_Students': '{:,.0f}',
-                'Total_Revenue': '{:,.0f}',
-                'Avg_Check': '{:,.0f}',
+                'Total_Revenue': lambda x: f"{x:,.0f} {t('currency')}",
+                'Avg_Check': lambda x: f"{x:,.0f} {t('currency')}",
                 'Conversion_Rate_%': '{:.1f}%'
             }).background_gradient(subset=['Total_Revenue', 'Conversion_Rate_%'], cmap='RdYlGn'),
             use_container_width=True,
@@ -2458,8 +2540,8 @@ with tabs[1]:
                 display_df.style\
                     .background_gradient(subset=['Revenue', 'Win_Rate'], cmap='Greens')\
                     .format({
-                        'Revenue': '{:,.0f}', 
-                        'Avg_Check': '{:,.0f}', 
+                        'Revenue': lambda x: f"{x:,.0f} {t('currency')}", 
+                        'Avg_Check': lambda x: f"{x:,.0f} {t('currency')}", 
                         'Median_Deal_Age_Days': '{:.0f}',
                         'Win_Rate': '{:.1f}%',
                         'Avg_Calls_Per_Deal': '{:.1f}'
@@ -2557,14 +2639,14 @@ with tabs[1]:
                 color='Win_Rate_Pct',
                 hover_name='Manager',
                 title=t('sla_vs_conversion'),
-                labels={'Median_SLA_Hours': f'{t("median_speed")} {t("conversion")} ({t("hours")})', 'Win_Rate_Pct': f'{t("conversion")} (%)'},
+                labels={'Median_SLA_Hours': f'{t("speed_of_response_hours")}', 'Win_Rate_Pct': f'{t("conversion")} (%)'},
                 color_continuous_scale='RdYlGn',
                 height=600
             )
             
             avg_sla = manager_sla_stats['Median_SLA_Hours'].median()
             avg_win = manager_sla_stats['Win_Rate_Pct'].median()
-            fig5.add_vline(x=avg_sla, line_dash="dash", line_color="gray", annotation_text=f"{t('avg_speed')} SLA")
+            fig5.add_vline(x=avg_sla, line_dash="dash", line_color="gray", annotation_text=f"{t('avg_response_time')}")
             fig5.add_hline(y=avg_win, line_dash="dash", line_color="gray", annotation_text=f"{t('avg_speed')} {t('conversion')}")
             st.plotly_chart(fig5, use_container_width=True)
             
@@ -2588,17 +2670,21 @@ with tabs[1]:
         manager_table = manager_table.sort_values('Median_SLA_Hours', ascending=True)
         
         display_df = manager_table[['Manager', 'Deals_Count', 'Median_SLA_Hours', 'Mean_SLA_Hours', 'Win_Rate_Pct']]
-        display_df.columns = [t('manager'), t('total_deals'), t('median_speed'), t('avg_speed'), f'{t("conversion")} %']
+        display_df.columns = [t('manager'), t('total_deals'), t('median_response_time'), t('avg_response_time'), f'{t("conversion")} %']
+        
+        # Получаем переводы для единиц времени
+        hours_text = t('hours')
+        percent_text = t('percent')
         
         st.dataframe(
             display_df.style\
-                .background_gradient(subset=[t('median_speed')], cmap='RdYlGn_r')\
-                .background_gradient(subset=[t('avg_speed')], cmap='RdYlGn_r')\
+                .background_gradient(subset=[t('median_response_time')], cmap='RdYlGn_r')\
+                .background_gradient(subset=[t('avg_response_time')], cmap='RdYlGn_r')\
                 .background_gradient(subset=[f'{t("conversion")} %'], cmap='RdYlGn')\
                 .format({
-                    t('median_speed'): '{:.1f} ч',
-                    t('avg_speed'): '{:.1f} ч',
-                    f'{t("conversion")} %': '{:.1f}%'
+                    t('median_response_time'): lambda x: f"{x:.1f} {hours_text}",
+                    t('avg_response_time'): lambda x: f"{x:.1f} {hours_text}",
+                    f'{t("conversion")} %': lambda x: f"{x:.1f}{percent_text}"
                 }),
             use_container_width=True,
             height=300
@@ -2616,7 +2702,7 @@ with tabs[1]:
                 'stage_normalized': lambda x: (x == 'Active Student').mean() * 100
             }).reset_index()
             conversion_by_speed['Time_Label'] = conversion_by_speed['SLA_Minutes'].apply(
-                lambda m: f"{m/60:.1f} ч" if m >= 60 else f"{m:.0f} мин"
+                lambda m: f"{m/60:.1f} {t('hours')}" if m >= 60 else f"{m:.0f} {t('minutes')}"
             )
             conversion_by_speed.columns = ['Decile', 'SLA_Minutes', 'Win_Rate_Pct', 'Time_Label']
             
@@ -2627,17 +2713,22 @@ with tabs[1]:
                     y='Win_Rate_Pct',
                     markers=True,
                     text='Time_Label',
-                    title=f'{t("conversion")} vs {t("avg_speed")} {t("conversion")}',
-                    labels={'SLA_Minutes': f'{t("avg_speed")} {t("conversion")} (мин)', 'Win_Rate_Pct': f'{t("conversion")} (%)'},
+                    title=f'{t("conversion")} vs {t("avg_response_time")}',
+                    labels={'SLA_Minutes': f'{t("avg_response_time")} ({t("minutes")})', 'Win_Rate_Pct': f'{t("conversion")} (%)'},
                     height=400
                 )
                 fig6.update_traces(textposition="top center")
                 st.plotly_chart(fig6, use_container_width=True)
                 
+                # Получаем переводы для единиц времени
+                minutes_text = t('minutes')
+                hours_text = t('hours')
+                days_text = t('days')
+                
                 def format_time(minutes):
-                    if minutes < 60: return f"{minutes:.1f} мин"
-                    if minutes < 1440: return f"{minutes/60:.1f} ч"
-                    return f"{minutes/1440:.1f} дн"
+                    if minutes < 60: return f"{minutes:.1f} {minutes_text}"
+                    if minutes < 1440: return f"{minutes/60:.1f} {hours_text}"
+                    return f"{minutes/1440:.1f} {days_text}"
                 
                 mean_sla = sla_clean['SLA_Minutes'].mean()
                 median_sla = sla_clean['SLA_Minutes'].median()
@@ -2645,7 +2736,7 @@ with tabs[1]:
                 q75 = sla_clean['SLA_Minutes'].quantile(0.75)
                 
                 metrics_df = pd.DataFrame({
-                    t('metric'): [f'{t("avg_speed")} {t("avg_speed")}', f'{t("median_speed")} {t("avg_speed")}', '25% сделок быстрее', '75% сделок быстрее'],
+                    t('metric'): [t('avg_response_time'), t('median_response_time'), t('deals_faster_25'), t('deals_faster_75')],
                     t('value'): [format_time(mean_sla), format_time(median_sla), format_time(q25), format_time(q75)]
                 })
                 
@@ -2810,18 +2901,22 @@ with tabs[2]:
                             'C1', 'CLTV', 'LTV', 'CAC', 'CM']
             display_df = product_metrics[display_cols].sort_values('Revenue', ascending=False)
             
+            # Получаем переводы для форматирования
+            currency_text = t('currency')
+            percent_text = t('percent')
+            
             st.dataframe(
                 display_df.style.format({
                     'B': '{:,.0f}',
-                    'Revenue': '{:,.0f}',
-                    'Avg_Check': '{:,.0f}',
-                    'Avg_Contract': '{:,.0f}',
+                    'Revenue': lambda x: f"{x:,.0f} {currency_text}",
+                    'Avg_Check': lambda x: f"{x:,.0f} {currency_text}",
+                    'Avg_Contract': lambda x: f"{x:,.0f} {currency_text}",
                     'Collection_Ratio': '{:.1f}%',
                     'C1': '{:.2%}',
-                    'CLTV': '{:,.0f}',
-                    'LTV': '{:.2f}',
-                    'CAC': '{:,.0f}',
-                    'CM': '{:,.0f}'
+                    'CLTV': lambda x: f"{x:,.0f} {currency_text}",
+                    'LTV': lambda x: f"{x:.2f} {currency_text}",
+                    'CAC': lambda x: f"{x:,.0f} {currency_text}",
+                    'CM': lambda x: f"{x:,.0f} {currency_text}"
                 }).background_gradient(subset=['Revenue', 'LTV', 'CM'], cmap='RdYlGn'),
                 use_container_width=True
             )
@@ -3130,13 +3225,17 @@ with tabs[3]:
                     
                     pivot_table = pivot_table.sort_values('Total_Revenue', ascending=False)
                     
+                    # Получаем переводы для форматирования
+                    currency_text = t('currency')
+                    percent_text = t('percent')
+                    
                     # Отображаем таблицу
                     st.dataframe(
                         pivot_table.style.format({
-                            'Total_Revenue': '{:,.0f}',
+                            'Total_Revenue': lambda x: f"{x:,.0f} {currency_text}",
                             'Active_Students': '{:,.0f}',
-                            'Avg_Check_City': '{:,.0f}',
-                            'Win_Rate_Pct': '{:.1f}%',
+                            'Avg_Check_City': lambda x: f"{x:,.0f} {currency_text}",
+                            'Win_Rate_Pct': lambda x: f"{x:.1f}{percent_text}",
                             **{level: '{:.1f}%' for level in level_order}
                         }).background_gradient(subset=['Total_Revenue', 'Avg_Check_City', 'Win_Rate_Pct'], cmap='RdYlGn'),
                         use_container_width=True,
@@ -3226,8 +3325,8 @@ with tabs[3]:
                 st.markdown(f"**{t('german_levels_stats')}**")
                 st.dataframe(
                     lang_stats.style.format({
-                        'Total_Revenue': '{:,.0f}',
-                        'Avg_Revenue_per_Student': '{:,.0f}',
+                        'Total_Revenue': lambda x: f"{x:,.0f} {t('currency')}",
+                        'Avg_Revenue_per_Student': lambda x: f"{x:,.0f} {t('currency')}",
                         'Win_Rate': '{:.1f}%'
                     }).background_gradient(subset=['Win_Rate', 'Total_Revenue'], cmap='RdYlGn'),
                     use_container_width=True,
@@ -3281,13 +3380,13 @@ with tabs[3]:
         
         geo_summary_data = {
             t('metric'): [
-                f'Всего {t("cities")} с данными',
+                f'{t("cities")} с данными',
                 f'{t("cities")} с ≥5 сделками',
                 f'{t("avg_speed")} {t("win_rate")} по {t("cities")}',
-                f'Доля {t("revenue")} топ-3 {t("cities")}',
+                f'{t("revenue_share")} топ-3 {t("cities")}',
                 f'Самый частый {t("source")}',
                 f'{t("cities")} с этим {t("source")}',
-                f'Доля {t("students")} топ-3 {t("cities")}'
+                f'{t("share")} {t("students")} топ-3 {t("cities")}'
             ],
             t('value'): [
                 f"{len(city_stats)}",
@@ -3359,7 +3458,7 @@ with tabs[6]:
 └── SPEND['Impressions'] — {t('impressions')}
 
 **{t('tree_level_5')}**  
-├── DEALS['SLA'] — {t('avg_speed')} {t('conversion')}  
+├── DEALS['SLA'] — {t('avg_response_time')}  
 ├── DEALS['Level of Deutsch'] — {t('level')}  
 ├── DEALS['Course duration'] — {t('deal_closing_speed')}  
 ├── CALLS['Call Duration (in seconds)'] — {t('calls')} {t('avg_speed')}  
@@ -3457,7 +3556,7 @@ with tabs[6]:
                         f"Нет различий: C1_B ≤ C1_A.",
                         f"Группа A — текущий процесс. Случайное распределение 50% новых лидов. Длительность: 14 дней.",
                         f"Группа B — {hyp_text}. Случайное распределение 50% новых лидов. Длительность: 14 дней.",
-                        f"Основная: C1 ({t('sales')} / {t('leads')}). Дополнительные: TTFC, дозвоны, CPA.",
+                        f"Основная: C1 ({t('sales')} / {t('leads')}). Дополнительные: TTFC, {t('calls')}, CPA.",
                         f"C1_B ≥ C1_A × 1.10 и различие статистически значимо.",
                         "α = 0.05"
                     ]
